@@ -1,5 +1,5 @@
-import api from '../src/core/api';
-import request from 'supertest';
+import api from '../src/core/api'
+import request from 'supertest'
 
 describe('GET / - a simple api endpoint', () => {
     it('Hello API Request', async () => {
