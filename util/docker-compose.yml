@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:14.5-alpine
+    container_name: mindgest-db
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - ./data/:/var/lib/postgresql/data/
+  api:
+    image: mindgest-api:latest
+    build: ../api
+    container_name: mindgest-api
+    ports:
+      - 8080:8080
+    env_file: ../api/.env
+    volumes:
+      - ../api:/usr/src/api
+    depends_on:
+      - db
