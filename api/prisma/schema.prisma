@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,214 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model accountant {
+  person_id BigInt @id
+  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountant_fk1")
+}
+
+model appointment {
+  online              Boolean?
+  room_id             BigInt
+  pricetable_id       String                @db.VarChar(512)
+  slot_id             BigInt                @id
+  slot_start_date     DateTime              @db.Timestamp(6)
+  slot_end_date       DateTime              @db.Timestamp(6)
+  room                room                  @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk1")
+  pricetable          pricetable            @relation(fields: [pricetable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk2")
+  appointment_process appointment_process[]
+  receipt             receipt[]
+}
+
+model appointment_process {
+  appointment_slot_id BigInt
+  process_id          BigInt
+  appointment         appointment @relation(fields: [appointment_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_process_fk1")
+  process             process     @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_process_fk2")
+
+  @@id([appointment_slot_id, process_id])
+}
+
+model availability {
+  slot_id                BigInt                   @id
+  slot_start_date        DateTime                 @db.Timestamp(6)
+  slot_end_date          DateTime                 @db.Timestamp(6)
+  intern_availability    intern_availability[]
+  therapist_availability therapist_availability[]
+}
+
+model guard {
+  person_id BigInt @id
+  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guard_fk1")
+}
+
+model intern {
+  person_id           BigInt                @id
+  person              person                @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
+  intern_availability intern_availability[]
+  intern_process      intern_process[]
+}
+
+model intern_availability {
+  intern_person_id     BigInt
+  availability_slot_id BigInt
+  intern               intern       @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_availability_fk1")
+  availability         availability @relation(fields: [availability_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_availability_fk2")
+
+  @@id([intern_person_id, availability_slot_id])
+}
+
+model intern_process {
+  intern_person_id BigInt
+  process_id       BigInt
+  intern           intern  @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_process_fk1")
+  process          process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_process_fk2")
+
+  @@id([intern_person_id, process_id])
+}
+
+model liable {
+  id             BigInt           @id @default(autoincrement())
+  name           String           @db.VarChar(512)
+  email          String           @db.VarChar(512)
+  phonenumber    BigInt
+  type           String           @db.VarChar(512)
+  remarks        String?          @db.VarChar(512)
+  process_liable process_liable[]
+}
+
+model patient {
+  tax_number      BigInt
+  health_number   BigInt
+  request         String            @db.VarChar(512)
+  remarks         String?           @db.VarChar(512)
+  patienttype_id  BigInt
+  person_id       BigInt            @id
+  patienttype     patienttype       @relation(fields: [patienttype_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk1")
+  person          person            @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk2")
+  patient_process patient_process[]
+  profession      profession[]
+  school          school[]
+}
+
+model patient_process {
+  patient_person_id BigInt
+  process_id        BigInt
+  patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "patient_process_fk1")
+  process           process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_process_fk2")
+
+  @@id([patient_person_id, process_id])
+}
+
+model patienttype {
+  id      BigInt    @id
+  type    String    @db.VarChar(512)
+  patient patient[]
+}
+
+model person {
+  id           BigInt      @id @default(autoincrement())
+  name         String      @db.VarChar(512)
+  email        String      @db.VarChar(512)
+  password     String      @db.VarChar(512)
+  address      String      @db.VarChar(512)
+  birth_date   DateTime    @db.Date
+  phone_number BigInt
+  active       Boolean
+  aproved      Boolean
+  photo        String?     @db.VarChar(512)
+  accountant   accountant?
+  guard        guard?
+  intern       intern?
+  patient      patient?
+  therapist    therapist?
+}
+
+model pricetable {
+  id          String        @id @db.VarChar(512)
+  type        String        @db.VarChar(512)
+  price       Float         @db.Real
+  appointment appointment[]
+}
+
+model process {
+  id                  BigInt                @id @default(autoincrement())
+  ref                 String                @unique @db.VarChar(512)
+  active              Boolean
+  appointment_process appointment_process[]
+  intern_process      intern_process[]
+  patient_process     patient_process[]
+  process_liable      process_liable[]
+  therapist_process   therapist_process[]
+}
+
+model process_liable {
+  process_id BigInt
+  liable_id  BigInt
+  process    process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_liable_fk1")
+  liable     liable  @relation(fields: [liable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_liable_fk2")
+
+  @@id([process_id, liable_id])
+}
+
+model profession {
+  id                BigInt  @id
+  name              String  @unique @db.VarChar(512)
+  patient_person_id BigInt
+  patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "profession_fk1")
+}
+
+model receipt {
+  id                  BigInt      @id @default(autoincrement())
+  ref                 String      @unique @db.VarChar(512)
+  name                String      @db.VarChar(512)
+  description         String      @db.VarChar(512)
+  datetime            DateTime    @db.Timestamp(6)
+  therapist           String?     @db.VarChar(512)
+  appointment_slot_id BigInt
+  appointment         appointment @relation(fields: [appointment_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "receipt_fk1")
+}
+
+model room {
+  id          BigInt        @id @default(autoincrement())
+  name        String        @unique @db.VarChar(512)
+  appointment appointment[]
+}
+
+model school {
+  id                BigInt  @id @default(autoincrement())
+  name              BigInt
+  course            String  @db.VarChar(512)
+  grade             BigInt? @unique
+  patient_person_id BigInt
+  patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "school_fk1")
+}
+
+model therapist {
+  extern                 Boolean
+  admin                  Boolean
+  cedula                 String?                  @db.VarChar(512)
+  person_id              BigInt                   @id
+  person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
+  therapist_availability therapist_availability[]
+  therapist_process      therapist_process[]
+}
+
+model therapist_availability {
+  therapist_person_id  BigInt
+  availability_slot_id BigInt
+  therapist            therapist    @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_availability_fk1")
+  availability         availability @relation(fields: [availability_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_availability_fk2")
+
+  @@id([therapist_person_id, availability_slot_id])
+}
+
+model therapist_process {
+  therapist_person_id BigInt
+  process_id          BigInt
+  therapist           therapist @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_process_fk1")
+  process             process   @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_process_fk2")
+
+  @@id([therapist_person_id, process_id])
 }
