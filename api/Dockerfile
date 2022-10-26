@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:alpine
 
 WORKDIR /usr/src/api
 
@@ -8,6 +8,8 @@ RUN npm install --silent
 
 COPY . .
 
+RUN npm run build
+
 EXPOSE 8080
 
-CMD [ "npm", "run", "dev"]
+CMD [ "npm", "start"]
