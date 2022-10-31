@@ -8,6 +8,7 @@ import {Errors} from "typescript-rest"
 import { IGetPersonAuthInfoRequest, GetPayloadAuthInfoRequest } from "../utils/requestDefinitions.js"
 import * as express from 'express'
 import { PrismaClient } from '@prisma/client'
+import log from '../utils/logger.js'
 
 
 export async function register(req:IGetPersonAuthInfoRequest, res:express.Response){
@@ -20,9 +21,16 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
         } 
     });
     if (emailAlreadyExists) {
-        throw new Errors.BadRequestError('Email already exists');
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        msg: 'User type doesnt exist!',
+      })
+      return
     }
     const verificationToken = crypto.randomBytes(40).toString('hex');
+
+    log.info(req)
+    log.info(body)
+    log.info(body.type)
 
     if(body.type == 'accountant'){
         const accountant = await prisma.accountant.create({
@@ -36,7 +44,7 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
                             aproved: true, //mudar para false
                             birth_date: body.birth_date,
                             password: body.password,
-                            phone_number: body.password,
+                            phone_number: body.phone_number,
                     }
                 }
             }
@@ -54,7 +62,7 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
                             aproved: true, //mudar para false
                             birth_date: body.birth_date,
                             password: body.password,
-                            phone_number: body.password,
+                            phone_number: body.phone_number,
                     }
                 }
             }
@@ -72,7 +80,7 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
                             aproved: true, //mudar para false
                             birth_date: body.birth_date,
                             password: body.password,
-                            phone_number: body.password,
+                            phone_number: body.phone_number,
                     }
                 }
             }
@@ -109,7 +117,7 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
                             aproved: true, //mudar para false
                             birth_date: body.birth_date,
                             password: body.password,
-                            phone_number: body.password,
+                            phone_number: body.phone_number,
                     }
                 }
             }
@@ -130,14 +138,17 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
                             aproved: true, //mudar para false
                             birth_date: body.birth_date,
                             password: body.password,
-                            phone_number: body.password,
+                            phone_number: body.phone_number,
                     }
                 }
             }
         })
     }
     else{
-        throw new Errors.BadRequestError("Type of user does not exist")
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        msg: 'User type doesnt exist!',
+      })
+      return
     }
   // const origin = 'http://localhost:3000';
   // const newOrigin = 'https://react-node-user-workflow-front-end.netlify.app';

@@ -1,9 +1,12 @@
 import express from 'express'
 import auth from '../routes/authRoutes.js'
+import bodyParser from 'body-parser'
 
 const api = express()
 
 api.use(express.json())
+api.use(bodyParser.urlencoded({ extended: false }))
+api.use(bodyParser.json())
 api.use('/auth',auth)
 
 /**
