@@ -112,20 +112,21 @@ model patienttype {
 }
 
 model person {
-  id           BigInt      @id @default(autoincrement())
-  name         String      @db.VarChar(512)
-  email        String      @db.VarChar(512)
-  password     String      @db.VarChar(512)
-  address      String      @db.VarChar(512)
-  birth_date   DateTime    @db.Date
+  id           BigInt         @id @default(autoincrement())
+  name         String         @db.VarChar(512)
+  email        String         @db.VarChar(512)
+  password     String         @db.VarChar(512)
+  address      String         @db.VarChar(512)
+  birth_date   DateTime       @db.Date
   phone_number BigInt
   active       Boolean
   aproved      Boolean
-  photo        String?     @db.VarChar(512)
+  photo        String?        @db.VarChar(512)
   accountant   accountant?
   guard        guard?
   intern       intern?
   patient      patient?
+  refreshtoken refreshtoken[]
   therapist    therapist?
 }
 
@@ -215,4 +216,13 @@ model therapist_process {
   process             process   @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_process_fk2")
 
   @@id([therapist_person_id, process_id])
+}
+
+model refreshtoken {
+  refreshtoken String   @id @db.VarChar(512)
+  ip           String?  @db.VarChar(512)
+  useragent    String?  @db.VarChar(512)
+  isvalid      Boolean?
+  person_id    BigInt
+  person       person   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "refreshtoken_fk1")
 }

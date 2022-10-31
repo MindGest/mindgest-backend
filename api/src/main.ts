@@ -2,9 +2,9 @@ import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-import api from './core/api'
-import log from './utils/logger'
-import docs from './utils/docs'
+import api from './core/api.js'
+import log from './utils/logger.js'
+import docs from './utils/docs.js'
 
 // Fetch Environment Variables
 const HOST = String(process.env.HOST)
@@ -25,12 +25,11 @@ const prisma = new PrismaClient()
 //     },
 // })
 
-const users = await prisma.person.findMany()
-console.log(users)
+//const users = await prisma.person.findMany()
+//console.log(users)
 
 // Run Server
-// api.listen(PORT, HOST, () => {
-//     log.info(`MindGest API is live at http://${HOST}:${PORT}/api`)
-//     docs(api, HOST, PORT)
-// })
-//
+api.listen(PORT, HOST, () => {
+     log.info(`MindGest API is live at http://${HOST}:${PORT}/api`)
+     docs(api, HOST, PORT)
+})

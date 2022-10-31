@@ -1,8 +1,10 @@
 import express from 'express'
+import auth from '../routes/authRoutes.js'
 
 const api = express()
 
 api.use(express.json())
+api.use('/auth',auth)
 
 /**
  * @openapi
