@@ -1,171 +1,172 @@
-import { patienttype, person, prisma, refreshtoken } from "@prisma/client"
+import { patienttype, person, prisma, refreshtoken } from '@prisma/client'
 import { StatusCodes } from 'http-status-codes'
-import { createTokenUser } from '../utils/permissions/createToken.js'
-import { hashString } from '../utils/permissions/createHash.js'
-import { attachCookiesToResponse } from '../utils/permissions/jwt.js'
+import { createTokenUser } from '../utils/permissions/createToken'
+import { hashString } from '../utils/permissions/createHash'
+import { attachCookiesToResponse } from '../utils/permissions/jwt'
 import * as crypto from 'crypto'
-import {Errors} from "typescript-rest"
-import { IGetPersonAuthInfoRequest, GetPayloadAuthInfoRequest } from "../utils/requestDefinitions.js"
+
+import {
+    IGetPersonAuthInfoRequest,
+    GetPayloadAuthInfoRequest,
+} from '../utils/requestDefinitions'
+
 import * as express from 'express'
 import { PrismaClient } from '@prisma/client'
-import log from '../utils/logger.js'
+import log from '../utils/logger'
 
-
-export async function register(req:IGetPersonAuthInfoRequest, res:express.Response){
-    const body = req.body;
+export async function register(
+    req: IGetPersonAuthInfoRequest,
+    res: express.Response
+) {
+    const body = req.body
     const prisma = new PrismaClient()
 
     const emailAlreadyExists = await prisma.person.findFirst({
-        where:{
-            email: body.email 
-        } 
-    });
+        where: {
+            email: body.email,
+        },
+    })
     if (emailAlreadyExists) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        msg: 'User type doesnt exist!',
-      })
-      return
+        res.status(StatusCodes.UNAUTHORIZED).json({
+            msg: 'User type doesnt exist!',
+        })
+        return
     }
-    const verificationToken = crypto.randomBytes(40).toString('hex');
+    const verificationToken = crypto.randomBytes(40).toString('hex')
 
-    if(body.type == 'accountant'){
+    if (body.type == 'accountant') {
         const accountant = await prisma.accountant.create({
-            data :{
+            data: {
                 person: {
-                    create:{
-                            active: true, 
-                            address: body.address,
-                            name: body.name,
-                            email: body.email,
-                            aproved: true, //mudar para false
-                            birth_date: body.birth_date,
-                            password: body.password,
-                            phone_number: body.phone_number,
-                    }
-                }
-            }
+                    create: {
+                        active: true,
+                        address: body.address,
+                        name: body.name,
+                        email: body.email,
+                        aproved: true, //mudar para false
+                        birth_date: body.birth_date,
+                        password: body.password,
+                        phone_number: body.phone_number,
+                    },
+                },
+            },
         })
-    }
-    else if(body.type == 'guard'){
+    } else if (body.type == 'guard') {
         const guard = await prisma.guard.create({
-            data :{
+            data: {
                 person: {
-                    create:{
-                            active: true, 
-                            address: body.address,
-                            name: body.name,
-                            email: body.email,
-                            aproved: true, //mudar para false
-                            birth_date: body.birth_date,
-                            password: body.password,
-                            phone_number: body.phone_number,
-                    }
-                }
-            }
+                    create: {
+                        active: true,
+                        address: body.address,
+                        name: body.name,
+                        email: body.email,
+                        aproved: true, //mudar para false
+                        birth_date: body.birth_date,
+                        password: body.password,
+                        phone_number: body.phone_number,
+                    },
+                },
+            },
         })
-    }
-    else if (body.type == 'intern'){
+    } else if (body.type == 'intern') {
         const intern = await prisma.intern.create({
-            data :{
+            data: {
                 person: {
-                    create:{
-                            active: true, 
-                            address: body.address,
-                            name: body.name,
-                            email: body.email,
-                            aproved: true, //mudar para false
-                            birth_date: body.birth_date,
-                            password: body.password,
-                            phone_number: body.phone_number,
-                    }
-                }
-            }
+                    create: {
+                        active: true,
+                        address: body.address,
+                        name: body.name,
+                        email: body.email,
+                        aproved: true, //mudar para false
+                        birth_date: body.birth_date,
+                        password: body.password,
+                        phone_number: body.phone_number,
+                    },
+                },
+            },
         })
-    }
-    else if(body.type == 'patient'){
+    } else if (body.type == 'patient') {
         const patient = await prisma.patient.create({
-            data :{
+            data: {
                 tax_number: body.tax_number,
                 health_number: body.health_number,
                 request: body.request,
                 remarks: body.remarks,
                 patienttype: {
-                    connect:{
-                        id: body.patienttype
-                    }
+                    connect: {
+                        id: body.patienttype,
+                    },
                 },
                 school: {
-                    connect:{
-                        id: body.school
-                    }
+                    connect: {
+                        id: body.school,
+                    },
                 },
-                profession:{
-                    connect:{
-                        id: body.profession
-                    }
+                profession: {
+                    connect: {
+                        id: body.profession,
+                    },
                 },
                 person: {
-                    create:{
-                            active: true, 
-                            address: body.address,
-                            name: body.name,
-                            email: body.email,
-                            aproved: true, //mudar para false
-                            birth_date: body.birth_date,
-                            password: body.password,
-                            phone_number: body.phone_number,
-                    }
-                }
-            }
+                    create: {
+                        active: true,
+                        address: body.address,
+                        name: body.name,
+                        email: body.email,
+                        aproved: true, //mudar para false
+                        birth_date: body.birth_date,
+                        password: body.password,
+                        phone_number: body.phone_number,
+                    },
+                },
+            },
         })
-    }
-    else if(body.type == 'therapist'){
+    } else if (body.type == 'therapist') {
         const therapist = await prisma.therapist.create({
-            data :{
-                extern : body.extern,
+            data: {
+                extern: body.extern,
                 admin: body.admin,
                 cedula: body.cedula,
                 person: {
-                    create:{
-                            active: true, 
-                            address: body.address,
-                            name: body.name,
-                            email: body.email,
-                            aproved: true, //mudar para false
-                            birth_date: body.birth_date,
-                            password: body.password,
-                            phone_number: body.phone_number,
-                    }
-                }
-            }
+                    create: {
+                        active: true,
+                        address: body.address,
+                        name: body.name,
+                        email: body.email,
+                        aproved: true, //mudar para false
+                        birth_date: body.birth_date,
+                        password: body.password,
+                        phone_number: body.phone_number,
+                    },
+                },
+            },
         })
+    } else {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+            msg: 'User type doesnt exist!',
+        })
+        return
     }
-    else{
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        msg: 'User type doesnt exist!',
-      })
-      return
-    }
-  // const origin = 'http://localhost:3000';
-  // const newOrigin = 'https://react-node-user-workflow-front-end.netlify.app';
+    // const origin = 'http://localhost:3000';
+    // const newOrigin = 'https://react-node-user-workflow-front-end.netlify.app';
 
-  // const tempOrigin = req.get('origin');
-  // const protocol = req.protocol;
-  // const host = req.get('host');
-  // const forwardedHost = req.get('x-forwarded-host');
-  // const forwardedProtocol = req.get('x-forwarded-proto');
+    // const tempOrigin = req.get('origin');
+    // const protocol = req.protocol;
+    // const host = req.get('host');
+    // const forwardedHost = req.get('x-forwarded-host');
+    // const forwardedProtocol = req.get('x-forwarded-proto');
 
-  /*await sendVerificationEmail({
+    /*await sendVerificationEmail({
     name: user.name,
     email: user.email,
     verificationToken: user.verificationToken,
     origin,
   }); */
-  // send verification token back only while testing in postman!!!
-  res.status(StatusCodes.CREATED).json({
-    msg: 'Success!',
-  })
-};
+    // send verification token back only while testing in postman!!!
+    res.status(StatusCodes.CREATED).json({
+        msg: 'Success!',
+    })
+}
 
 /*const verifyEmail = async (req, res) => {
   const { verificationToken, email } = req.body;
@@ -187,108 +188,112 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
   res.status(StatusCodes.OK).json({ msg: 'Email Verified' });
 };*/
 
-export async function login(req:IGetPersonAuthInfoRequest, res:express.Response){
-  const { email, password } = req.body
-  const prisma = new PrismaClient()
+export async function login(
+    req: IGetPersonAuthInfoRequest,
+    res: express.Response
+) {
+    const { email, password } = req.body
+    const prisma = new PrismaClient()
 
-  if (!email || !password) {
-    res.status(StatusCodes.BAD_REQUEST).json({
-      msg: 'Please provide email and password!',
-    })
-  }
-  const user = await prisma.person.findFirst(
-    {
-      where: {
-        email: email
-      }
+    if (!email || !password) {
+        res.status(StatusCodes.BAD_REQUEST).json({
+            msg: 'Please provide email and password!',
+        })
     }
-  );
-
-  if (!user) {
-    res.status(StatusCodes.UNAUTHORIZED).json({
-      msg: 'Invalid credentials USER!',
+    const user = await prisma.person.findFirst({
+        where: {
+            email: email,
+        },
     })
-    return
-  }
 
-  if (password != user.password) {
-    res.status(StatusCodes.UNAUTHORIZED).json({
-      msg: 'Invalid credentials Password!',
-    })
-    return
-  }
-  if (!user.aproved) {
-    res.status(StatusCodes.UNAUTHORIZED).json({
-      msg: 'Unauthorized user',
-    })
-    return
-  }
-  const tokenUser = await createTokenUser(user)
-
-  // create refresh token
-  let refreshToken = ''
-  // check for existing token
-  const existingToken = await prisma.refreshtoken.findFirst({ 
-    where: {
-      person_id: user.id
+    if (!user) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+            msg: 'Invalid credentials USER!',
+        })
+        return
     }
-  });
 
-  if (existingToken) {
-    const { isvalid } = existingToken;
-    if (!isvalid) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        msg: 'Invalid credentials! NOT VALID',
-      })
-      return
+    if (password != user.password) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+            msg: 'Invalid credentials Password!',
+        })
+        return
     }
-    refreshToken = existingToken.refreshtoken
-    attachCookiesToResponse(res,tokenUser, refreshToken )
-    res.status(StatusCodes.OK).json({ user: tokenUser })
-    return;
-  }
+    if (!user.aproved) {
+        res.status(StatusCodes.UNAUTHORIZED).json({
+            msg: 'Unauthorized user',
+        })
+        return
+    }
+    const tokenUser = await createTokenUser(user)
 
-  refreshToken = crypto.randomBytes(40).toString('hex')
-  const userAgent = req.headers['user-agent']
-  const ip = req.ip
+    // create refresh token
+    let refreshToken = ''
+    // check for existing token
+    const existingToken = await prisma.refreshtoken.findFirst({
+        where: {
+            person_id: user.id,
+        },
+    })
 
-  await prisma.refreshtoken.create({
-    data: {
-      refreshtoken: refreshToken,
-      ip:ip,
-      useragent: userAgent,
-      isvalid: true,
-      person:{
-        connect:{
-          id: user.id
+    if (existingToken) {
+        const { isvalid } = existingToken
+        if (!isvalid) {
+            res.status(StatusCodes.UNAUTHORIZED).json({
+                msg: 'Invalid credentials! NOT VALID',
+            })
+            return
         }
-      }
-    } 
-  });
-
-  attachCookiesToResponse(res, tokenUser, refreshToken);
-
-  res.status(StatusCodes.OK).json({ user: tokenUser });
-};
-
-export async function logout(req:IGetPersonAuthInfoRequest, res:express.Response){
-  const prisma = new PrismaClient()
-  await prisma.refreshtoken.deleteMany({
-    where: {
-      person_id: req.person.id
+        refreshToken = existingToken.refreshtoken
+        attachCookiesToResponse(res, tokenUser, refreshToken)
+        res.status(StatusCodes.OK).json({ user: tokenUser })
+        return
     }
-  })
 
-  res.cookie('accessToken', 'logout', {
-    httpOnly: true,
-    expires: new Date(Date.now()),
-  });
-  res.cookie('refreshToken', 'logout', {
-    httpOnly: true,
-    expires: new Date(Date.now()),
-  });
-  res.status(StatusCodes.OK).json({ msg: 'user logged out!' });
-};
+    refreshToken = crypto.randomBytes(40).toString('hex')
+    const userAgent = req.headers['user-agent']
+    const ip = req.ip
+
+    await prisma.refreshtoken.create({
+        data: {
+            refreshtoken: refreshToken,
+            ip: ip,
+            useragent: userAgent,
+            isvalid: true,
+            person: {
+                connect: {
+                    id: user.id,
+                },
+            },
+        },
+    })
+
+    attachCookiesToResponse(res, tokenUser, refreshToken)
+
+    res.status(StatusCodes.OK).json({ user: tokenUser })
+}
+
+export async function logout(
+    req: IGetPersonAuthInfoRequest,
+    res: express.Response
+) {
+    const prisma = new PrismaClient()
+    await prisma.refreshtoken.deleteMany({
+        where: {
+            person_id: req.person.id,
+        },
+    })
+
+    res.cookie('accessToken', 'logout', {
+        httpOnly: true,
+        expires: new Date(Date.now()),
+    })
+    res.cookie('refreshToken', 'logout', {
+        httpOnly: true,
+        expires: new Date(Date.now()),
+    })
+    res.status(StatusCodes.OK).json({ msg: 'user logged out!' })
+}
 
 /*const forgotPassword = async (req, res) => {
   const { email } = req.body;

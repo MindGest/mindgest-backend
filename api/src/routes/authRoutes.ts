@@ -1,7 +1,10 @@
 import * as express from 'express'
-import { login, register,logout } from '../controllers//authController.js'
-import { authenticateUser } from '../middleware/authentication.js'
-import { IGetPersonAuthInfoRequest, GetPayloadAuthInfoRequest } from "../utils/requestDefinitions.js"
+import { login, register, logout } from '../controllers/authController'
+import { authenticateUser } from '../middleware/authentication'
+import {
+    IGetPersonAuthInfoRequest,
+    GetPayloadAuthInfoRequest,
+} from '../utils/requestDefinitions'
 
 const router = express.Router()
 
@@ -118,9 +121,15 @@ const router = express.Router()
  *         schema:
  *           type: string
  */
-router.post('/register', (request, response) => {register(request as IGetPersonAuthInfoRequest,response)})
+router.post('/register', (request, response) => {
+    register(request as IGetPersonAuthInfoRequest, response)
+})
 
-router.put('/login', (request, response) => {login(request as IGetPersonAuthInfoRequest,response)})
+router.put('/login', (request, response) => {
+    login(request as IGetPersonAuthInfoRequest, response)
+})
 
-router.delete('/logout', (request, response) => {logout(request as IGetPersonAuthInfoRequest,response)})
+router.delete('/logout', (request, response) => {
+    logout(request as IGetPersonAuthInfoRequest, response)
+})
 export default router

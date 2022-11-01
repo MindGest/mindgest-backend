@@ -1,6 +1,14 @@
-import { accountant, guard, intern, patient, person, PrismaClient, therapist } from "@prisma/client";
+import {
+    accountant,
+    guard,
+    intern,
+    patient,
+    person,
+    PrismaClient,
+    therapist,
+} from '@prisma/client'
 
-export async function createTokenUser(person:person){
+export async function createTokenUser(person: person) {
     const prisma = new PrismaClient()
 
     const isAccountant: accountant | null = await prisma.accountant.findUnique({
@@ -32,19 +40,41 @@ export async function createTokenUser(person:person){
             person_id: person.id,
         },
     })
-    
-    if(isTherapist != null){
-        return { name: person.name, userId: String(person.id) , role: "therapist", admin: isTherapist.admin };
+
+    if (isTherapist != null) {
+        return {
+            name: person.name,
+            userId: String(person.id),
+            role: 'therapist',
+            admin: isTherapist.admin,
+        }
+    } else if (isGuard != null) {
+        return {
+            name: person.name,
+            userId: String(person.id),
+            role: 'guard',
+            admin: false,
+        }
+    } else if (isAccountant != null) {
+        return {
+            name: person.name,
+            userId: String(person.id),
+            role: 'accountant',
+            admin: false,
+        }
+    } else if (isIntern != null) {
+        return {
+            name: person.name,
+            userId: String(person.id),
+            role: 'intern',
+            admin: false,
+        }
+    } else {
+        return {
+            name: person.name,
+            userId: String(person.id),
+            role: 'patient',
+            admin: false,
+        }
     }
-    else if(isGuard != null){
-        return { name: person.name, userId: String(person.id), role: "guard", admin: false };
-    }
-    else if(isAccountant != null){
-        return { name: person.name, userId: String(person.id), role: "accountant", admin: false };
-    }
-    else if(isIntern != null){
-        return { name: person.name, userId: String(person.id), role: "intern", admin: false };
-    }else{
-        return { name: person.name, userId: String(person.id), role: "patient", admin: false };
-    }
-  };
+}

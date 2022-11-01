@@ -1,44 +1,51 @@
-import { isTokenValid, attachCookiesToResponse } from '../utils/permissions/jwt.js';
+import {
+    isTokenValid,
+    attachCookiesToResponse,
+} from '../utils/permissions/jwt'
 import * as express from 'express'
-import { IGetPersonAuthInfoRequest, GetPayloadAuthInfoRequest } from "../utils/requestDefinitions.js"
+import {
+    IGetPersonAuthInfoRequest,
+    GetPayloadAuthInfoRequest,
+} from '../utils/requestDefinitions'
 import { PrismaClient } from '@prisma/client'
-import {Errors} from "typescript-rest";
 
-export async function authenticateUser(req: IGetPersonAuthInfoRequest, res:express.Response, next:Function){
-  const { refreshToken, accessToken } = req.signedCookies;
+export async function authenticateUser(
+    req: IGetPersonAuthInfoRequest,
+    res: express.Response,
+    next: Function
+) {
+    const { refreshToken, accessToken } = req.signedCookies
 
-  try {
-    if (accessToken) {
-      const payload = isTokenValid(accessToken) as GetPayloadAuthInfoRequest
-      req.person = payload.person
-      return next()
+    try {
+        if (accessToken) {
+            const payload = isTokenValid(
+                accessToken
+            ) as GetPayloadAuthInfoRequest
+            req.person = payload.person
+            return next()
+        }
+        const payload = isTokenValid(refreshToken) as GetPayloadAuthInfoRequest
+        const prisma = new PrismaClient()
+
+        const existingToken = await prisma.refreshtoken.findFirst({
+            where: {
+                person_id: payload.person.id,
+                refreshtoken: payload.refreshToken,
+            },
+        })
+
+        if (!existingToken || !existingToken?.isvalid) {
+            throw new Error('Authentication Invalid')
+        }
+
+        attachCookiesToResponse(res, payload.user, existingToken.refreshtoken)
+
+        req.person = payload.user
+        next()
+    } catch (error) {
+        throw new Error('Authentication Invalid')
     }
-    const payload = isTokenValid(refreshToken) as GetPayloadAuthInfoRequest
-    const prisma = new PrismaClient()
-
-    const existingToken = await prisma.refreshtoken.findFirst({
-      where : {
-        person_id: payload.person.id,
-        refreshtoken: payload.refreshToken,
-      }
-    });
-
-    if (!existingToken || !existingToken?.isvalid) {
-      throw new Errors.UnauthorizedError('Authentication Invalid')
-    }
-
-    attachCookiesToResponse(
-      res,
-      payload.user,
-      existingToken.refreshtoken,
-    );
-
-    req.person = payload.user
-    next()
-  } catch (error) {
-    throw new Errors.UnauthorizedError('Authentication Invalid')
-  }
-};
+}
 
 /*export function authorizePermissions(...roles:any){
   return (req:express.Request, res:express.Response, next:Function) => {
