@@ -1,5 +1,5 @@
 import * as express from 'express'
-import { register } from '../controllers//authController.js'
+import { login, register } from '../controllers//authController.js'
 import { authenticateUser } from '../middleware/authentication.js'
 import { IGetPersonAuthInfoRequest, GetPayloadAuthInfoRequest } from "../utils/requestDefinitions.js"
 
@@ -119,5 +119,7 @@ const router = express.Router()
  *           type: string
  */
 router.post('/register', (request, response) => {register(request as IGetPersonAuthInfoRequest,response)})
+
+router.put('/login', (request, response) => {login(request as IGetPersonAuthInfoRequest,response)})
 
 export default router

@@ -1,7 +1,6 @@
 import { accountant, guard, intern, patient, person, PrismaClient, therapist } from "@prisma/client";
 
 export async function createTokenUser(person:person){
-    //VERSAO INICIAL NSEI SE ISTO TA BEM OU N
     const prisma = new PrismaClient()
 
     const isAccountant: accountant | null = await prisma.accountant.findUnique({
@@ -35,22 +34,17 @@ export async function createTokenUser(person:person){
     })
     
     if(isTherapist != null){
-        if(isTherapist.admin == true){
-            return { name: person.name, userId: person.id, role: "therapist", admin: true };
-        }
-        else{
-            return { name: person.name, userId: person.id, role: "therapist", admin: false };
-        }
+        return { name: person.name, userId: String(person.id) , role: "therapist", admin: isTherapist.admin };
     }
     else if(isGuard != null){
-        return { name: person.name, userId: person.id, role: "guard", admin: false };
+        return { name: person.name, userId: String(person.id), role: "guard", admin: false };
     }
     else if(isAccountant != null){
-        return { name: person.name, userId: person.id, role: "accountant", admin: false };
+        return { name: person.name, userId: String(person.id), role: "accountant", admin: false };
     }
     else if(isIntern != null){
-        return { name: person.name, userId: person.id, role: "intern", admin: false };
+        return { name: person.name, userId: String(person.id), role: "intern", admin: false };
     }else{
-        return { name: person.name, userId: person.id, role: "patient", admin: false };
+        return { name: person.name, userId: String(person.id), role: "patient", admin: false };
     }
   };

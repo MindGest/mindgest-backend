@@ -1,4 +1,4 @@
-import { patienttype, person, refreshtoken } from "@prisma/client"
+import { patienttype, person, prisma, refreshtoken } from "@prisma/client"
 import { StatusCodes } from 'http-status-codes'
 import { createTokenUser } from '../utils/permissions/createToken.js'
 import { hashString } from '../utils/permissions/createHash.js'
@@ -27,10 +27,6 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
       return
     }
     const verificationToken = crypto.randomBytes(40).toString('hex');
-
-    log.info(req)
-    log.info(body)
-    log.info(body.type)
 
     if(body.type == 'accountant'){
         const accountant = await prisma.accountant.create({
@@ -191,55 +187,97 @@ export async function register(req:IGetPersonAuthInfoRequest, res:express.Respon
   res.status(StatusCodes.OK).json({ msg: 'Email Verified' });
 };*/
 
-/*const login = async (req, res) => {
-  const { email, password } = req.body;
+export async function login(req:IGetPersonAuthInfoRequest, res:express.Response){
+  const { email, password } = req.body
+  const prisma = new PrismaClient()
 
   if (!email || !password) {
-    throw new CustomError.BadRequestError('Please provide email and password');
+    res.status(StatusCodes.BAD_REQUEST).json({
+      msg: 'Please provide email and password!',
+    })
   }
-  const user = await User.findOne({ email });
+  const user = await prisma.person.findFirst(
+    {
+      where: {
+        email: email
+      }
+    }
+  );
 
   if (!user) {
-    throw new CustomError.UnauthenticatedError('Invalid Credentials');
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      msg: 'Invalid credentials USER!',
+    })
+    return
   }
-  const isPasswordCorrect = await user.comparePassword(password);
 
-  if (!isPasswordCorrect) {
-    throw new CustomError.UnauthenticatedError('Invalid Credentials');
+  if (password != user.password) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      msg: 'Invalid credentials Password!',
+    })
+    return
   }
-  if (!user.isVerified) {
-    throw new CustomError.UnauthenticatedError('Please verify your email');
+  if (!user.aproved) {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      msg: 'Unauthorized user',
+    })
+    return
   }
-  const tokenUser = createTokenUser(user);
+  const tokenUser = await createTokenUser(user)
 
   // create refresh token
-  let refreshToken = '';
+  let refreshToken = ''
   // check for existing token
-  const existingToken = await Token.findOne({ user: user._id });
+  const existingToken = await prisma.refreshtoken.findFirst({ 
+    where: {
+      person_id: user.id
+    }
+  });
 
   if (existingToken) {
-    const { isValid } = existingToken;
-    if (!isValid) {
-      throw new CustomError.UnauthenticatedError('Invalid Credentials');
+    const { isvalid } = existingToken;
+    if (!isvalid) {
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        msg: 'Invalid credentials! NOT VALID',
+      })
+      return
     }
-    refreshToken = existingToken.refreshToken;
-    attachCookiesToResponse({ res, user: tokenUser, refreshToken });
-    res.status(StatusCodes.OK).json({ user: tokenUser });
+    refreshToken = existingToken.refreshtoken
+    attachCookiesToResponse(res,tokenUser, refreshToken )
+    res.status(StatusCodes.OK).json({ user: tokenUser })
     return;
   }
 
-  refreshToken = crypto.randomBytes(40).toString('hex');
-  const userAgent = req.headers['user-agent'];
-  const ip = req.ip;
-  const userToken = { refreshToken, ip, userAgent, user: user._id };
+  refreshToken = crypto.randomBytes(40).toString('hex')
+  const userAgent = req.headers['user-agent']
+  const ip = req.ip
 
-  await Token.create(userToken);
+  await prisma.refreshtoken.create({
+    data: {
+      refreshtoken: refreshToken,
+      ip:ip,
+      useragent: userAgent,
+      isvalid: true,
+      person:{
+        connect:{
+          id: user.id
+        }
+      }
+    } 
+  });
 
-  attachCookiesToResponse({ res, user: tokenUser, refreshToken });
+  attachCookiesToResponse(res, tokenUser, refreshToken);
 
   res.status(StatusCodes.OK).json({ user: tokenUser });
 };
-const logout = async (req, res) => {
+
+export async function logout(req:IGetPersonAuthInfoRequest, res:express.Response){
+  const prisma = new PrismaClient()
+  conawait prisma.refreshtoken.delete({
+    where: {
+      person: 
+    }
+  })
   await Token.findOneAndDelete({ user: req.user.userId });
 
   res.cookie('accessToken', 'logout', {

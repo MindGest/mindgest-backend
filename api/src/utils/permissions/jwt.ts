@@ -1,17 +1,17 @@
 import { person } from "@prisma/client";
-import * as jwt from 'jsonwebtoken'
+import jsonwebtoken from 'jsonwebtoken';
 import * as express from 'express'
 
 export function createJWT(payload:any){
-  const token = jwt.sign(payload, process.env.JWT_SECRET as string);
+  const token = jsonwebtoken.sign(payload, process.env.JWT_SECRET as string);
   return token;
 };
 
 export function isTokenValid(token:string){
-  return jwt.verify(token, process.env.JWT_SECRET as string)
+  return jsonwebtoken.verify(token, process.env.JWT_SECRET as string)
 }
 
-export function attachCookiesToResponse(res:express.Response, person:person, refreshToken:string){
+export function attachCookiesToResponse(res:express.Response, person:any, refreshToken:string){
   const accessTokenJWT = createJWT({ payload: { person } });
   const refreshTokenJWT = createJWT({ payload: { person, refreshToken } });
 
