@@ -273,12 +273,11 @@ export async function login(req:IGetPersonAuthInfoRequest, res:express.Response)
 
 export async function logout(req:IGetPersonAuthInfoRequest, res:express.Response){
   const prisma = new PrismaClient()
-  conawait prisma.refreshtoken.delete({
+  await prisma.refreshtoken.deleteMany({
     where: {
-      person: 
+      person_id: req.person.id
     }
   })
-  await Token.findOneAndDelete({ user: req.user.userId });
 
   res.cookie('accessToken', 'logout', {
     httpOnly: true,

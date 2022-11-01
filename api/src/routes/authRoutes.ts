@@ -1,5 +1,5 @@
 import * as express from 'express'
-import { login, register } from '../controllers//authController.js'
+import { login, register,logout } from '../controllers//authController.js'
 import { authenticateUser } from '../middleware/authentication.js'
 import { IGetPersonAuthInfoRequest, GetPayloadAuthInfoRequest } from "../utils/requestDefinitions.js"
 
@@ -122,4 +122,5 @@ router.post('/register', (request, response) => {register(request as IGetPersonA
 
 router.put('/login', (request, response) => {login(request as IGetPersonAuthInfoRequest,response)})
 
+router.delete('/logout', (request, response) => {logout(request as IGetPersonAuthInfoRequest,response)})
 export default router
