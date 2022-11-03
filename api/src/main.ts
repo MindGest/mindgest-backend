@@ -25,8 +25,8 @@ const prisma = new PrismaClient()
 //     },
 // })
 
-//const users = await prisma.person.findMany()
-//console.log(users)
+// const users = await prisma.person.findMany()
+// console.log(users)
 
 // Run Server
 api.listen(PORT, HOST, () => {
