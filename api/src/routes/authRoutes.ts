@@ -125,11 +125,36 @@ router.post('/register', (request, response) => {
     register(request as IGetPersonAuthInfoRequest, response)
 })
 
+/**
+ * @openapi
+ * /api/auth/register:
+ *  post:
+ *    tags:
+ *      - auth
+ *    summary: Endpoint to register a endpoint
+ *    description: ''
+ *    responses:
+ *      200:
+ *        description: successful registration
+ *    parameters:
+ *      - name: email
+ *        in: body
+ *        description: Email of user
+ *        required: true
+ *        schema:
+ *          type: string
+ *      - name: password
+ *        in: body
+ *        description: Password of user
+ *        required: true
+ *        schema:
+ *          type: string
+ */ 
 router.put('/login', (request, response) => {
     login(request as IGetPersonAuthInfoRequest, response)
 })
 
 router.delete('/logout', (request, response) => {
-    logout(request as IGetPersonAuthInfoRequest, response)
+    authenticateUser(request as IGetPersonAuthInfoRequest, response, logout)
 })
 export default router
