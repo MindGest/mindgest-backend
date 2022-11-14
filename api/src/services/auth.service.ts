@@ -29,7 +29,7 @@ export function createToken(payload: Object) {
     const token = signJWT({ ...payload }, JWT_UTIL_SECRET, {
         expiresIn: '1h',
     })
-    return token 
+    return token
 }
 
 export function verifyAccessToken<T>(token: string): T | null {
@@ -39,7 +39,6 @@ export function verifyAccessToken<T>(token: string): T | null {
 export function verifyRefreshToken<T>(token: string): T | null {
     return verifyJWT<T>(token, JWT_REFRESH_SECRET)
 }
-
 
 export function verifyToken<T>(token: string): T | null {
     return verifyJWT<T>(token, JWT_UTIL_SECRET)

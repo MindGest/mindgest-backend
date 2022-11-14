@@ -21,7 +21,7 @@ user.get('/list', (req: Request, res: Response) => {
     controller.getAllUsers(req, res)
 })
 
-user.post("/avatar", (req: Request, res: Response) => {
+user.post('/avatar', (req: Request, res: Response) => {
     controller.uploadAvatar(req, res)
 })
 

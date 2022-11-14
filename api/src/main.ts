@@ -28,9 +28,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
 app.use(middleware.bodyParserErrorValidator())
-app.use(fileUpload({
-    
-}))
+app.use(fileUpload({}))
 
 // Routes
 

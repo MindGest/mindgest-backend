@@ -18,7 +18,6 @@ import * as express from 'express'
 
 // routerUser.get('/list', (request, response) => {getAllUsers(request,response)})
 
-
 /**
  * @openapi
  * /api/user/edit:
@@ -163,6 +162,5 @@ import * as express from 'express'
 // TODO: a password devia poder ser alterada assim?
 // TODO: não faz sentido a grade ser um integer, ou só guardamos a parte inteira da nota?
 // routerUser.put('/edit', (request, response) => {editUser(request,response)})
-
 
 // export default routerUser

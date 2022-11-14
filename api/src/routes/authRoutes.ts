@@ -121,9 +121,9 @@
  *         schema:
  *           type: string
  */
-router.post('/register', (request, response) => {
-    register(request as IGetPersonAuthInfoRequest, response)
-})
+// router.post('/register', (request, response) => {
+//     register(request as IGetPersonAuthInfoRequest, response)
+// })
 
 /**
  * @openapi
