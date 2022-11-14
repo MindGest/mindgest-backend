@@ -1,35 +1,53 @@
-import { PrismaClient } from '@prisma/client'
-import * as dotenv from 'dotenv'
+import express, { Request, Response } from 'express'
+
+import dotenv from 'dotenv'
+import helmet from 'helmet'
+import rateLimiter from 'express-rate-limit'
+import fileUpload from 'express-fileupload'
+
+import { StatusCodes } from 'http-status-codes'
+
 dotenv.config()
 
-import api from './core/api'
-import log from './utils/logger'
-import docs from './utils/docs'
+import api from './routes/api.route'
+import logger from './utils/logger'
+import middleware from './middleware/api.middleware'
 
-// Fetch Environment Variables
+// Environment Variables
 const HOST = String(process.env.HOST)
 const PORT = Number(process.env.PORT)
 
-const prisma = new PrismaClient()
+const app = express()
 
-// const newUser = await prisma.person.create({
-//     data: {
-//         active: false,
-//         address: 'Rua do G.D.R. da chã',
-//         name: 'Pedro Rodrigues',
-//         email: 'pedror@student.dei.uc.pt',
-//         aproved: true,
-//         birth_date: new Date(),
-//         password: '123',
-//         phone_number: 924109520,
-//     },
-// })
+// Security
+app.disable('x-powered-by')
 
-// const users = await prisma.person.findMany()
-// console.log(users)
+// Midleware
+app.use(helmet())
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
+app.use(middleware.bodyParserErrorValidator())
+app.use(fileUpload({
+    
+}))
+
+// Routes
+
+/// Mindgest API Route
+app.use('/api', api)
+
+// Endpoints
+
+/// Redirect To API Documentation UI
+app.get('/', (_: Request, res: Response) =>
+    res.redirect(StatusCodes.OK, '/api/docs/')
+)
+
+// Default route
+app.use(middleware.notFound)
 
 // Run Server
-api.listen(PORT, HOST, () => {
-    log.info(`MindGest API is live at http://${HOST}:${PORT}/api`)
-    docs(api, HOST, PORT)
+app.listen(PORT, HOST, () => {
+    logger.info(`MindGest API is live at http://${HOST}:${PORT}/api/`)
 })

@@ -1,4 +1,4 @@
-import api from '../src/core/api'
+import api from '../src/routes/api.route'
 import request from 'supertest'
 
 describe('GET / - a simple api endpoint', () => {
