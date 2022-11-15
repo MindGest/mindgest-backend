@@ -1,6 +1,6 @@
 import z from 'zod'
 
-export const DateSchema = z.preprocess((arg) => {
+export const DateSchema = z.preprocess((arg:any) => {
     if (typeof arg === 'string' || arg instanceof Date) return new Date(arg)
 }, z.date())
 
@@ -69,7 +69,7 @@ export const ResetPasswordSchema = z.object({
             }),
         })
         .strict()
-        .refine((data) => data.password === data.confirm, {
+        .refine((data:any) => data.password === data.confirm, {
             message: 'Passwords should match',
         }),
 })
@@ -83,12 +83,13 @@ export const VerifyAccountSchema = z.object({
         .required(),
 })
 
-export const EditUserSchema = z.object({
+export const ArchiveProcessSchema = z.object({
     body: z.object({
         token: z.string(),
-        info: UserInfoSchema,
+        processId: z.number()
     }),
 })
+
 
 export default {
     RegistrationSchema,
@@ -98,4 +99,5 @@ export default {
     ResetPasswordSchema,
     VerifyAccountSchema,
     DateSchema,
+    ArchiveProcessSchema
 }

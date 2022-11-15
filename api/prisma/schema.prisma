@@ -7,213 +7,263 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Person {
-  id           BigInt      @id @default(autoincrement())
-  name         String      @db.VarChar(512)
-  email        String      @unique @db.VarChar(512)
-  password     String      @db.VarChar(512)
-  address      String      @db.VarChar(512)
-  birth_date   DateTime    @db.Date
-  phone_number BigInt
-  active       Boolean
-  aproved      Boolean
-  verified     Boolean
-  photo        String?     @db.VarChar(512)
-  accountant   Accountant?
-  guard        Guard?
-  intern       Intern?
-  patient      Patient?
-  therapist    Therapist?
-}
-
-model Patient {
-  tax_number      BigInt
-  health_number   BigInt
-  request         String           @db.VarChar(512)
-  remarks         String?          @db.VarChar(512)
-  patien_type_id  BigInt
-  person_id       BigInt           @id
-  patient_type    PatientType      @relation(fields: [patien_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk1")
-  person          Person           @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk2")
-  patient_process PatientProcess[]
-  profession      Profession[]
-  school          School[]
-}
-
-model Therapist {
-  extern                 Boolean
-  admin                  Boolean
-  cedula                 String?                 @db.VarChar(512)
-  person_id              BigInt                  @id
-  person                 Person                  @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
-  therapist_availability TherapistAvailability[]
-  therapist_process      TherapistProcess[]
-}
-
-model Guard {
+model accountant {
   person_id BigInt @id
-  person    Person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guard_fk1")
+  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountant_fk1")
 }
 
-model Accountant {
+model admin {
   person_id BigInt @id
-  person    Person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountant_fk1")
+  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "admin_fk1")
 }
 
-model Intern {
-  person_id           BigInt               @id
-  person              Person               @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
-  intern_availability InternAvailability[]
-  intern_process      InternProcess[]
-}
-
-model Appointment {
+model appointment {
   online              Boolean?
   room_id             BigInt
-  pricetable_id       String               @db.VarChar(512)
-  slot_id             BigInt               @id
-  slot_start_date     DateTime             @db.Timestamp(6)
-  slot_end_date       DateTime             @db.Timestamp(6)
-  room                Room                 @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk1")
-  pricetable          PriceTable           @relation(fields: [pricetable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk2")
-  appointment_process AppointmentProcess[]
-  receipt             Receipt[]
+  pricetable_id       String                @db.VarChar(512)
+  slot_id             BigInt                @id
+  slot_start_date     DateTime              @db.Timestamp(6)
+  slot_end_date       DateTime              @db.Timestamp(6)
+  room                room                  @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk1")
+  pricetable          pricetable            @relation(fields: [pricetable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk2")
+  appointment_process appointment_process[]
+  receipt             receipt[]
 }
 
-model AppointmentProcess {
+model appointment_process {
   appointment_slot_id BigInt
   process_id          BigInt
-  appointment         Appointment @relation(fields: [appointment_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_process_fk1")
-  process             Process     @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_process_fk2")
+  appointment         appointment @relation(fields: [appointment_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_process_fk1")
+  process             process     @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_process_fk2")
 
   @@id([appointment_slot_id, process_id])
 }
 
-model Availability {
-  slot_id                BigInt                  @id
-  slot_start_date        DateTime                @db.Timestamp(6)
-  slot_end_date          DateTime                @db.Timestamp(6)
-  intern_availability    InternAvailability[]
-  therapist_availability TherapistAvailability[]
+model availability {
+  slot_id                BigInt                   @id
+  slot_start_date        DateTime                 @db.Timestamp(6)
+  slot_end_date          DateTime                 @db.Timestamp(6)
+  intern_availability    intern_availability[]
+  therapist_availability therapist_availability[]
 }
 
-model InternAvailability {
+model guard {
+  person_id BigInt @id
+  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guard_fk1")
+}
+
+model intern {
+  person_id           BigInt                @id
+  person              person                @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
+  intern_availability intern_availability[]
+  intern_process      intern_process[]
+  permissions         permissions[]
+}
+
+model intern_availability {
   intern_person_id     BigInt
   availability_slot_id BigInt
-  intern               Intern       @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_availability_fk1")
-  availability         Availability @relation(fields: [availability_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_availability_fk2")
+  intern               intern       @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_availability_fk1")
+  availability         availability @relation(fields: [availability_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_availability_fk2")
 
   @@id([intern_person_id, availability_slot_id])
 }
 
-model InternProcess {
+model intern_process {
   intern_person_id BigInt
   process_id       BigInt
-  intern           Intern  @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_process_fk1")
-  process          Process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_process_fk2")
+  intern           intern  @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_process_fk1")
+  process          process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_process_fk2")
 
   @@id([intern_person_id, process_id])
 }
 
-model Liable {
-  id             BigInt          @id @default(autoincrement())
-  name           String          @db.VarChar(512)
-  email          String          @db.VarChar(512)
+model liable {
+  id             BigInt           @id @default(autoincrement())
+  name           String           @db.VarChar(512)
+  email          String           @db.VarChar(512)
   phonenumber    BigInt
-  type           String          @db.VarChar(512)
-  remarks        String?         @db.VarChar(512)
-  process_liable ProcessLiable[]
+  type           String           @db.VarChar(512)
+  remarks        String?          @db.VarChar(512)
+  process_liable process_liable[]
 }
 
-model PatientProcess {
+model notifications {
+  id        BigInt   @id
+  message   String?  @db.VarChar(512)
+  seen      Boolean?
+  person_id BigInt
+  person    person   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notifications_fk1")
+}
+
+model patient {
+  tax_number      BigInt
+  health_number   BigInt
+  request         String            @db.VarChar(512)
+  remarks         String?           @db.VarChar(512)
+  patienttype_id  BigInt
+  person_id       BigInt            @id
+  patienttype     patienttype       @relation(fields: [patienttype_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk1")
+  person          person            @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk2")
+  patient_process patient_process[]
+  profession      profession[]
+  school          school[]
+}
+
+model patient_process {
   patient_person_id BigInt
   process_id        BigInt
-  patient           Patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "patient_process_fk1")
-  process           Process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_process_fk2")
+  patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "patient_process_fk1")
+  process           process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_process_fk2")
 
   @@id([patient_person_id, process_id])
 }
 
-model PatientType {
+model patienttype {
   id      BigInt    @id
   type    String    @db.VarChar(512)
-  patient Patient[]
+  patient patient[]
 }
 
-model PriceTable {
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model permissions {
+  editprocess      Boolean @default(false)
+  see              Boolean @default(false)
+  appoint          Boolean @default(false)
+  statitics        Boolean @default(false)
+  editpatitent     Boolean @default(false)
+  id               BigInt  @id
+  intern_person_id BigInt
+  process_id       BigInt
+  intern           intern  @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
+  process          process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk2")
+
+  @@ignore
+}
+
+model person {
+  id            BigInt          @id @default(autoincrement())
+  name          String          @db.VarChar(512)
+  email         String          @db.VarChar(512)
+  password      String          @db.VarChar(512)
+  address       String          @db.VarChar(512)
+  birth_date    DateTime        @db.Date
+  phone_number  BigInt
+  active        Boolean
+  aproved       Boolean
+  photo         String?         @db.VarChar(512)
+  accountant    accountant?
+  admin         admin?
+  guard         guard?
+  intern        intern?
+  notifications notifications[]
+  patient       patient?
+  therapist     therapist?
+}
+
+model pricetable {
   id          String        @id @db.VarChar(512)
   type        String        @db.VarChar(512)
   price       Float         @db.Real
-  appointment Appointment[]
+  appointment appointment[]
 }
 
-model Process {
-  id                  BigInt               @id @default(autoincrement())
-  ref                 String               @unique @db.VarChar(512)
-  active              Boolean
-  appointment_process AppointmentProcess[]
-  intern_process      InternProcess[]
-  patient_process     PatientProcess[]
-  process_liable      ProcessLiable[]
-  therapist_process   TherapistProcess[]
+model process {
+  id                    BigInt                @id @default(autoincrement())
+  ref                   String                @unique @db.VarChar(512)
+  active                Boolean
+  remarks               String?               @db.VarChar(512)
+  speciality_speciality String                @db.VarChar(512)
+  speciality            speciality            @relation(fields: [speciality_speciality], references: [speciality], onDelete: NoAction, onUpdate: NoAction, map: "process_fk1")
+  appointment_process   appointment_process[]
+  intern_process        intern_process[]
+  patient_process       patient_process[]
+  permissions           permissions[]
+  process_liable        process_liable[]
+  therapist_process     therapist_process[]
 }
 
-model ProcessLiable {
+model process_liable {
   process_id BigInt
   liable_id  BigInt
-  process    Process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_liable_fk1")
-  liable     Liable  @relation(fields: [liable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_liable_fk2")
+  process    process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_liable_fk1")
+  liable     liable  @relation(fields: [liable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_liable_fk2")
 
   @@id([process_id, liable_id])
 }
 
-model Profession {
+model profession {
   id                BigInt  @id
   name              String  @unique @db.VarChar(512)
   patient_person_id BigInt
-  patient           Patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "profession_fk1")
+  patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "profession_fk1")
 }
 
-model Receipt {
+model receipt {
   id                  BigInt      @id @default(autoincrement())
   ref                 String      @unique @db.VarChar(512)
   name                String      @db.VarChar(512)
   description         String      @db.VarChar(512)
   datetime            DateTime    @db.Timestamp(6)
-  therapist           String?     @db.VarChar(512)
+  payed               Boolean?    @default(false)
   appointment_slot_id BigInt
-  appointment         Appointment @relation(fields: [appointment_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "receipt_fk1")
+  appointment         appointment @relation(fields: [appointment_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "receipt_fk1")
 }
 
-model Room {
+model room {
   id          BigInt        @id @default(autoincrement())
   name        String        @unique @db.VarChar(512)
-  appointment Appointment[]
+  appointment appointment[]
 }
 
-model School {
+model school {
   id                BigInt  @id @default(autoincrement())
   name              BigInt
   course            String  @db.VarChar(512)
   grade             BigInt? @unique
   patient_person_id BigInt
-  patient           Patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "school_fk1")
+  patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "school_fk1")
 }
 
-model TherapistAvailability {
+model speciality {
+  speciality           String                 @id @db.VarChar(512)
+  process              process[]
+  therapist_speciality therapist_speciality[]
+}
+
+model therapist {
+  extern                 Boolean
+  cedula                 String?                  @db.VarChar(512)
+  person_id              BigInt                   @id
+  person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
+  therapist_availability therapist_availability[]
+  therapist_process      therapist_process[]
+  therapist_speciality   therapist_speciality[]
+}
+
+model therapist_availability {
   therapist_person_id  BigInt
   availability_slot_id BigInt
-  therapist            Therapist    @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_availability_fk1")
-  availability         Availability @relation(fields: [availability_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_availability_fk2")
+  therapist            therapist    @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_availability_fk1")
+  availability         availability @relation(fields: [availability_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_availability_fk2")
 
   @@id([therapist_person_id, availability_slot_id])
 }
 
-model TherapistProcess {
+model therapist_process {
   therapist_person_id BigInt
   process_id          BigInt
-  therapist           Therapist @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_process_fk1")
-  process             Process   @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_process_fk2")
+  therapist           therapist @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_process_fk1")
+  process             process   @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_process_fk2")
 
   @@id([therapist_person_id, process_id])
+}
+
+model therapist_speciality {
+  therapist_person_id   BigInt
+  speciality_speciality String     @db.VarChar(512)
+  therapist             therapist  @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_speciality_fk1")
+  speciality            speciality @relation(fields: [speciality_speciality], references: [speciality], onDelete: NoAction, onUpdate: NoAction, map: "therapist_speciality_fk2")
+
+  @@id([therapist_person_id, speciality_speciality])
 }

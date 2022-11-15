@@ -16,7 +16,6 @@ export type VerifyAccountBody = z.TypeOf<
 >['body']
 
 export type RefreshToken = { session: number; person: number } & Object
-
 export type VerificationToken = { person: number } & Object
 export type PasswordResetToken = VerificationToken
 
@@ -26,4 +25,8 @@ export type ForgotPasswordBody = z.TypeOf<
 
 export type ResetPasswordBody = z.TypeOf<
     typeof schemas.ResetPasswordSchema
+>['body']
+
+export type ArchiveProcessBody = z.TypeOf<
+    typeof schemas.ArchiveProcessSchema
 >['body']
