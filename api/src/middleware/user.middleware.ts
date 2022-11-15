@@ -1,5 +1,5 @@
-import * as express from 'express'
-import { PrismaClient } from '@prisma/client'
+import * as express from "express"
+import { PrismaClient } from "@prisma/client"
 
 // export async function authenticateUser(
 //     req: express.Request,

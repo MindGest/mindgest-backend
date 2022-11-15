@@ -125,7 +125,6 @@ model patienttype {
   patient patient[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model permissions {
   editprocess      Boolean @default(false)
   see              Boolean @default(false)
@@ -137,8 +136,6 @@ model permissions {
   process_id       BigInt
   intern           intern  @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
   process          process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk2")
-
-  @@ignore
 }
 
 model person {
@@ -234,6 +231,7 @@ model speciality {
 model therapist {
   extern                 Boolean
   cedula                 String?                  @db.VarChar(512)
+  healthsystem           String?                  @db.VarChar(512)
   person_id              BigInt                   @id
   person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
   therapist_availability therapist_availability[]

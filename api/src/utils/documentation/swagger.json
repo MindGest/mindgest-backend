@@ -1,0 +1,59 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "description": "This is the Mindgest Rest API Documentation",
+    "title": "Mindgest API Documentation",
+    "contact": {
+      "email": "gp2223@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://mit-license.org/"
+    },
+    "version": "0.1.0"
+  },
+  "servers": [{ "url": "http://mindgest.dei.uc.pt" }, { "url": "http://localhost:8080" }],
+  "externalDocs": {
+    "description": "Find out more about us",
+    "url": "http://github.com/Mindgest"
+  },
+  "tags": [
+    {
+      "name": "Documentation",
+      "description": "Access API's Documentation"
+    }
+  ],
+  "paths": {
+    "/api/docs": {
+      "get": {
+        "tags": ["Documentation"],
+        "summary": "Mindgest API Documentation Web Page",
+        "description": "Fetch the Swagger UI version of the documentation (static website)",
+        "operationId": "docs",
+        "parameters": {},
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/html": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/docs/json": {
+      "get": {
+        "tags": ["Documentation"],
+        "summary": "Mindgest API Documentation in JSON Format",
+        "operationId": "Fetch the Swagger UI JSON version of the documentation",
+        "operationId": "json-docs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          }
+        }
+      }
+    }
+  }
+}
