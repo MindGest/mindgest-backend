@@ -43,7 +43,8 @@ model Patient {
 model Therapist {
   extern                 Boolean
   admin                  Boolean
-  cedula                 String?                 @db.VarChar(512)
+  cedula                 String                  @db.VarChar(512)
+  healthSystem           String?                 @db.VarChar(512)
   person_id              BigInt                  @id
   person                 Person                  @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
   therapist_availability TherapistAvailability[]

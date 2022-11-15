@@ -106,3 +106,5 @@ dist
 
 # Docker Database container local volume
 util/data
+
+docs/endpoints.md

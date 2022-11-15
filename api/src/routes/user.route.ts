@@ -1,6 +1,6 @@
-import { Router, Request, Response } from 'express'
-import { request } from 'http'
-import controller from '../controllers/user.controller'
+import { Router, Request, Response } from "express"
+import { request } from "http"
+import controller from "../controllers/user.controller"
 
 const user = Router()
 
@@ -17,16 +17,16 @@ const user = Router()
  *              description: Successfully retrieved all the users.
  */
 
-user.get('/list', (req: Request, res: Response) => {
-    controller.getAllUsers(req, res)
+user.get("/list", (req: Request, res: Response) => {
+  controller.getAllUsers(req, res)
 })
 
-user.post('/avatar', (req: Request, res: Response) => {
-    controller.uploadAvatar(req, res)
+user.post("/avatar", (req: Request, res: Response) => {
+  controller.uploadAvatar(req, res)
 })
 
-user.put('/edit', (req: Request, res: Response) => {
-    controller.editUser(req, res)
+user.put("/edit", (req: Request, res: Response) => {
+  controller.editUser(req, res)
 })
 
 export default user

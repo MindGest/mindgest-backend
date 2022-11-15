@@ -1,101 +1,118 @@
-import z from 'zod'
+import { callbackPromise } from "nodemailer/lib/shared"
+import z, { ZodAny } from "zod"
 
 export const DateSchema = z.preprocess((arg) => {
-    if (typeof arg === 'string' || arg instanceof Date) return new Date(arg)
+  if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
 }, z.date())
 
-const PersonSchema = z.object({
-    name: z.string(),
-    email: z.string().email(),
-    password: z.string(),
-    address: z.string(),
-    birthDate: DateSchema,
-    phoneNumber: z.number(),
-    nif: z.number(),
+export const PersonSchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  password: z.string(),
+  address: z.string(),
+  birthDate: DateSchema,
+  phoneNumber: z.number(),
+  nif: z.number(),
 })
 
-const TherapistSchema = z
-    .object({ health_system: z.string(), cedula: z.string() })
-    .and(PersonSchema)
+export const TherapistSchema = z
+  .object({ healthSystem: z.string().optional(), cedula: z.string() })
+  .merge(PersonSchema)
 
-const GuardSchema = PersonSchema
-const InternSchema = PersonSchema
-const AccountantSchema = PersonSchema
-
-const UserInfoSchema = GuardSchema.and(z.object({ role: z.literal('guard') }))
-    .or(TherapistSchema.and(z.object({ role: z.literal('therapist') })))
-    .or(InternSchema.and(z.object({ role: z.literal('intern') })))
-    .or(AccountantSchema.and(z.object({ role: z.literal('accountant') })))
+export const GuardSchema = PersonSchema
+export const InternSchema = PersonSchema
+export const AccountantSchema = PersonSchema
 
 export const RegistrationSchema = z.object({
-    body: UserInfoSchema,
+  body: z.discriminatedUnion("role", [
+    GuardSchema.merge(
+      z.object({
+        role: z.literal("guard"),
+      })
+    ).strict(),
+    TherapistSchema.merge(
+      z.object({
+        role: z.literal("therapist"),
+      })
+    ).strict(),
+    InternSchema.merge(
+      z.object({
+        role: z.literal("intern"),
+      })
+    ).strict(),
+    AccountantSchema.merge(
+      z.object({
+        role: z.literal("accountant"),
+      })
+    ).strict(),
+  ]),
 })
 
 export const LoginSchema = z.object({
-    body: z.object({
-        email: z.string().email(),
-        password: z.string(),
-    }),
+  body: z.object({
+    email: z.string().email(),
+    password: z.string(),
+  }),
 })
 
 export const RefreshSchema = z.object({
-    body: z
-        .object({
-            refreshToken: z.string().optional(),
-        })
-        .strict()
-        .required(),
+  body: z
+    .object({
+      refreshToken: z.string().optional(),
+    })
+    .strict()
+    .required(),
 })
 
 export const ForgotPasswordSchema = z.object({
-    body: z.object({
-        email: z
-            .string({
-                required_error: 'Email is required',
-            })
-            .email('Email not valid'),
-    }),
+  body: z.object({
+    email: z.string().email(),
+    callback: z.string().url().optional(),
+  }),
+})
+
+export const AccountVerificationSchema = z.object({
+  body: z.object({
+    email: z.string().email(),
+    callback: z.string().url().optional(),
+  }),
 })
 
 export const ResetPasswordSchema = z.object({
-    body: z
-        .object({
-            token: z.string(),
-            password: z.string({
-                required_error: 'Password is required',
-            }),
-            confirm: z.string({
-                required_error: 'Password confirmation is required',
-            }),
-        })
-        .strict()
-        .refine((data) => data.password === data.confirm, {
-            message: 'Passwords should match',
-        }),
-})
-
-export const VerifyAccountSchema = z.object({
-    body: z
-        .object({
-            verification: z.string(),
-        })
-        .strict()
-        .required(),
-})
-
-export const EditUserSchema = z.object({
-    body: z.object({
-        token: z.string(),
-        info: UserInfoSchema,
+  body: z
+    .object({
+      token: z.string(),
+      password: z.string(),
+      confirm: z.string(),
+    })
+    .strict()
+    .refine((data) => data.password === data.confirm, {
+      message: "Passwords should match",
     }),
 })
 
+export const VerifyAccountSchema = z.object({
+  body: z
+    .object({
+      token: z.string(),
+    })
+    .strict()
+    .required(),
+})
+
+export const EditUserSchema = z.object({
+  body: z.object({
+    token: z.string(),
+  }),
+})
+
 export default {
-    RegistrationSchema,
-    LoginSchema,
-    RefreshSchema,
-    ForgotPasswordSchema,
-    ResetPasswordSchema,
-    VerifyAccountSchema,
-    DateSchema,
+  RegistrationSchema,
+  LoginSchema,
+  RefreshSchema,
+  ForgotPasswordSchema,
+  ResetPasswordSchema,
+  VerifyAccountSchema,
+  DateSchema,
+  AccountVerificationSchema,
 }
