@@ -146,6 +146,7 @@ model person {
   address       String          @db.VarChar(512)
   birth_date    DateTime        @db.Date
   phone_number  BigInt
+  verified      Boolean
   active        Boolean
   aproved       Boolean
   photo         String?         @db.VarChar(512)

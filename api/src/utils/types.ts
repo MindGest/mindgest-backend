@@ -24,3 +24,7 @@ export type ResetPasswordBody = z.TypeOf<typeof schemas.ResetPasswordSchema>["bo
 export type ArchiveProcessBody = z.TypeOf<
     typeof schemas.ArchiveProcessSchema
 >['body']
+
+export type ProcessListBody = z.TypeOf<
+    typeof schemas.ProcessListSchema
+>['body']

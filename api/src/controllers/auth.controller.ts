@@ -34,7 +34,7 @@ import {
 export async function register(req: Request<{}, {}, RegistrationBody>, res: Response) {
   try {
     // Find user by email
-    let user = await prisma.person.findUnique({
+    let user = await prisma.person.findFirst({
       where: { email: req.body.email },
     })
 
@@ -108,7 +108,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
 export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
   try {
     // Find user by email
-    const person = await prisma.person.findUnique({
+    const person = await prisma.person.findFirst({
       where: { email: req.body.email },
     })
 
@@ -280,7 +280,7 @@ export async function verify(req: Request<{}, {}, VerifyAccountBody>, res: Respo
 
 export async function forgotPassword(req: Request<{}, {}, ForgotPasswordBody>, res: Response) {
   try {
-    const person = await prisma.person.findUnique({
+    const person = await prisma.person.findFirst({
       where: { email: req.body.email },
     })
 
@@ -329,7 +329,7 @@ export async function accountVerification(
   res: Response
 ) {
   try {
-    const person = await prisma.person.findUnique({
+    const person = await prisma.person.findFirst({
       where: { email: req.body.email },
     })
 

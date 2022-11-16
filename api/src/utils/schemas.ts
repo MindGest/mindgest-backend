@@ -117,6 +117,12 @@ export const ArchiveProcessSchema = z.object({
   }),
 })
 
+export const ProcessListSchema = z.object({
+  body: z.object({
+      token: z.string(),
+  }),
+})
+
 
 export default {
     RegistrationSchema,
@@ -128,4 +134,5 @@ export default {
     ArchiveProcessSchema,
     AccountVerificationSchema,
     DateSchema,
+    ProcessListSchema,
 }
