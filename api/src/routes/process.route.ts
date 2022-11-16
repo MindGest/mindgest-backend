@@ -24,4 +24,10 @@ process.get(
     controller.list
 )
 
+process.get(
+    '/list/active',
+    middleware.requestValidator(schemas.ProcessListSchema),
+    controller.listActive
+)
+
 export default process

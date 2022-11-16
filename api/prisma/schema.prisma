@@ -12,11 +12,6 @@ model accountant {
   person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountant_fk1")
 }
 
-model admin {
-  person_id BigInt @id
-  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "admin_fk1")
-}
-
 model appointment {
   online              Boolean?
   room_id             BigInt
@@ -151,7 +146,6 @@ model person {
   aproved       Boolean
   photo         String?         @db.VarChar(512)
   accountant    accountant?
-  admin         admin?
   guard         guard?
   intern        intern?
   notifications notifications[]
@@ -231,6 +225,7 @@ model speciality {
 
 model therapist {
   extern                 Boolean
+  admin                  Boolean                  @default(false)
   cedula                 String?                  @db.VarChar(512)
   healthsystem           String?                  @db.VarChar(512)
   person_id              BigInt                   @id

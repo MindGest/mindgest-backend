@@ -6,7 +6,7 @@ export async function fetchPersonProperties(personId: bigint) {
   let therapist = await prisma.therapist.findUnique({
     where: { person_id: personId },
   })
-  if (therapist) return { /*isAdmin: therapist.admin,*/ userRole: "therapist" }
+  if (therapist) return { isAdmin: therapist.admin, userRole: "therapist" }
 
   let intern = await prisma.intern.findUnique({
     where: { person_id: personId },
