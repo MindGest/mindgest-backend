@@ -18,4 +18,10 @@ process.get(
     controller.info
 )
 
+process.get(
+    '/list',
+    middleware.requestValidator(schemas.ProcessListSchema),
+    controller.list
+)
+
 export default process
