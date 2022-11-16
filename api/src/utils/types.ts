@@ -28,3 +28,7 @@ export type ArchiveProcessBody = z.TypeOf<
 export type ProcessListBody = z.TypeOf<
     typeof schemas.ProcessListSchema
 >['body']
+
+export type ProcessInfoBody = z.TypeOf<
+    typeof schemas.ProcessInfoSchema
+>['body']

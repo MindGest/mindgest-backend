@@ -3,7 +3,7 @@ import prisma from '../utils/prisma'
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { verifyAccessToken, verifyToken } from '../services/auth.service'
-import { ArchiveProcessBody, VerificationToken, ProcessListBody } from '../utils/types'
+import { ArchiveProcessBody, VerificationToken, ProcessListBody, ProcessInfoBody } from '../utils/types'
 import logger from '../utils/logger'
 import { appointment_process, intern_process, therapist, therapist_process } from '@prisma/client'
 
@@ -32,16 +32,16 @@ export async function archive(req: Request<{}, {}, ArchiveProcessBody>, res: Res
     }
 }
 
-export async function info(req: Request<{}, {}, ArchiveProcessBody>, res: Response){
+export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response){
     try {
         // Fetch and decoded the verification token
         let decoded = verifyAccessToken<VerificationToken>(req.body.token)
         
-        if (!decoded) {
-            return res.status(StatusCodes.FORBIDDEN).json({
-                message: 'Invalid Verification Token',
-            })
-        }
+        //if (!decoded) {
+        //    return res.status(StatusCodes.FORBIDDEN).json({
+        //        message: 'Invalid Verification Token',
+        //    })
+        //}
 
         var processId = req.body.processId
         
@@ -99,8 +99,7 @@ export async function info(req: Request<{}, {}, ArchiveProcessBody>, res: Respon
             }
         })
 
-        //Nao temos especialidade do processo
-
+        //retorna todos os active ou n?
         var active = process?.active;
 
         var apointments = await prisma.appointment_process.findMany({
@@ -130,8 +129,7 @@ export async function info(req: Request<{}, {}, ArchiveProcessBody>, res: Respon
             utent: utentName?.name,
             state: process?.active,
             financialSituation: isPayed,
-            //especiality:,
-            message: 'Process Archived!',
+            speciality: process?.speciality_speciality
         })
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -165,4 +163,4 @@ export async function list(req: Request<{}, {}, ProcessListBody>, res: Response)
 
 
 
-export default { archive }
+export default { archive,info }

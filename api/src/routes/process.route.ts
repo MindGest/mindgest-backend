@@ -12,4 +12,10 @@ process.post(
     controller.archive
 )
 
+process.get(
+    '/info',
+    middleware.requestValidator(schemas.ProcessInfoSchema),
+    controller.info
+)
+
 export default process
