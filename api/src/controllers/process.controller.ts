@@ -3,14 +3,14 @@ import prisma from '../utils/prisma'
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { verifyAccessToken, verifyToken } from '../services/auth.service'
-import { ArchiveProcessBody, VerificationToken, ProcessListBody, ProcessInfoBody } from '../utils/types'
+import { ArchiveProcessBody, VerificationToken, ProcessListBody, ProcessInfoBody, ProcessCreateBody } from '../utils/types'
 import logger from '../utils/logger'
 import { appointment_process, intern_process, process, therapist, therapist_process } from '@prisma/client'
 
 export async function archive(req: Request<{}, {}, ArchiveProcessBody>, res: Response){
     try {
         // Fetch and decoded the verification token
-        let decoded = verifyToken<VerificationToken>(req.body.token)
+        let decoded = verifyAccessToken<VerificationToken>(req.body.token)
         
         if (!decoded) {
             return res.status(StatusCodes.FORBIDDEN).json({
@@ -37,11 +37,11 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
         // Fetch and decoded the verification token
         let decoded = verifyAccessToken<VerificationToken>(req.body.token)
         
-        //if (!decoded) {
-        //    return res.status(StatusCodes.FORBIDDEN).json({
-        //        message: 'Invalid Verification Token',
-        //    })
-        //}
+        if (!decoded) {
+            return res.status(StatusCodes.FORBIDDEN).json({
+                message: 'Invalid Verification Token',
+            })
+        }
 
         var processId = req.body.processId
         
@@ -141,13 +141,13 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
 export async function list(req: Request<{}, {}, ProcessListBody>, res: Response){
     try {
         // Fetch and decoded the verification token
-        let decoded = verifyToken<VerificationToken>(req.body.token)
+        let decoded = verifyAccessToken<VerificationToken>(req.body.token)
         
-        /*if (!decoded) {
+        if (!decoded) {
             return res.status(StatusCodes.FORBIDDEN).json({
                 message: 'Invalid Verification Token',
             })
-        }*/
+        }
 
         var processes = await prisma.process.findMany()
 
@@ -235,13 +235,13 @@ export async function list(req: Request<{}, {}, ProcessListBody>, res: Response)
 export async function listActive(req: Request<{}, {}, ProcessListBody>, res: Response){
     try {
         // Fetch and decoded the verification token
-        let decoded = verifyToken<VerificationToken>(req.body.token)
+        let decoded = verifyAccessToken<VerificationToken>(req.body.token)
         
-        /*if (!decoded) {
+        if (!decoded) {
             return res.status(StatusCodes.FORBIDDEN).json({
                 message: 'Invalid Verification Token',
             })
-        }*/
+        }
 
         var processes = await prisma.process.findMany({
             where:{
@@ -329,6 +329,146 @@ export async function listActive(req: Request<{}, {}, ProcessListBody>, res: Res
     }
 }
 
+export async function activate(req: Request<{}, {}, ArchiveProcessBody>, res: Response){
+    try {
+        // Fetch and decoded the verification token
+        let decoded = verifyAccessToken<VerificationToken>(req.body.token)
+        
+        if (!decoded) {
+            return res.status(StatusCodes.FORBIDDEN).json({
+                message: 'Invalid Verification Token',
+            })
+        }
+
+        //Falta saber se o user é admin ou n
+        /*if(decoded.admin==false){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                message: 'Not authorized',
+            })
+        }*/
+
+        var processId = req.body.processId
+        await prisma.process.update({
+            data:{active: true},
+            where: {id: processId}
+        })
+        return res.status(StatusCodes.OK).json({
+            message: 'Process Activated!',
+        })
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: 'Ups... Something went wrong',
+        })
+    }
+}
 
 
-export default { archive, info, list, listActive }
+export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Response){
+    try {
+        // Fetch and decoded the verification token
+        let decoded = verifyAccessToken<VerificationToken>(req.body.token)
+        
+        if (!decoded) {
+            return res.status(StatusCodes.FORBIDDEN).json({
+                message: 'Invalid Verification Token',
+            })
+        }
+
+        var admin = false
+        //Falta saber se o user é admin ou n, se n for tem de se mandar notificacao
+        /*if(decoded.admin==false){
+            admin = true
+        }*/
+
+        var ref = (Math.random() + 1).toString(36).substring(7) //isto ta a fazer random, depois mudar i guess
+        
+        var process = await prisma.process.create({
+            data:{
+                active: admin,
+                ref: ref,
+                remarks: req.body.remarks,
+                speciality_speciality: req.body.speciality,
+            },
+        })
+        
+        await prisma.therapist_process.create({
+            data:{
+                therapist_person_id:req.body.terapeutaId,
+                process_id: process.id
+            }
+        })
+
+        await prisma.patient_process.create({
+            data:{
+                patient_person_id:req.body.patientId,
+                process_id: process.id
+            }
+        })
+
+        return res.status(StatusCodes.OK).json({
+            message: 'Process Created!',
+        })
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: 'Ups... Something went wrong',
+        })
+    }
+}
+
+//FALTA ACABAR ISTO, dependente de noticias dos req
+export async function edit(req: Request<{}, {}, ProcessCreateBody>, res: Response){
+    try {
+        // Fetch and decoded the verification token
+        let decoded = verifyAccessToken<VerificationToken>(req.body.token)
+        
+        if (!decoded) {
+            return res.status(StatusCodes.FORBIDDEN).json({
+                message: 'Invalid Verification Token',
+            })
+        }
+
+        var ref = (Math.random() + 1).toString(36).substring(7) //isto ta a fazer random, depois mudar i guess
+        
+        var process = await prisma.process.update({
+            where:{
+                id:req.body.processId
+            },
+            data:{
+                speciality_speciality: req.body.speciality,
+            },
+        })
+
+        await prisma.therapist_process.deleteMany({
+            where:{
+                process_id: process.id,
+            }
+        })
+        
+        await prisma.therapist_process.create({
+            data:{
+                therapist_person_id:req.body.terapeutaId,
+                process_id: process.id
+            }
+        })
+        
+
+        await prisma.patient_process.create({
+            data:{
+                patient_person_id:req.body.patientId,
+                process_id: process.id
+            }
+        })
+
+        return res.status(StatusCodes.OK).json({
+            message: 'Process Created!',
+        })
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: 'Ups... Something went wrong',
+        })
+    }
+}
+
+
+
+export default { archive, info, list, listActive, create, activate }

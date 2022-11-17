@@ -30,4 +30,16 @@ process.get(
     controller.listActive
 )
 
+process.post(
+    '/create',
+    middleware.requestValidator(schemas.ProcessCreateSchema),
+    controller.create
+)
+
+process.post(
+    '/activate',
+    middleware.requestValidator(schemas.ProcessListSchema),
+    controller.activate
+)
+
 export default process

@@ -130,6 +130,31 @@ export const ProcessListSchema = z.object({
   }),
 })
 
+export const ProcessCreateSchema = z.object({
+  body: z.object({
+      token: z.string(),
+      processId: z.number(),
+      patientId: z.number(),
+      terapeutaId: z.number(),
+      speciality: z.string(),
+      remarks: z.string()
+  }),
+})
+
+
+
+export const ProcessEditSchema = z.object({
+  body: z.object({
+      token: z.string(),
+      terapeutaId: z.number(),
+      speciality: z.string(),
+      remarks: z.string(),
+      interns: z.array(z.number())
+  }),
+})
+
+
+
 
 export default {
     RegistrationSchema,
@@ -143,4 +168,6 @@ export default {
     DateSchema,
     ProcessListSchema,
     ProcessInfoSchema,
+    ProcessCreateSchema,
+    ProcessEditSchema
 }
