@@ -12,4 +12,34 @@ process.post(
     controller.archive
 )
 
+process.get(
+    '/info',
+    middleware.requestValidator(schemas.ProcessInfoSchema),
+    controller.info
+)
+
+process.get(
+    '/list',
+    middleware.requestValidator(schemas.ProcessListSchema),
+    controller.list
+)
+
+process.get(
+    '/list/active',
+    middleware.requestValidator(schemas.ProcessListSchema),
+    controller.listActive
+)
+
+process.post(
+    '/create',
+    middleware.requestValidator(schemas.ProcessCreateSchema),
+    controller.create
+)
+
+process.post(
+    '/activate',
+    middleware.requestValidator(schemas.ProcessListSchema),
+    controller.activate
+)
+
 export default process

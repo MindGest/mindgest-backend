@@ -305,7 +305,7 @@ async function updateInfoPatient(req: Request, res: Response, userType: String) 
       person: true,
       school: true,
       profession: true,
-      patient_type: true,
+      patienttype: true,
     },
     where: { person_id: userId },
   })
@@ -323,9 +323,9 @@ async function updateInfoPatient(req: Request, res: Response, userType: String) 
       health_number: body.health_number == EMPTY_FIELD ? oldData.health_number : body.health_number,
       request: body.request == EMPTY_FIELD ? oldData.request : body.request,
       remarks: body.remarks == EMPTY_FIELD ? oldData.remarks : body.remarks,
-      patient_type: {
+      patienttype: {
         update: {
-          id: body.patienttype == EMPTY_FIELD ? oldData.patien_type_id : body.patienttype,
+          id: body.patienttype == EMPTY_FIELD ? oldData.patienttype_id : body.patienttype,
         },
       },
       person: {
