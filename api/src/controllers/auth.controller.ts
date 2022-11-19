@@ -83,7 +83,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
         await prisma.therapist.create({
           data: {
             cedula: req.body.cedula,
-            healthsystem: req.body.healthsystem,
+            healthSystem: req.body.healthsystem,
             admin:
               (await prisma.therapist.count({
                 where: { admin: true },
