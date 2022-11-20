@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 import helmet from "helmet"
 import rateLimiter from "express-rate-limit"
 import fileUpload from "express-fileupload"
+import cors from "cors"
 
 import { StatusCodes } from "http-status-codes"
 
@@ -26,7 +27,8 @@ app.disable("x-powered-by")
 // Midleware
 app.use(helmet())
 app.use(express.json())
-// app.use(compression({ filter: middleware.shouldCompress }))
+app.use(cors())
+app.use(compression({ filter: middleware.shouldCompress }))
 app.use(express.urlencoded({ extended: false }))
 app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
 app.use(middleware.bodyParserErrorValidator())
@@ -49,5 +51,5 @@ app.use(middleware.notFound)
 
 // Run Server
 app.listen(PORT, () => {
-  logger.info(`MindGest API is live on port ${PORT}`)
+  logger.info(`MindGest API is live on http://${HOST}:${PORT}`)
 })

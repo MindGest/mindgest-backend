@@ -1,10 +1,10 @@
 FROM node:alpine
 
-WORKDIR /usr/src/api
+WORKDIR /usr/src/mindgest
 
-COPY package*.json ./
+COPY ./package*.json ./ 
 
-RUN apk --no-cache add curl
+RUN npm install -g npm --silent
 RUN npm install --silent
 
 COPY . .
@@ -12,6 +12,6 @@ COPY . .
 RUN npx prisma generate
 RUN npm run build
 
-EXPOSE 8080
+EXPOSE 8080 
 
 CMD [ "npm", "start" ]

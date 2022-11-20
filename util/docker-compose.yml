@@ -20,22 +20,20 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    network_mode: host
   api:
     image: mindgest-api:latest
-    build: ../api
+    container_name: mindgest-api
+    build: ../api/
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
-    container_name: mindgest-api
     ports:
       - 8080:8080
     env_file:
       - ../api/.env
     volumes:
-      - ../api:/usr/src/api/
-    command: "sh -c 'npx prisma db push && npm start'"
+      - ../api:/usr/src/mindgest
     healthcheck:
       test:
         [
@@ -45,4 +43,3 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    network_mode: host

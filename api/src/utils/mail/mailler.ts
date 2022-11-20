@@ -25,7 +25,7 @@ export async function sendEmail(payload: mailer.SendMailOptions) {
     if (error) {
       return logger.error(error)
     }
-    logger.info(`Email Sent: ${info.response}`)
+    logger.debug(`Email Sent: ${info.response}`)
   })
 }
 

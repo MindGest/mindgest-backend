@@ -12,17 +12,16 @@ export const PersonSchema = z.object({
   address: z.string(),
   birthDate: DateSchema,
   phoneNumber: z.number(),
-  nif: z.number(),
 })
 
 export const TherapistSchema = z
-  .object({ health_system: z.string().optional(), cedula: z.string() })
+  .object({ health_system: z.string().optional(), cedula: z.string(), nif: z.number() })
   .merge(PersonSchema)
 
 export const AdminSchema = PersonSchema
-export const GuardSchema = PersonSchema
+export const GuardSchema = PersonSchema.merge(z.object({ nif: z.number() }))
 export const InternSchema = PersonSchema
-export const AccountantSchema = PersonSchema
+export const AccountantSchema = PersonSchema.merge(z.object({ nif: z.number() }))
 
 export const RegistrationSchema = z.object({
   body: z.discriminatedUnion("role", [
