@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes"
 import {
   EditUserBody
 } from "../utils/types";
+import user from "../routes/user.route";
 
 
 
@@ -82,6 +83,8 @@ export async function editUser(req: Request<{}, {}, EditUserBody>, res: Response
   //   updateInfoPerson(req, res, "intern")
   // }
   switch(req.body.userToEdit.role){
+    case "admin":
+      updateInfoPerson(req, res)
     case "therapist":
       updateInfoTherapist(req, res)
     case "accountant":
@@ -145,7 +148,7 @@ async function getUserType(id: number) {
 }
 
 async function updateInfoTherapist(req: Request<{}, {}, EditUserBody>, res: Response) {
-  var body = req.body.userToEdit;
+  var body = req.body.userToEdit
   var userId = req.body.id
   var userType = req.body.userToEdit.role
 
@@ -166,7 +169,6 @@ async function updateInfoTherapist(req: Request<{}, {}, EditUserBody>, res: Resp
   prisma.therapist.update({
     data: {
       extern: body.extern,
-      admin: body.admin,
       cedula: body.cedula,
       person: {
         update: {

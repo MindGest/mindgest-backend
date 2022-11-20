@@ -28,7 +28,6 @@ export const TherapistSchema = z.object({
 export const TherapistUpdateSchema = z.object({
   healthsystem: z.string().optional(), 
   cedula: z.string(),
-  admin: z.boolean(),
   extern: z.boolean(),
 }).merge(PersonUpdateSchema)
 
@@ -45,6 +44,7 @@ export const GuardSchema = PersonSchema
 export const InternSchema = PersonSchema
 export const AccountantSchema = PersonSchema
 
+export const AdminUpdateSchema = PersonUpdateSchema
 export const GuardUpdateSchema = PersonUpdateSchema
 export const InternUpdateSchema = PersonUpdateSchema
 export const AccountantUpdateSchema = PersonUpdateSchema
@@ -141,6 +141,11 @@ export const EditUserSchema = z.object({
         token: z.string(),
         id: z.number(), // o id do user que se vai atualizar
         userToEdit: z.discriminatedUnion("role", [
+          AdminUpdateSchema.merge(
+            z.object({
+              role: z.literal("admin"),
+            })
+          ).strict(),
           GuardUpdateSchema.
           merge(
             z.object({
