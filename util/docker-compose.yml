@@ -1,23 +1,48 @@
-version: "3"
+version: "3.9"
 
 services:
   db:
     image: postgres:14.5-alpine
     container_name: mindgest-db
+    restart: unless-stopped
     ports:
       - 5432:5432
     env_file:
       - .env
     volumes:
       - ./data/:/var/lib/postgresql/data/
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    network_mode: host
   api:
     image: mindgest-api:latest
     build: ../api
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
     container_name: mindgest-api
     ports:
       - 8080:8080
-    env_file: ../api/.env
+    env_file:
+      - ../api/.env
     volumes:
       - ../api:/usr/src/api/
-    depends_on:
-      - db
+    command: "sh -c 'npx prisma db push && npm start'"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'curl -f http://localhost:8080/api/healthcheck || exit 1'"
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    network_mode: host

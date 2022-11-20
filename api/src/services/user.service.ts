@@ -3,10 +3,23 @@ import prisma from "../utils/prisma"
 // If it is a bug (or bad implementation) that you rely on.
 // It's not a bug. It's a feature.
 export async function fetchPersonProperties(personId: bigint) {
+  let admin = await prisma.therapist.findUnique({
+    where: { person_id: personId },
+  })
+  if (admin) {
+    return { isAdmin: true, userRole: "admin" }
+  }
+
   let therapist = await prisma.therapist.findUnique({
     where: { person_id: personId },
   })
-  if (therapist) return { isAdmin: therapist.admin, userRole: "therapist" }
+  if (therapist)
+    return {
+      isAdmin: await prisma.admin.findUnique({
+        where: { person_id: personId },
+      }),
+      userRole: "therapist",
+    }
 
   let intern = await prisma.intern.findUnique({
     where: { person_id: personId },

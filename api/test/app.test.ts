@@ -1,5 +1,9 @@
-import api from "../src/routes/api.route"
 import request from "supertest"
+import dotenv from "dotenv"
+
+dotenv.config()
+
+import api from "../src/routes/api.route"
 
 describe("GET / - a simple api endpoint", () => {
   it("Hello API Request", async () => {
