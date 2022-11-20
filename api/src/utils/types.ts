@@ -29,7 +29,6 @@ export type ProcessInfoBody = z.TypeOf<typeof schemas.ProcessInfoSchema>["body"]
 
 export type ProcessCreateBody = z.TypeOf<typeof schemas.ProcessCreateSchema>["body"]
 
-<<<<<<< HEAD
 export type ProcessEditBody = z.TypeOf<
     typeof schemas.ProcessEditSchema
 >['body']
@@ -37,6 +36,3 @@ export type ProcessEditBody = z.TypeOf<
 export type EditUserBody = z.TypeOf<
     typeof schemas.EditUserSchema
 >['body']
-=======
-export type ProcessEditBody = z.TypeOf<typeof schemas.ProcessEditSchema>["body"]
->>>>>>> c06195be41af5127348f0062d54b7aa73d89cf3d
