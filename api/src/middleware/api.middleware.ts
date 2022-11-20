@@ -1,5 +1,6 @@
 import { AnyZodObject, ZodError } from "zod"
 import { StatusCodes } from "http-status-codes"
+import compression from "compression"
 
 import type { NextFunction, Request, Response } from "express"
 
@@ -41,4 +42,8 @@ export function notFound(req: Request, res: Response) {
   })
 }
 
-export default { requestValidator, bodyParserErrorValidator, notFound }
+export function shouldCompress(req: Request, res: Response) {
+  return req.headers["x-no-compression"] ? false : compression.filter(req, res)
+}
+
+export default { requestValidator, bodyParserErrorValidator, notFound, shouldCompress }

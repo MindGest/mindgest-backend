@@ -47,6 +47,11 @@ model guard {
   person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guard_fk1")
 }
 
+model admin {
+  person_id BigInt @id
+  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "admin_fk1")
+}
+
 model intern {
   person_id           BigInt                @id
   person              person                @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
@@ -140,11 +145,12 @@ model person {
   password      String          @db.VarChar(512)
   address       String          @db.VarChar(512)
   birth_date    DateTime        @db.Date
+  photo         String?         @db.VarChar(512)
   phone_number  BigInt
   verified      Boolean
   active        Boolean
   aproved       Boolean
-  photo         String?         @db.VarChar(512)
+  admin         admin?
   accountant    accountant?
   guard         guard?
   intern        intern?
@@ -225,7 +231,6 @@ model speciality {
 
 model therapist {
   extern                 Boolean
-  admin                  Boolean                  @default(false)
   cedula                 String?                  @db.VarChar(512)
   healthsystem           String?                  @db.VarChar(512)
   person_id              BigInt                   @id

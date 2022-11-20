@@ -79,15 +79,27 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
         })
         break
       }
+      case "admin":
+        await prisma.admin.create({
+          data: {
+            person: { connect: { id: person.id } },
+          },
+        })
+        break
       case "therapist": {
+        // Add therapist as an admin too
+        if ((await prisma.admin.count()) < 4) {
+          await prisma.admin.create({
+            data: {
+              person: { connect: { id: person.id } },
+            },
+          })
+        }
+        // Insert therapist in the therapist table
         await prisma.therapist.create({
           data: {
             cedula: req.body.cedula,
-            healthSystem: req.body.healthsystem,
-            admin:
-              (await prisma.therapist.count({
-                where: { admin: true },
-              })) < 4,
+            healthsystem: req.body.health_system,
             extern: false,
             person: { connect: { id: person.id } },
           },
@@ -155,8 +167,6 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
     // Access Token Information
     const accessTokenPayload = {
       id: person.id,
-      email: person.name,
-      active: person.active,
       admin: isAdmin,
       role: userRole,
     }
@@ -210,8 +220,6 @@ export async function refresh(req: Request<{}, {}, RefreshBody>, res: Response) 
         // Access Token Information
         const accessTokenPayload = {
           id: person.id,
-          email: person.name,
-          active: person.active,
           admin: isAdmin,
           role: userRole,
         }

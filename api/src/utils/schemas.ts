@@ -2,7 +2,7 @@ import { callbackPromise } from "nodemailer/lib/shared"
 import z, { ZodAny } from "zod"
 
 export const DateSchema = z.preprocess((arg) => {
-    if (typeof arg === 'string' || arg instanceof Date) return new Date(arg)
+  if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
 }, z.date())
 
 export const PersonSchema = z.object({
@@ -16,15 +16,21 @@ export const PersonSchema = z.object({
 })
 
 export const TherapistSchema = z
-  .object({ healthsystem: z.string().optional(), cedula: z.string() })
+  .object({ health_system: z.string().optional(), cedula: z.string() })
   .merge(PersonSchema)
 
+export const AdminSchema = PersonSchema
 export const GuardSchema = PersonSchema
 export const InternSchema = PersonSchema
 export const AccountantSchema = PersonSchema
 
 export const RegistrationSchema = z.object({
   body: z.discriminatedUnion("role", [
+    AdminSchema.merge(
+      z.object({
+        role: z.literal("admin"),
+      })
+    ).strict(),
     GuardSchema.merge(
       z.object({
         role: z.literal("guard"),
@@ -79,20 +85,20 @@ export const AccountVerificationSchema = z.object({
 })
 
 export const ResetPasswordSchema = z.object({
-    body: z
-        .object({
-            token: z.string(),
-            password: z.string({
-                required_error: 'Password is required',
-            }),
-            confirm: z.string({
-                required_error: 'Password confirmation is required',
-            }),
-        })
-        .strict()
-        .refine((data) => data.password === data.confirm, {
-            message: 'Passwords should match',
-        }),
+  body: z
+    .object({
+      token: z.string(),
+      password: z.string({
+        required_error: "Password is required",
+      }),
+      confirm: z.string({
+        required_error: "Password confirmation is required",
+      }),
+    })
+    .strict()
+    .refine((data) => data.password === data.confirm, {
+      message: "Passwords should match",
+    }),
 })
 
 export const VerifyAccountSchema = z.object({
@@ -105,69 +111,64 @@ export const VerifyAccountSchema = z.object({
 })
 
 export const EditUserSchema = z.object({
-    body: z.object({
-        token: z.string(),
-    }),
+  body: z.object({
+    token: z.string(),
+  }),
 })
 
 export const ArchiveProcessSchema = z.object({
   body: z.object({
-      token: z.string(),
-      processId: z.number()
+    token: z.string(),
+    processId: z.number(),
   }),
 })
 
 export const ProcessInfoSchema = z.object({
   body: z.object({
-      token: z.string(),
-      processId: z.number(),
+    token: z.string(),
+    processId: z.number(),
   }),
 })
 
 export const ProcessListSchema = z.object({
   body: z.object({
-      token: z.string(),
+    token: z.string(),
   }),
 })
 
 export const ProcessCreateSchema = z.object({
   body: z.object({
-      token: z.string(),
-      processId: z.number(),
-      patientId: z.number(),
-      terapeutaId: z.number(),
-      speciality: z.string(),
-      remarks: z.string()
+    token: z.string(),
+    processId: z.number(),
+    patientId: z.number(),
+    terapeutaId: z.number(),
+    speciality: z.string(),
+    remarks: z.string(),
   }),
 })
-
-
 
 export const ProcessEditSchema = z.object({
   body: z.object({
-      token: z.string(),
-      terapeutaId: z.number(),
-      speciality: z.string(),
-      remarks: z.string(),
-      interns: z.array(z.number())
+    token: z.string(),
+    terapeutaId: z.number(),
+    speciality: z.string(),
+    remarks: z.string(),
+    interns: z.array(z.number()),
   }),
 })
 
-
-
-
 export default {
-    RegistrationSchema,
-    LoginSchema,
-    RefreshSchema,
-    ForgotPasswordSchema,
-    ResetPasswordSchema,
-    VerifyAccountSchema,
-    ArchiveProcessSchema,
-    AccountVerificationSchema,
-    DateSchema,
-    ProcessListSchema,
-    ProcessInfoSchema,
-    ProcessCreateSchema,
-    ProcessEditSchema
+  RegistrationSchema,
+  LoginSchema,
+  RefreshSchema,
+  ForgotPasswordSchema,
+  ResetPasswordSchema,
+  VerifyAccountSchema,
+  ArchiveProcessSchema,
+  AccountVerificationSchema,
+  DateSchema,
+  ProcessListSchema,
+  ProcessInfoSchema,
+  ProcessCreateSchema,
+  ProcessEditSchema,
 }
