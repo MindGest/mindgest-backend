@@ -15,13 +15,38 @@ export const PersonSchema = z.object({
   nif: z.number(),
 })
 
-export const TherapistSchema = z
-  .object({ healthsystem: z.string().optional(), cedula: z.string() })
-  .merge(PersonSchema)
+export const PersonUpdateSchema = z.object({
+  active: z.boolean(),
+  aproved: z.boolean(),
+}).merge(PersonSchema)
+
+export const TherapistSchema = z.object({
+  healthsystem: z.string().optional(), 
+  cedula: z.string(),
+}).merge(PersonSchema)
+
+export const TherapistUpdateSchema = z.object({
+  healthsystem: z.string().optional(), 
+  cedula: z.string(),
+  admin: z.boolean(),
+  extern: z.boolean(),
+}).merge(PersonUpdateSchema)
+
+export const PatientSchema = z.object({
+  tax_number: z.number(),
+  health_number: z.number(),
+  request: z.string(),
+  remarks: z.string(),
+  patienttype_id: z.number(),
+}).merge(PersonUpdateSchema)
 
 export const GuardSchema = PersonSchema
 export const InternSchema = PersonSchema
 export const AccountantSchema = PersonSchema
+
+export const GuardUpdateSchema = PersonUpdateSchema
+export const InternUpdateSchema = PersonUpdateSchema
+export const AccountantUpdateSchema = PersonUpdateSchema
 
 export const RegistrationSchema = z.object({
   body: z.discriminatedUnion("role", [
@@ -104,9 +129,40 @@ export const VerifyAccountSchema = z.object({
     .required(),
 })
 
+// it has the token of the user that called the method (token) and the info of the user that is going to be updated
 export const EditUserSchema = z.object({
     body: z.object({
         token: z.string(),
+        id: z.number(), // o id do user que se vai atualizar
+        userToEdit: z.discriminatedUnion("role", [
+          GuardUpdateSchema.
+          merge(
+            z.object({
+              role: z.literal("guard"),
+            })
+          ).strict(),
+          TherapistUpdateSchema.
+          merge(
+            z.object({
+              role: z.literal("therapist"),
+            })
+          ).strict(),
+          InternUpdateSchema.merge(
+            z.object({
+              role: z.literal("intern"),
+            })
+          ).strict(),
+          AccountantUpdateSchema.merge(
+            z.object({
+              role: z.literal("accountant"),
+            })
+          ).strict(),
+          PatientSchema.merge(
+            z.object({
+              role: z.literal("patient"),
+            })
+          ).strict(),
+        ]),
     }),
 })
 
@@ -169,5 +225,6 @@ export default {
     ProcessListSchema,
     ProcessInfoSchema,
     ProcessCreateSchema,
-    ProcessEditSchema
+    ProcessEditSchema,
+    EditUserSchema,
 }

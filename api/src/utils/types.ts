@@ -1,4 +1,4 @@
-import z from "zod"
+import z, { TypeOf } from "zod"
 import schemas from "./schemas"
 
 export type DateSchema = z.infer<typeof schemas.DateSchema>
@@ -39,4 +39,8 @@ export type ProcessCreateBody = z.TypeOf<
 
 export type ProcessEditBody = z.TypeOf<
     typeof schemas.ProcessEditSchema
+>['body']
+
+export type EditUserBody = z.TypeOf<
+    typeof schemas.EditUserSchema
 >['body']
