@@ -9,9 +9,12 @@ import {
   ProcessListBody,
   ProcessInfoBody,
   ProcessCreateBody,
+  ValidationToken,
+  ProcessEditBody,
+  ProcessEditPermissionsBody,
 } from "../utils/types"
 import logger from "../utils/logger"
-import {
+import type {
   appointment_process,
   intern_process,
   process,
@@ -22,13 +25,27 @@ import {
 export async function archive(req: Request<{}, {}, ArchiveProcessBody>, res: Response) {
   try {
     // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<VerificationToken>(req.body.token)
+    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
 
     if (!decoded) {
       return res.status(StatusCodes.FORBIDDEN).json({
         message: "Invalid Verification Token",
       })
     }
+
+    var permissions = await prisma.permissions.findFirst({
+      where:{
+        process_id:req.body.processId,
+        person_id:decoded.id
+      }
+    })
+
+    if(decoded.admin == false || permissions!.archive==false){
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "User doesn't have authorization",
+      })
+    }
+
     var processId = req.body.processId
     await prisma.process.update({
       data: { active: false },
@@ -47,11 +64,24 @@ export async function archive(req: Request<{}, {}, ArchiveProcessBody>, res: Res
 export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response) {
   try {
     // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<VerificationToken>(req.body.token)
+    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
 
     if (!decoded) {
       return res.status(StatusCodes.FORBIDDEN).json({
         message: "Invalid Verification Token",
+      })
+    }
+
+    var permissions = await prisma.permissions.findFirst({
+      where:{
+        process_id:req.body.processId,
+        person_id:decoded.id
+      }
+    })
+
+    if(decoded.admin == false || permissions!.see==false){
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "User doesn't have authorization",
       })
     }
 
@@ -63,16 +93,35 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
       },
     })
 
-    var responsibleTherapists: string[] = []
+    var colaborators: string[] = []
+    var mainTherapist
 
-    therapists.forEach(async (therapist: therapist_process) => {
+    var flag = false;
+    for(let therapist of therapists){
       var person = await prisma.person.findUnique({
         where: {
           id: therapist.therapist_person_id,
         },
       })
-      responsibleTherapists.push(person!.name)
-    })
+      
+      if(flag==false){
+        var permissions = await prisma.permissions.findFirst({
+          where:{
+            person_id:therapist.therapist_person_id,
+            process_id:processId
+          }
+        })
+
+        if(permissions?.isMain){
+          mainTherapist = therapist.therapist_person_id
+        }
+        else{
+          colaborators.push(person!.name+ " (terapeuta)")
+        }
+    }
+
+      colaborators.push(person!.name+ " (terapeuta)")
+    }
 
     var process = await prisma.process.findUnique({
       where: {
@@ -88,16 +137,14 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
       },
     })
 
-    var colaborators: string[] = []
-
-    interns.forEach(async (intern: intern_process) => {
+    for(let intern of interns){
       var internName = await prisma.person.findUnique({
         where: {
           id: intern.intern_person_id,
         },
       })
-      colaborators.push(internName!.name)
-    })
+      colaborators.push(internName!.name+ " (Em estágio)")
+    }
 
     var utent = await prisma.patient_process.findFirst({
       where: {
@@ -111,9 +158,6 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
       },
     })
 
-    //retorna todos os active ou n?
-    var active = process?.active
-
     var apointments = await prisma.appointment_process.findMany({
       where: {
         process_id: processId,
@@ -122,7 +166,7 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
 
     var isPayed = true
 
-    apointments.forEach(async (apointment: appointment_process) => {
+    for(let apointment of apointments){
       var receipt = await prisma.receipt.findFirst({
         where: {
           appointment_slot_id: apointment.appointment_slot_id,
@@ -131,10 +175,12 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
       if (receipt!.payed == false) {
         isPayed = false
       }
-    })
+    }
+
+    
 
     return res.status(StatusCodes.OK).json({
-      therapeuts: responsibleTherapists,
+      therapistId: mainTherapist,
       ref: processRef,
       colaborators: colaborators,
       utent: utentName?.name,
@@ -344,7 +390,7 @@ export async function listActive(req: Request<{}, {}, ProcessListBody>, res: Res
 export async function activate(req: Request<{}, {}, ArchiveProcessBody>, res: Response) {
   try {
     // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<VerificationToken>(req.body.token)
+    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
 
     if (!decoded) {
       return res.status(StatusCodes.FORBIDDEN).json({
@@ -353,11 +399,11 @@ export async function activate(req: Request<{}, {}, ArchiveProcessBody>, res: Re
     }
 
     //Falta saber se o user é admin ou n
-    /*if(decoded.admin==false){
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                message: 'Not authorized',
-            })
-        }*/
+    if(decoded.admin==false){
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+          message: 'Not authorized',
+      })
+    }
 
     var processId = req.body.processId
     await prisma.process.update({
@@ -377,7 +423,7 @@ export async function activate(req: Request<{}, {}, ArchiveProcessBody>, res: Re
 export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Response) {
   try {
     // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<VerificationToken>(req.body.token)
+    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
 
     if (!decoded) {
       return res.status(StatusCodes.FORBIDDEN).json({
@@ -386,10 +432,10 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
     }
 
     var admin = false
-    //Falta saber se o user é admin ou n, se n for tem de se mandar notificacao
-    /*if(decoded.admin==false){
-            admin = true
-        }*/
+    //FALTA CRIAR NOTIFICACAO
+    if(decoded.admin==false){
+      admin = true
+    }
 
     var ref = (Math.random() + 1).toString(36).substring(7) //isto ta a fazer random, depois mudar i guess
 
@@ -404,7 +450,7 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
 
     await prisma.therapist_process.create({
       data: {
-        therapist_person_id: req.body.terapeutaId,
+        therapist_person_id: req.body.therapistId,
         process_id: process.id,
       },
     })
@@ -414,6 +460,19 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
         patient_person_id: req.body.patientId,
         process_id: process.id,
       },
+    })
+
+    await prisma.permissions.create({
+      data:{
+        editpatitent:true,
+        see:true,
+        appoint:true,
+        statitics:true,
+        editprocess:true,
+        isMain:true,
+        process_id:process.id,
+        person_id:req.body.therapistId
+      }
     })
 
     return res.status(StatusCodes.OK).json({
@@ -426,8 +485,127 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
   }
 }
 
-//FALTA ACABAR ISTO, dependente de noticias dos req
-export async function edit(req: Request<{}, {}, ProcessCreateBody>, res: Response) {
+export async function edit(req: Request<{}, {}, ProcessEditBody>, res: Response) {
+  try {
+    // Fetch and decoded the verification token
+    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
+
+    if (!decoded) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        message: "Invalid Verification Token",
+      })
+    }
+
+    var permissions = await prisma.permissions.findFirst({
+      where:{
+        process_id:req.body.processId,
+        person_id:decoded.id
+      }
+    })
+
+    if(decoded.admin == false || permissions!.see==false){
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "User doesn't have authorization",
+      })
+    }
+
+    let permissionMainTherapist = await prisma.permissions.findFirst({
+      where:{
+        process_id:req.body.processId,
+        isMain:true
+      }
+    })
+
+    await prisma.permissions.delete({
+      where:{
+        id:permissionMainTherapist?.id
+      }
+    })
+
+    await prisma.therapist_process.deleteMany({
+      where:{
+        therapist_person_id: permissionMainTherapist?.person_id,
+        process_id: permissionMainTherapist?.id
+      }
+    })
+
+    await prisma.therapist_process.create({
+      data:{
+        process_id:req.body.processId,
+        therapist_person_id:req.body.therapistId
+      }
+    })
+    
+    await prisma.permissions.create({
+      data:{
+        editpatitent:true,
+        see:true,
+        appoint:true,
+        statitics:true,
+        editprocess:true,
+        isMain:true,
+        process_id:req.body.processId,
+        person_id:req.body.therapistId
+      }
+    })
+    
+
+    await prisma.process.update({
+      where:{
+        id:req.body.processId
+      },
+      data:{
+        speciality_speciality:req.body.speciality
+      }
+    })
+
+
+    for (let colaboratorId of req.body.colaborators){
+      var type = await prisma.intern.findUnique({
+        where:{
+          person_id:colaboratorId 
+        }
+      })
+
+      if (type!=null){//é interno
+        await prisma.intern_process.create({
+          data:{
+            process_id:req.body.processId,
+            intern_person_id: colaboratorId
+          }
+        })
+
+      }
+      else{//é terapeuta
+        await prisma.therapist_process.create({
+          data:{
+            process_id:req.body.processId,
+            therapist_person_id: colaboratorId
+          }
+        })
+      }
+
+      await prisma.permissions.create({
+        data:{
+          process_id:req.body.processId,
+          person_id:colaboratorId
+        }
+      })
+    }
+
+
+    return res.status(StatusCodes.OK).json({
+      message: "Process Created!",
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+//Nao sei bem oq este é suposto devolver tbh
+export async function appointments(req: Request<{}, {}, ProcessInfoBody>, res: Response) {
   try {
     // Fetch and decoded the verification token
     let decoded = verifyAccessToken<VerificationToken>(req.body.token)
@@ -438,40 +616,40 @@ export async function edit(req: Request<{}, {}, ProcessCreateBody>, res: Respons
       })
     }
 
-    var ref = (Math.random() + 1).toString(36).substring(7) //isto ta a fazer random, depois mudar i guess
-
-    var process = await prisma.process.update({
-      where: {
-        id: req.body.processId,
-      },
-      data: {
-        speciality_speciality: req.body.speciality,
-      },
+    var appointments = await prisma.appointment_process.findMany({
+      where:{
+        process_id:req.body.processId
+      }
     })
 
-    await prisma.therapist_process.deleteMany({
-      where: {
-        process_id: process.id,
-      },
-    })
+    var infoAppointments = []
 
-    await prisma.therapist_process.create({
-      data: {
-        therapist_person_id: req.body.terapeutaId,
-        process_id: process.id,
-      },
-    })
+    for(var appointmentProcess of appointments){
+      var apointment = await prisma.appointment.findUnique({
+        where:{
+          slot_id:appointmentProcess.appointment_slot_id
+        }
+      })
 
-    await prisma.patient_process.create({
-      data: {
-        patient_person_id: req.body.patientId,
-        process_id: process.id,
-      },
-    })
+      var room = await prisma.room.findUnique({
+        where:{
+          id:apointment?.room_id
+        }
+      })
 
+      var type = await prisma.pricetable.findUnique({
+        where:{
+          id:apointment?.pricetable_id
+        }
+      })
+
+      infoAppointments.push({"online":apointment?.online,"start_date":apointment?.slot_start_date,"end_date":apointment?.slot_end_date,"room":room?.name,"type":type?.type})
+    }
+    
     return res.status(StatusCodes.OK).json({
-      message: "Process Created!",
+      message: infoAppointments,
     })
+
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
@@ -479,4 +657,58 @@ export async function edit(req: Request<{}, {}, ProcessCreateBody>, res: Respons
   }
 }
 
-export default { archive, info, list, listActive, create, activate }
+export async function editPermissions(req: Request<{}, {}, ProcessEditPermissionsBody>, res: Response) {
+  try {
+    // Fetch and decoded the verification token
+    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
+
+    if (!decoded) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        message: "Invalid Verification Token",
+      })
+    }
+
+    var permissions = await prisma.permissions.findFirst({
+      where:{
+        process_id:req.body.processId,
+        person_id:decoded.id
+      }
+    })
+
+    if(decoded.admin == false || permissions!.editprocess==false){
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "User doesn't have authorization",
+      })
+    }
+
+    var permission = await prisma.permissions.findFirst({
+      where:{
+        person_id: req.body.collaboratorId,
+        process_id: req.body.processId,
+      }
+    })
+
+    await prisma.permissions.update({
+      where:{
+        id: permission?.id
+      },
+      data:{
+        editprocess:req.body.editProcess,
+        see:req.body.see,
+        appoint:req.body.appoint,
+        statitics:req.body.statitics,
+        editpatitent:req.body.editPatient,
+        archive:req.body.archive
+      }
+    })
+
+
+
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export default { archive, info, list, listActive, create, activate, edit, appointments, editPermissions }

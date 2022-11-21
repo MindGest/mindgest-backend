@@ -13,6 +13,7 @@ export type VerifyAccountBody = z.TypeOf<typeof schemas.VerifyAccountSchema>["bo
 
 export type RefreshToken = { session: number; person: number } & Object
 export type VerificationToken = { person: number } & Object
+export type ValidationToken = { id: number, admin: boolean } & Object
 export type PasswordResetToken = VerificationToken
 
 export type ForgotPasswordBody = z.TypeOf<typeof schemas.ForgotPasswordSchema>["body"]
@@ -35,4 +36,8 @@ export type ProcessEditBody = z.TypeOf<
 
 export type EditUserBody = z.TypeOf<
     typeof schemas.EditUserSchema
+>['body']
+
+export type ProcessEditPermissionsBody = z.TypeOf<
+    typeof schemas.ProcessEditPermissionsSchema
 >['body']

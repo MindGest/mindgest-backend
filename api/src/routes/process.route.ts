@@ -25,9 +25,22 @@ process.get(
 process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema), controller.create)
 
 process.post(
-  "/activate",
-  middleware.requestValidator(schemas.ProcessListSchema),
-  controller.activate
+  "/edit",
+  middleware.requestValidator(schemas.ProcessEditSchema),
+  controller.edit
 )
+
+process.post(
+  "/appointments",
+  middleware.requestValidator(schemas.ProcessInfoSchema),
+  controller.appointments
+)
+
+process.post(
+  "/edit/permissions",
+  middleware.requestValidator(schemas.ProcessEditPermissionsSchema),
+  controller.editPermissions
+)
+
 
 export default process

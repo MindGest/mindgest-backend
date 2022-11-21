@@ -180,7 +180,7 @@ export const EditUserSchema = z.object({
 export const ArchiveProcessSchema = z.object({
   body: z.object({
     token: z.string(),
-      processId: z.number()
+    processId: z.number()
   }),
 })
 
@@ -200,9 +200,8 @@ export const ProcessListSchema = z.object({
 export const ProcessCreateSchema = z.object({
   body: z.object({
     token: z.string(),
-    processId: z.number(),
     patientId: z.number(),
-    terapeutaId: z.number(),
+    therapistId: z.number(),
     speciality: z.string(),
       remarks: z.string()
   }),
@@ -213,10 +212,25 @@ export const ProcessCreateSchema = z.object({
 export const ProcessEditSchema = z.object({
   body: z.object({
     token: z.string(),
-    terapeutaId: z.number(),
+    therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
-      interns: z.array(z.number())
+    colaborators: z.array(z.number()),
+    processId: z.number(),
+  }),
+})
+
+export const ProcessEditPermissionsSchema = z.object({
+  body: z.object({
+    token: z.string(),
+    processId: z.number(),
+    collaboratorId: z.number(),
+    appoint: z.boolean(),
+    statitics: z.boolean(),
+    editProcess: z.boolean(),
+    editPatient: z.boolean(),
+    archive: z.boolean(),
+    see:z.boolean()
   }),
 })
 
@@ -238,4 +252,5 @@ export default {
     ProcessCreateSchema,
     ProcessEditSchema,
     EditUserSchema,
+    ProcessEditPermissionsSchema,
 }
