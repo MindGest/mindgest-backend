@@ -45,7 +45,7 @@
       "get": {
         "tags": ["Documentation"],
         "summary": "Mindgest API Documentation in JSON Format",
-        "operationId": "Fetch the Swagger UI JSON version of the documentation",
+        "description": "Fetch the Swagger UI JSON version of the documentation",
         "operationId": "json-docs",
         "responses": {
           "200": {

@@ -168,8 +168,8 @@ async function updateInfoTherapist(req: Request<{}, {}, EditUserBody>, res: Resp
 
   prisma.therapist.update({
     data: {
-      extern: body.extern,
-      cedula: body.cedula,
+      //extern: body.extern,
+      //cedula: body.cedula,
       person: {
         update: {
           active: body.active,
@@ -337,7 +337,7 @@ async function updateInfoPatient(req: Request<{}, {}, EditUserBody>, res: Respon
     return
   }
 
-  prisma.patient.update({
+ /* prisma.patient.update({
     data: {
       tax_number: body.tax_number,
       health_number: body.health_number,
@@ -392,7 +392,7 @@ async function updateInfoPatient(req: Request<{}, {}, EditUserBody>, res: Respon
         name: body.profession_name,
       },
     })
-  }
+  }*/
 
   res.status(StatusCodes.OK).json({
     msg: "Success.",

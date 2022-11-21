@@ -184,7 +184,7 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
       ref: processRef,
       colaborators: colaborators,
       utent: utentName?.name,
-      state: process?.active,
+      active: process?.active,
       financialSituation: isPayed,
       speciality: process?.speciality_speciality,
     })
@@ -273,8 +273,8 @@ export async function list(req: Request<{}, {}, ProcessListBody>, res: Response)
       }
 
       listing.push({
-        responsible: therapistListing,
-        utentName: utentName?.name,
+        therapistListing: therapistListing,
+        patientName: utentName?.name,
         refCode: ref,
         nextAppointment: nextAppointmentString,
       })
@@ -371,8 +371,8 @@ export async function listActive(req: Request<{}, {}, ProcessListBody>, res: Res
       }
 
       listing.push({
-        responsible: therapistListing,
-        utentName: utentName?.name,
+        therapistListing: therapistListing,
+        patientName: utentName?.name,
         refCode: ref,
         nextAppointment: nextAppointmentString,
       })
@@ -595,7 +595,7 @@ export async function edit(req: Request<{}, {}, ProcessEditBody>, res: Response)
 
 
     return res.status(StatusCodes.OK).json({
-      message: "Process Created!",
+      message: "Edit done!",
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -702,7 +702,9 @@ export async function editPermissions(req: Request<{}, {}, ProcessEditPermission
       }
     })
 
-
+    return res.status(StatusCodes.OK).json({
+      message: "Permission updated",
+    })
 
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

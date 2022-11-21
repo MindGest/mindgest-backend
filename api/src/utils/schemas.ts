@@ -203,7 +203,7 @@ export const ProcessCreateSchema = z.object({
     patientId: z.number(),
     therapistId: z.number(),
     speciality: z.string(),
-      remarks: z.string()
+    remarks: z.string()
   }),
 })
 
