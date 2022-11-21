@@ -1,0 +1,278 @@
+openapi: 3.0.3
+info:
+  description: This is the Mindgest Rest API Documentation
+  title: Mindgest API Documentation
+  contact:
+    email: gp2223@gmail.com
+  license:
+    name: MIT
+    url: https://mit-license.org/
+  version: 0.1.0
+servers:
+  - url: http://mindgest.dei.uc.pt/api
+    description: Production Server
+  - url: http://localhost:8080/api
+    description: Development Server
+externalDocs:
+  description: Find out more about us
+  url: http://github.com/Mindgest
+tags:
+  - name: Authentication
+    description: Authentication Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: User
+    description: User Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Appointment
+    description: Appointment Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Process
+    description: Process Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Room
+    description: Room Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Specialty
+    description: Specialty Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Documentation
+    description: Rest API Documentation
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+paths:
+  /docs:
+    get:
+      tags:
+        - Documentation
+      summary: Mindgest API Documentation Web Page
+      description: Fetch the Swagger UI version of the documentation (static website)
+      operationId: docs
+      responses:
+        "200":
+          description: OK
+          content:
+            application/html: {}
+  /docs/json:
+    get:
+      tags:
+        - Documentation
+      summary: Mindgest API Documentation in JSON Format
+      operationId: docs-json
+      description: Fetch the Swagger UI JSON version of the documentation
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+  /auth/login:
+    post:
+      summary: Login
+      tags:
+        - Authentication
+      description: User Authentication Enpoint
+      operationId: login
+      requestBody:
+        description: The body payload object
+        $ref: "#/components/requestBodies/Login"
+        required: true
+      responses:
+        "404":
+          description: User not found
+          content: {}
+components:
+  schemas:
+    Person:
+      oneOf:
+        - $ref: "#/components/schemas/Therapist"
+        - $ref: "#/components/schemas/Admin"
+        - $ref: "#/components/schemas/Guard"
+        - $ref: "#/components/schemas/Intern"
+        - $ref: "#/components/schemas/Accountant"
+    Admin:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The admin's name
+        email:
+          type: string
+          format: email
+          description: The admin's email address
+        password:
+          type: string
+          description: The admin's password
+        address:
+          type: string
+          description: The admin's home address
+        birthDate:
+          type: string
+          format: date-time
+          description: The admin's birth date
+        phoneNumber:
+          type: number
+          format: int64
+          description: The admin's phone number
+    Therapist:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The therapist's name
+        email:
+          type: string
+          format: email
+          description: The therapist's email address
+        password:
+          type: string
+          description: The therapist's password
+        address:
+          type: string
+          description: The therapist's home address
+        birthDate:
+          type: string
+          format: date-time
+          description: The therapist's birth date
+        phoneNumber:
+          type: number
+          format: int64
+          description: The therapist's phone number
+        healthSystem:
+          type: string
+          nullable: true
+          description: The therapist's health system
+        license:
+          type: string
+          description: The therapist's fiscal number
+        nif:
+          type: number
+          format: int64
+          description: The therapist's fiscal number
+    Intern:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The intern's name
+        email:
+          type: string
+          format: email
+          description: The intern's email address
+        password:
+          type: string
+          description: The intern's password
+        address:
+          type: string
+          description: The intern's home address
+        birthDate:
+          type: string
+          format: date-time
+          description: The intern's birth date
+        phoneNumber:
+          type: number
+          format: int64
+          description: The intern's phone number
+    Accountant:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The accountant's name
+        email:
+          type: string
+          format: email
+          description: The accountant's email address
+        password:
+          type: string
+          description: The accountant's password
+        address:
+          type: string
+          description: The accountant's home address
+        birthDate:
+          type: string
+          format: date-time
+          description: The accountant's birth date
+        phoneNumber:
+          type: number
+          format: int64
+          description: The accountant's fiscal number
+        nif:
+          type: number
+          format: int64
+          description: The accountant's fiscal number
+    Guard:
+      properties:
+        name:
+          type: string
+          description: The guard's email account
+        email:
+          type: string
+          format: email
+          description: The guard's email address
+        password:
+          type: string
+          format: password
+          description: The guard's password
+        address:
+          type: string
+          description: The guard's home address
+        birthDate:
+          type: string
+          description: The guard's birth date
+          format: date-time
+        phoneNumber:
+          type: number
+          description: The guard's phone number
+          format: int64
+        nif:
+          type: number
+          description: The guard's fiscal number
+          format: int64
+  requestBodies:
+    Login:
+      description: Login body payload
+      content:
+        application/json:
+          schema:
+            properties:
+              email:
+                type: number
+                description: The user's email
+                format: int64
+              password:
+                type: number
+                description: The user's password
+                format: int64
+  responses:
+    Login:
+      description: Login
+      content:
+        application/json:
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+              accessToken:
+                type: string
+                description: The Access Token to be used for authorization
+  
+   
+  
+  securitySchemes:
+    Access Token:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
