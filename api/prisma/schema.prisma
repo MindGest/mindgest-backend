@@ -57,7 +57,6 @@ model intern {
   person              person                @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
   intern_availability intern_availability[]
   intern_process      intern_process[]
-  permissions         permissions[]
 }
 
 model intern_availability {
@@ -131,10 +130,12 @@ model permissions {
   appoint          Boolean @default(false)
   statitics        Boolean @default(false)
   editpatitent     Boolean @default(false)
-  id               BigInt  @id
-  intern_person_id BigInt
+  archive          Boolean @default(false)
+  isMain           Boolean @default(false)
+  id               BigInt  @id @default(autoincrement())
+  person_id        BigInt
+  person           person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
   process_id       BigInt
-  intern           intern  @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
   process          process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk2")
 }
 
@@ -150,11 +151,12 @@ model person {
   verified      Boolean
   active        Boolean
   aproved       Boolean
-  admin         admin?
   accountant    accountant?
+  admin         admin?
   guard         guard?
   intern        intern?
   notifications notifications[]
+  permissions   permissions[]
   patient       patient?
   therapist     therapist?
 }

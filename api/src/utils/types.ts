@@ -12,6 +12,7 @@ export type RefreshBody = z.TypeOf<typeof schemas.RefreshSchema>["body"]
 export type VerifyAccountBody = z.TypeOf<typeof schemas.VerifyAccountSchema>["body"]
 
 export type VerificationToken = { person: number } & Object
+export type ValidationToken = { id: number, admin: boolean } & Object
 export type PasswordResetToken = VerificationToken
 
 export type RefreshToken = {
@@ -45,5 +46,9 @@ export type AppointmentCreate = z.TypeOf<typeof schemas.AppointmentCreateSchema>
 export type AppointmentsList = z.TypeOf<typeof schemas.AppointmentsListSchema>['body']
 
 export type AppointmentInfo = z.TypeOf<typeof schemas.AppointmentInfoSchema>['body']
+
+export type ProcessEditPermissionsBody = z.TypeOf<
+    typeof schemas.ProcessEditPermissionsSchema
+>['body']
 
 export type AppointmentEdit = z.TypeOf<typeof schemas.AppointmentEditSchema>['body']
