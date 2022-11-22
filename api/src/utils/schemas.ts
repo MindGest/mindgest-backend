@@ -21,7 +21,7 @@ export const PersonUpdateSchema = z.object({
 }).merge(PersonSchema)
 
 export const TherapistSchema = z.object({
-  healthsystem: z.string().optional(), 
+  healthSystem: z.string().optional(), 
   cedula: z.string(),
 }).merge(PersonSchema)
 
@@ -37,6 +37,14 @@ export const PatientSchema = z.object({
   request: z.string(),
   remarks: z.string(),
   patienttype_id: z.number(),
+
+  // school parameters (can be optional)
+  schoolName: z.string().optional(),
+  schoolCourse: z.string().optional(),
+  schoolGrade: z.string().optional(),
+
+  // profession parameters (can be optional)
+  professionName: z.string().optional(),
 }).merge(PersonUpdateSchema)
 
 export const AdminSchema = PersonSchema
@@ -220,7 +228,48 @@ export const ProcessEditSchema = z.object({
   }),
 })
 
+export const AppointmentCreateSchema = z.object({
+  body: z.object({
+    token: z.string(),
+    online: z.boolean(),
+    roomId: z.number(),
+    priceTableId: z.string(),
+    startDate: DateSchema,
+    endDate: DateSchema,
+    processId: z.number(),
+  })
+})
 
+export const AppointmentArchiveSchema = z.object({
+  body: z.object({
+    token: z.string(),
+    appointmentId: z.number(),
+  })
+})
+
+export const AppointmentsListSchema = z.object({
+  body: z.object({
+    token: z.string(),
+    filterId: z.number(), //can either be -1 for all, an id of a therapist for their appointments or of an intern 
+  })
+})
+
+export const AppointmentInfoSchema = z.object({
+  body: z.object({
+    token: z.string(),
+    appointmentId: z.number()
+  })
+})
+
+export const AppointmentEditSchema = z.object({
+  body: z.object({
+    token: z.string(),
+    appointmentId: z.number(),
+    appointmentStart: DateSchema,
+    appointmentEnd: DateSchema,
+    appointmentRoomId: z.number(),
+  })
+})
 
 
 export default {
@@ -238,4 +287,9 @@ export default {
     ProcessCreateSchema,
     ProcessEditSchema,
     EditUserSchema,
+    AppointmentArchiveSchema,
+    AppointmentCreateSchema,
+    AppointmentsListSchema,
+    AppointmentInfoSchema,
+    AppointmentEditSchema,
 }

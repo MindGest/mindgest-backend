@@ -7,10 +7,9 @@ import { StatusCodes } from "http-status-codes"
 import {
   EditUserBody
 } from "../utils/types";
-import user from "../routes/user.route";
 
 
-
+//TODO
 export async function uploadAvatar(req: Request, res: Response) {}
 
 // estava a dar stresses com BigInts, então a internet ajudou
@@ -59,9 +58,7 @@ export async function editUser(req: Request<{}, {}, EditUserBody>, res: Response
   //  - it is called by the actual user
   //  - it is called by a therapist, admin and maybe an intern
 
-  // TODO: fazer uma funcao que retorna o tipo do user com base no seu person_id.
-  // var userType = await getUserType(req.body.id) // so we know what type of user we want to update
-  var userType = req.body.userToEdit.role;
+  var userToEditType = req.body.userToEdit.role;
   
 
   if (!canEdit()) {
@@ -71,30 +68,19 @@ export async function editUser(req: Request<{}, {}, EditUserBody>, res: Response
     return
   }
 
-  // if (userType == "therapist") {
-  //   updateInfoTherapist(req, res, "therapist")
-  // } else if (userType == "accountant") {
-  //   updateInfoPerson(req, res, "accountant")
-  // } else if (userType == "patient") {
-  //   updateInfoPatient(req, res, "patient")
-  // } else if (userType == "guard") {
-  //   updateInfoPerson(req, res, "guard")
-  // } else if (userType == "intern") {
-  //   updateInfoPerson(req, res, "intern")
-  // }
   switch(req.body.userToEdit.role){
     case "admin":
-      updateInfoPerson(req, res)
+      updateInfoPerson(req.body.userToEdit, res, req.body.id)
     case "therapist":
-      updateInfoTherapist(req, res)
+      updateInfoTherapist(req.body.userToEdit, res, req.body.id)
     case "accountant":
-      updateInfoPerson(req, res)
+      updateInfoPerson(req.body.userToEdit, res, req.body.id)
     case "guard":
-      updateInfoPerson(req, res)
+      updateInfoPerson(req.body.userToEdit, res, req.body.id)
     case "intern":
-      updateInfoPerson(req, res)
+      updateInfoPerson(req.body.userToEdit, res, req.body.id)
     case "patient":
-      updateInfoPatient(req, res)
+      updateInfoPatient(req.body.userToEdit, res, req.body.id)
 
   }
 }
@@ -111,6 +97,8 @@ async function canEdit() {
 
   // type: patient -> admin, intern (with permissions?), therapist on the process
   // type: other -> admin(?), himself
+
+
 
   return true
 }
@@ -147,15 +135,12 @@ async function getUserType(id: number) {
   if (user) return "guard"
 }
 
-async function updateInfoTherapist(req: Request<{}, {}, EditUserBody>, res: Response) {
-  var body = req.body.userToEdit
-  var userId = req.body.id
-  var userType = req.body.userToEdit.role
+async function updateInfoTherapist(body: any, res: Response, userId: number) {
+  var userType = body.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.therapist.findUnique({
-    include: { person: true },
     where: { person_id: userId },
   })
 
@@ -166,36 +151,33 @@ async function updateInfoTherapist(req: Request<{}, {}, EditUserBody>, res: Resp
     return
   }
 
-  prisma.therapist.update({
-    data: {
-      extern: body.extern,
-      cedula: body.cedula,
-      person: {
-        update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          aproved: body.aproved,
-          birth_date: body.birthDate,
-          //password: body.password,
-          phone_number: body.phoneNumber
+    prisma.therapist.update({
+      data: {
+        extern: body.extern,
+        cedula: body.cedula,
+        person: {
+          update: {
+            active: body.active,
+            address: body.address,
+            name: body.name,
+            email: body.email,
+            aproved: body.aproved,
+            birth_date: body.birthDate,
+            //password: await argon2.hash(body.password),
+            phone_number: body.phoneNumber
+          },
         },
       },
-    },
-    where: { person_id: userId },
-  })
+      where: { person_id: userId },
+    })
 }
 
-async function updateInfoIntern(req: Request<{}, {}, EditUserBody>, res: Response) {
-  var body = req.body.userToEdit
-  var userId = req.body.id
-  var userType = req.body.userToEdit.role
+async function updateInfoIntern(body: any, res: Response, userId: number) {
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.intern.findUnique({
-    include: { person: true },
     where: { person_id: userId },
   })
 
@@ -216,7 +198,7 @@ async function updateInfoIntern(req: Request<{}, {}, EditUserBody>, res: Respons
           email: body.email,
           aproved: body.aproved,
           birth_date: body.birthDate,
-          //password: body.password,
+          //password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
         },
       },
@@ -229,15 +211,12 @@ async function updateInfoIntern(req: Request<{}, {}, EditUserBody>, res: Respons
   })
 }
 
-async function updateInfoGuard(req: Request<{}, {}, EditUserBody>, res: Response) {
-  var body = req.body.userToEdit
-  var userId = req.body.id
-  var userType = req.body.userToEdit.role
+async function updateInfoGuard(body: any, res: Response, userId: number) {
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.guard.findUnique({
-    include: { person: true },
     where: { person_id: userId },
   })
 
@@ -258,7 +237,7 @@ async function updateInfoGuard(req: Request<{}, {}, EditUserBody>, res: Response
           email: body.email,
           aproved: body.aproved,
           birth_date: body.birthDate,
-          // password: body.password,
+          // password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
         },
       },
@@ -271,15 +250,12 @@ async function updateInfoGuard(req: Request<{}, {}, EditUserBody>, res: Response
   })
 }
 
-async function updateInfoAccountant(req: Request<{}, {}, EditUserBody>, res: Response) {
-  var body = req.body.userToEdit
-  var userId = req.body.id
-  var userType = req.body.userToEdit.role
+async function updateInfoAccountant(body: any, res: Response, userId: number) {
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.accountant.findUnique({
-    include: { person: true },
     where: { person_id: userId },
   })
 
@@ -300,7 +276,7 @@ async function updateInfoAccountant(req: Request<{}, {}, EditUserBody>, res: Res
           email: body.email,
           aproved: body.aproved,
           birth_date: body.birthDate,
-          // password: body.password,
+          // password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
         },
       },
@@ -313,20 +289,12 @@ async function updateInfoAccountant(req: Request<{}, {}, EditUserBody>, res: Res
   })
 }
 
-async function updateInfoPatient(req: Request<{}, {}, EditUserBody>, res: Response) {
-  var body = req.body.userToEdit
-  var userId = req.body.id
-  var userType = req.body.userToEdit.role
+async function updateInfoPatient(body: any, res: Response, userId: number) {
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.patient.findUnique({
-    include: {
-      person: true,
-      school: true,
-      profession: true,
-      patienttype: true,
-    },
     where: { person_id: userId },
   })
 
@@ -339,13 +307,13 @@ async function updateInfoPatient(req: Request<{}, {}, EditUserBody>, res: Respon
 
   prisma.patient.update({
     data: {
-      tax_number: body.tax_number,
-      health_number: body.health_number,
+      tax_number: body.taxNumber,
+      health_number: body.healthNumber,
       request: body.request,
       remarks: body.remarks,
       patienttype: {
         update: {
-          id: body.patienttype,
+          id: body.patienttype_id,
         },
       },
       person: {
@@ -356,7 +324,7 @@ async function updateInfoPatient(req: Request<{}, {}, EditUserBody>, res: Respon
           email: body.email,
           aproved: body.aproved,
           birth_date: body.birthDate,
-          // password: body.password,
+          // password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
         },
       },
@@ -371,11 +339,11 @@ async function updateInfoPatient(req: Request<{}, {}, EditUserBody>, res: Respon
 
   if (oldSchool) {
     prisma.school.update({
-      where: { id: oldData.school[0].id },
+      where: {id: oldSchool.id},
       data: {
-        name: body.school_name,
-        course: body.course,
-        grade: body.school_grade,
+        name: body.schoolName,
+        course: body.schoolCourse,
+        grade: body.schoolGrade,
       },
     })
   }
@@ -387,9 +355,9 @@ async function updateInfoPatient(req: Request<{}, {}, EditUserBody>, res: Respon
 
   if (oldProfession) {
     prisma.profession.update({
-      where: { id: oldData.profession[0].id },
+      where: {id: oldProfession.id},
       data: {
-        name: body.profession_name,
+        name: body.professionName,
       },
     })
   }
@@ -399,14 +367,12 @@ async function updateInfoPatient(req: Request<{}, {}, EditUserBody>, res: Respon
   })
 }
 
-async function updateInfoPerson(req: Request<{}, {}, EditUserBody>, res: Response) {
+async function updateInfoPerson(body: any, res: Response, userId: number) {
   /**
    * Use this one to update accountant, guard and intern.
    * They don't have parameters in the respective entity.
    */
-  var body = req.body.userToEdit
-  var userId = req.body.id
-  var userType = req.body.userToEdit.role
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
@@ -427,7 +393,7 @@ async function updateInfoPerson(req: Request<{}, {}, EditUserBody>, res: Respons
       email: body.email,
       aproved: body.aproved,
       birth_date: body.birthDate,
-      // password: body.password,
+      // password: await argon2.hash(body.password),
       phone_number: body.phoneNumber,
     },
     where: { id: userId },
