@@ -114,6 +114,15 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
             },
           })
         }
+        // Insert therapist in the therapist table
+        await prisma.therapist.create({
+          data: {
+            license: req.body.license,
+            healthsystem: req.body.healthSystem,
+            extern: false,
+            person: { connect: { id: person.id } },
+          },
+        })
         break
       }
     }

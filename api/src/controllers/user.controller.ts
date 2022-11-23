@@ -3,6 +3,9 @@ import prisma from "../utils/prisma"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
+import { EditUserBody } from "../utils/types"
+
+//TODO
 export async function uploadAvatar(req: Request, res: Response) {}
 
 // estava a dar stresses com BigInts, então a internet ajudou
@@ -37,7 +40,7 @@ export async function getAllUsers(req: Request, res: Response) {
  * Acho que para cenas como alterar a role de alguem no sistema, tem de se usar outro endpoint, especifico para isso
  */
 
-export async function editUser(req: Request, res: Response) {
+export async function editUser(req: Request<{}, {}, EditUserBody>, res: Response) {
   /**
    * No body do request tem de vir o id da pessoa (preciso de saber quem vai ser alterado)
    * Com toda a informacao. Campos que nao são preenchidos pelo utilizador devem estar no body do request como null.
@@ -51,8 +54,7 @@ export async function editUser(req: Request, res: Response) {
   //  - it is called by the actual user
   //  - it is called by a therapist, admin and maybe an intern
 
-  // TODO: fazer uma funcao que retorna o tipo do user com base no seu person_id.
-  var userType = await getUserType(req.body.id) // so we know what type of user we want to update
+  var userToEditType = req.body.userToEdit.role
 
   if (!canEdit()) {
     res.status(StatusCodes.FORBIDDEN).json({
@@ -61,16 +63,19 @@ export async function editUser(req: Request, res: Response) {
     return
   }
 
-  if (userType == "therapist") {
-    updateInfoTherapist(req, res, "therapist")
-  } else if (userType == "accountant") {
-    updateInfoPerson(req, res, "accountant")
-  } else if (userType == "patient") {
-    updateInfoPatient(req, res, "patient")
-  } else if (userType == "guard") {
-    updateInfoPerson(req, res, "guard")
-  } else if (userType == "intern") {
-    updateInfoPerson(req, res, "intern")
+  switch (req.body.userToEdit.role) {
+    case "admin":
+      updateInfoPerson(req.body.userToEdit, res, req.body.id)
+    case "therapist":
+      updateInfoTherapist(req.body.userToEdit, res, req.body.id)
+    case "accountant":
+      updateInfoPerson(req.body.userToEdit, res, req.body.id)
+    case "guard":
+      updateInfoPerson(req.body.userToEdit, res, req.body.id)
+    case "intern":
+      updateInfoPerson(req.body.userToEdit, res, req.body.id)
+    case "patient":
+      updateInfoPatient(req.body.userToEdit, res, req.body.id)
   }
 }
 
@@ -122,15 +127,12 @@ async function getUserType(id: number) {
   if (user) return "guard"
 }
 
-async function updateInfoTherapist(req: Request, res: Response, userType: String) {
-  var EMPTY_FIELD = "null"
-  var body = req.body // it must have a parameter named "data" that has the json structure of a therapist.
-  var userId = req.body.id
+async function updateInfoTherapist(body: any, res: Response, userId: number) {
+  var userType = body.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.therapist.findUnique({
-    include: { person: true },
     where: { person_id: userId },
   })
 
@@ -143,19 +145,18 @@ async function updateInfoTherapist(req: Request, res: Response, userType: String
 
   prisma.therapist.update({
     data: {
-      extern: body.extern == EMPTY_FIELD ? oldData.extern : body.extern,
-      license: body.cedula == EMPTY_FIELD ? oldData.license : body.license,
+      extern: body.extern,
+      license: body.license,
       person: {
         update: {
-          active: body.active == EMPTY_FIELD ? oldData.person.active : body.active,
-          address: body.address == EMPTY_FIELD ? oldData.person.address : body.address,
-          name: body.name == EMPTY_FIELD ? oldData.person.name : body.name,
-          email: body.email == EMPTY_FIELD ? oldData.person.email : body.email,
-          aproved: body.aproved == EMPTY_FIELD ? oldData.person.aproved : body.aproved,
-          birth_date: body.birth_date == EMPTY_FIELD ? oldData.person.birth_date : body.birth_date,
-          password: body.password == EMPTY_FIELD ? oldData.person.password : body.password, // ISTO FAZ SEQUER SENTIDO?
-          phone_number:
-            body.phone_number == EMPTY_FIELD ? oldData.person.phone_number : body.phone_number,
+          active: body.active,
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          aproved: body.aproved,
+          birth_date: body.birthDate,
+          //password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
         },
       },
     },
@@ -163,15 +164,12 @@ async function updateInfoTherapist(req: Request, res: Response, userType: String
   })
 }
 
-async function updateInfoIntern(req: Request, res: Response, userType: String) {
-  var EMPTY_FIELD = "null"
-  var body = req.body // it must have a parameter named "data" that has the json structure of a therapist.
-  var userId = req.body.id
+async function updateInfoIntern(body: any, res: Response, userId: number) {
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.intern.findUnique({
-    include: { person: true },
     where: { person_id: userId },
   })
 
@@ -186,15 +184,14 @@ async function updateInfoIntern(req: Request, res: Response, userType: String) {
     data: {
       person: {
         update: {
-          active: body.active == EMPTY_FIELD ? oldData.person.active : body.active,
-          address: body.address == EMPTY_FIELD ? oldData.person.address : body.address,
-          name: body.name == EMPTY_FIELD ? oldData.person.name : body.name,
-          email: body.email == EMPTY_FIELD ? oldData.person.email : body.email,
-          aproved: body.aproved == EMPTY_FIELD ? oldData.person.aproved : body.aproved,
-          birth_date: body.birth_date == EMPTY_FIELD ? oldData.person.birth_date : body.birth_date,
-          password: body.password == EMPTY_FIELD ? oldData.person.password : body.password, // ISTO FAZ SEQUER SENTIDO?
-          phone_number:
-            body.phone_number == EMPTY_FIELD ? oldData.person.phone_number : body.phone_number,
+          active: body.active,
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          aproved: body.aproved,
+          birth_date: body.birthDate,
+          //password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
         },
       },
     },
@@ -206,15 +203,12 @@ async function updateInfoIntern(req: Request, res: Response, userType: String) {
   })
 }
 
-async function updateInfoGuard(req: Request, res: Response, userType: String) {
-  var EMPTY_FIELD = "null"
-  var body = req.body // it must have a parameter named "data" that has the json structure of a therapist.
-  var userId = req.body.id
+async function updateInfoGuard(body: any, res: Response, userId: number) {
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.guard.findUnique({
-    include: { person: true },
     where: { person_id: userId },
   })
 
@@ -229,15 +223,14 @@ async function updateInfoGuard(req: Request, res: Response, userType: String) {
     data: {
       person: {
         update: {
-          active: body.active == EMPTY_FIELD ? oldData.person.active : body.active,
-          address: body.address == EMPTY_FIELD ? oldData.person.address : body.address,
-          name: body.name == EMPTY_FIELD ? oldData.person.name : body.name,
-          email: body.email == EMPTY_FIELD ? oldData.person.email : body.email,
-          aproved: body.aproved == EMPTY_FIELD ? oldData.person.aproved : body.aproved,
-          birth_date: body.birth_date == EMPTY_FIELD ? oldData.person.birth_date : body.birth_date,
-          password: body.password == EMPTY_FIELD ? oldData.person.password : body.password, // ISTO FAZ SEQUER SENTIDO?
-          phone_number:
-            body.phone_number == EMPTY_FIELD ? oldData.person.phone_number : body.phone_number,
+          active: body.active,
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          aproved: body.aproved,
+          birth_date: body.birthDate,
+          // password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
         },
       },
     },
@@ -249,15 +242,12 @@ async function updateInfoGuard(req: Request, res: Response, userType: String) {
   })
 }
 
-async function updateInfoAccountant(req: Request, res: Response, userType: String) {
-  var EMPTY_FIELD = "null"
-  var body = req.body // it must have a parameter named "data" that has the json structure of a therapist.
-  var userId = req.body.id
+async function updateInfoAccountant(body: any, res: Response, userId: number) {
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.accountant.findUnique({
-    include: { person: true },
     where: { person_id: userId },
   })
 
@@ -272,15 +262,14 @@ async function updateInfoAccountant(req: Request, res: Response, userType: Strin
     data: {
       person: {
         update: {
-          active: body.active == EMPTY_FIELD ? oldData.person.active : body.active,
-          address: body.address == EMPTY_FIELD ? oldData.person.address : body.address,
-          name: body.name == EMPTY_FIELD ? oldData.person.name : body.name,
-          email: body.email == EMPTY_FIELD ? oldData.person.email : body.email,
-          aproved: body.aproved == EMPTY_FIELD ? oldData.person.aproved : body.aproved,
-          birth_date: body.birth_date == EMPTY_FIELD ? oldData.person.birth_date : body.birth_date,
-          password: body.password == EMPTY_FIELD ? oldData.person.password : body.password, // ISTO FAZ SEQUER SENTIDO?
-          phone_number:
-            body.phone_number == EMPTY_FIELD ? oldData.person.phone_number : body.phone_number,
+          active: body.active,
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          aproved: body.aproved,
+          birth_date: body.birthDate,
+          // password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
         },
       },
     },
@@ -292,20 +281,12 @@ async function updateInfoAccountant(req: Request, res: Response, userType: Strin
   })
 }
 
-async function updateInfoPatient(req: Request, res: Response, userType: String) {
-  var EMPTY_FIELD = "null"
-  var body = req.body // it must have a parameter named "data" that has the json structure of a therapist.
-  var userId = req.body.id
+async function updateInfoPatient(body: any, res: Response, userId: number) {
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
   var oldData = await prisma.patient.findUnique({
-    include: {
-      person: true,
-      school: true,
-      profession: true,
-      patienttype: true,
-    },
     where: { person_id: userId },
   })
 
@@ -318,26 +299,25 @@ async function updateInfoPatient(req: Request, res: Response, userType: String) 
 
   prisma.patient.update({
     data: {
-      tax_number: body.tax_number == EMPTY_FIELD ? oldData.tax_number : body.tax_number,
-      health_number: body.health_number == EMPTY_FIELD ? oldData.health_number : body.health_number,
-      request: body.request == EMPTY_FIELD ? oldData.request : body.request,
-      remarks: body.remarks == EMPTY_FIELD ? oldData.remarks : body.remarks,
+      tax_number: body.taxNumber,
+      health_number: body.healthNumber,
+      request: body.request,
+      remarks: body.remarks,
       patienttype: {
         update: {
-          id: body.patienttype == EMPTY_FIELD ? oldData.patienttype_id : body.patienttype,
+          id: body.patienttype_id,
         },
       },
       person: {
         update: {
-          active: body.active == EMPTY_FIELD ? oldData.person.active : body.active,
-          address: body.address == EMPTY_FIELD ? oldData.person.address : body.address,
-          name: body.name == EMPTY_FIELD ? oldData.person.name : body.name,
-          email: body.email == EMPTY_FIELD ? oldData.person.email : body.email,
-          aproved: body.aproved == EMPTY_FIELD ? oldData.person.aproved : body.aproved,
-          birth_date: body.birth_date == EMPTY_FIELD ? oldData.person.birth_date : body.birth_date,
-          password: body.password == EMPTY_FIELD ? oldData.person.password : body.password, // ISTO FAZ SEQUER SENTIDO?
-          phone_number:
-            body.phone_number == EMPTY_FIELD ? oldData.person.phone_number : body.phone_number,
+          active: body.active,
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          aproved: body.aproved,
+          birth_date: body.birthDate,
+          // password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
         },
       },
     },
@@ -351,10 +331,11 @@ async function updateInfoPatient(req: Request, res: Response, userType: String) 
 
   if (oldSchool) {
     prisma.school.update({
-      where: { id: oldData.school[0].id },
+      where: { id: oldSchool.id },
       data: {
-        name: body.school_name == EMPTY_FIELD ? oldSchool.name : body.school_name,
-        grade: body.school_grade == EMPTY_FIELD ? oldSchool.grade : body.school_grade,
+        name: body.schoolName,
+        course: body.schoolCourse,
+        grade: body.schoolGrade,
       },
     })
   }
@@ -366,9 +347,9 @@ async function updateInfoPatient(req: Request, res: Response, userType: String) 
 
   if (oldProfession) {
     prisma.profession.update({
-      where: { id: oldData.profession[0].id },
+      where: { id: oldProfession.id },
       data: {
-        name: body.profession_name == EMPTY_FIELD ? oldProfession.name : body.profession_name,
+        name: body.professionName,
       },
     })
   }
@@ -378,14 +359,12 @@ async function updateInfoPatient(req: Request, res: Response, userType: String) 
   })
 }
 
-async function updateInfoPerson(req: Request, res: Response, userType: String) {
+async function updateInfoPerson(body: any, res: Response, userId: number) {
   /**
    * Use this one to update accountant, guard and intern.
    * They don't have parameters in the respective entity.
    */
-  var EMPTY_FIELD = "null"
-  var body = req.body // it must have a parameter named "data" that has the json structure of a therapist.
-  var userId = req.body.id
+  var userType = body.userToEdit.role
 
   // fetch the current record from the database -> needed for the update
   // also usefull to guarantee that the user actually exists and is a therapist
@@ -400,14 +379,14 @@ async function updateInfoPerson(req: Request, res: Response, userType: String) {
 
   prisma.person.update({
     data: {
-      active: body.active == EMPTY_FIELD ? oldData.active : body.active,
-      address: body.address == EMPTY_FIELD ? oldData.address : body.address,
-      name: body.name == EMPTY_FIELD ? oldData.name : body.name,
-      email: body.email == EMPTY_FIELD ? oldData.email : body.email,
-      aproved: body.aproved == EMPTY_FIELD ? oldData.aproved : body.aproved,
-      birth_date: body.birth_date == EMPTY_FIELD ? oldData.birth_date : body.birth_date,
-      password: body.password == EMPTY_FIELD ? oldData.password : body.password, // ISTO FAZ SEQUER SENTIDO?
-      phone_number: body.phone_number == EMPTY_FIELD ? oldData.phone_number : body.phone_number,
+      active: body.active,
+      address: body.address,
+      name: body.name,
+      email: body.email,
+      aproved: body.aproved,
+      birth_date: body.birthDate,
+      // password: await argon2.hash(body.password),
+      phone_number: body.phoneNumber,
     },
     where: { id: userId },
   })
