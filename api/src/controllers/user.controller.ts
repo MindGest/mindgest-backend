@@ -144,7 +144,7 @@ async function updateInfoTherapist(req: Request, res: Response, userType: String
   prisma.therapist.update({
     data: {
       extern: body.extern == EMPTY_FIELD ? oldData.extern : body.extern,
-      cedula: body.cedula == EMPTY_FIELD ? oldData.cedula : body.cedula,
+      license: body.cedula == EMPTY_FIELD ? oldData.license : body.license,
       person: {
         update: {
           active: body.active == EMPTY_FIELD ? oldData.person.active : body.active,

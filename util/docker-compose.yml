@@ -4,6 +4,7 @@ services:
   db:
     image: postgres:14.5-alpine
     container_name: mindgest-db
+    hostname: db
     restart: unless-stopped
     ports:
       - 5432:5432
@@ -23,6 +24,7 @@ services:
   api:
     image: mindgest-api:latest
     container_name: mindgest-api
+    hostname: api
     build: ../api/
     depends_on:
       db:
@@ -31,14 +33,21 @@ services:
     ports:
       - 8080:8080
     env_file:
+      - .env
       - ../api/.env
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public"
+      HOST: 0.0.0.0
+      PORT: 8080
+    links:
+      - db
     volumes:
       - ../api:/usr/src/mindgest
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "sh -c 'curl -f http://localhost:8080/api/healthcheck || exit 1'"
+          "sh -c 'curl --fail http://localhost:8080/api/healthcheck || exit 1'"
         ]
       interval: 10s
       timeout: 3s

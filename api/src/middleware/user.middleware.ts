@@ -1,40 +1,43 @@
 import * as express from "express"
 import { PrismaClient } from "@prisma/client"
+import { verify } from "crypto"
+import { verifyToken } from "../services/auth.service"
+import { RefreshToken } from "../utils/types"
 
 // export async function authenticateUser(
-//     req: express.Request,
-//     res: express.Response,
-//     next: Function
+//   req: express.Request,
+//   res: express.Response,
+//   next: Function
 // ) {
-//     const { refreshToken, accessToken } = req.signedCookies
+//   const { refreshToken, accessToken } = req.signedCookies
 //
-//     try {
-//         if (accessToken) {
-//             const payload = isTokenValid(accessToken)
-//             // req.person = payload.person
-//             return next()
-//         }
-//         const payload = isTokenValid(refreshToken)
-//         const prisma = new PrismaClient()
-//
-//         const existingToken = await prisma.refreshtoken.findFirst({
-//             where: {
-//                 person_id: payload.person.id,
-//                 refreshtoken: payload.refreshToken,
-//             },
-//         })
-//
-//         if (!existingToken || !existingToken?.isvalid) {
-//             throw new Error('Authentication Invalid')
-//         }
-//
-//         attachCookiesToResponse(res, payload.user, existingToken.refreshtoken)
-//
-//         req.person = payload.user
-//         next()
-//     } catch (error) {
-//         throw new Error('Authentication Invalid')
+//   try {
+//     if (accessToken) {
+//       const payload = verifyToken<AccessToken>(accessToken)
+//       // req.person = payload.person
+//       return next()
 //     }
+//     const payload = isTokenValid(refreshToken)
+//     const prisma = new PrismaClient()
+//
+//     const existingToken = await prisma.refreshtoken.findFirst({
+//       where: {
+//         person_id: payload.person.id,
+//         refreshtoken: payload.refreshToken,
+//       },
+//     })
+//
+//     if (!existingToken || !existingToken?.isvalid) {
+//       throw new Error("Authentication Invalid")
+//     }
+//
+//     attachCookiesToResponse(res, payload.user, existingToken.refreshtoken)
+//
+//     req.person = payload.user
+//     next()
+//   } catch (error) {
+//     throw new Error("Authentication Invalid")
+//   }
 // }
 
 /*export function authorizePermissions(...roles:any){

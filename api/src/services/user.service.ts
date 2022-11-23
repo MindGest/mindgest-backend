@@ -15,9 +15,10 @@ export async function fetchPersonProperties(personId: bigint) {
   })
   if (therapist)
     return {
-      isAdmin: await prisma.admin.findUnique({
-        where: { person_id: personId },
-      }),
+      isAdmin:
+        (await prisma.admin.findUnique({
+          where: { person_id: personId },
+        })) !== null,
       userRole: "therapist",
     }
 

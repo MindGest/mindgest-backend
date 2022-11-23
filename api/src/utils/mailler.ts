@@ -1,5 +1,5 @@
 import mailer from "nodemailer"
-import logger from "../logger"
+import logger from "./logger"
 import Email from "email-templates"
 import path from "path"
 

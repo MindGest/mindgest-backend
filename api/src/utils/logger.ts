@@ -1,13 +1,13 @@
 import log from "pino"
 import dayjs from "dayjs"
 
-const LOG = String(process.env.LOG)
+const NODE_ENV = String(process.env.NODE_ENV)
 
 const logger = log({
   transport: {
     target: "pino-pretty",
   },
-  level: LOG,
+  level: NODE_ENV === "development" ? "debug" : "info",
   base: {
     pid: false,
   },

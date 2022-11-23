@@ -11,7 +11,12 @@ export type RefreshBody = z.TypeOf<typeof schemas.RefreshSchema>["body"]
 
 export type VerifyAccountBody = z.TypeOf<typeof schemas.VerifyAccountSchema>["body"]
 
-export type RefreshToken = { session: number; person: number } & Object
+export type RefreshToken = {
+  session: { ip: string; userAgent: string | undefined; creationDate: string | undefined }
+  person: number
+} & Object
+export type AccessToken = { id: number; admin: boolean; role: string } & Object
+
 export type VerificationToken = { person: number } & Object
 export type PasswordResetToken = VerificationToken
 

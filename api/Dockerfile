@@ -1,4 +1,7 @@
-FROM node:alpine
+FROM node:18
+
+RUN apt update -y
+RUN apt install curl -y
 
 WORKDIR /usr/src/mindgest
 
@@ -14,4 +17,5 @@ RUN npm run build
 
 EXPOSE 8080 
 
-CMD [ "npm", "start" ]
+ENTRYPOINT ["/bin/sh", "-c" , "npx prisma db push --skip-generate && npm start"]
+

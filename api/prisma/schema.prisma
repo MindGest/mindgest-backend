@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl"]
+  binaryTargets = ["debian-openssl-3.0.x", "native"]
 }
 
 datasource db {
@@ -232,7 +232,7 @@ model speciality {
 
 model therapist {
   extern                 Boolean
-  cedula                 String?                  @db.VarChar(512)
+  license                String?                  @db.VarChar(512)
   healthsystem           String?                  @db.VarChar(512)
   person_id              BigInt                   @id
   person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")

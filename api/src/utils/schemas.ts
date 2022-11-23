@@ -1,5 +1,4 @@
-import { callbackPromise } from "nodemailer/lib/shared"
-import z, { ZodAny } from "zod"
+import z from "zod"
 
 export const DateSchema = z.preprocess((arg) => {
   if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
@@ -15,7 +14,7 @@ export const PersonSchema = z.object({
 })
 
 export const TherapistSchema = z
-  .object({ health_system: z.string().optional(), cedula: z.string(), nif: z.number() })
+  .object({ healthSystem: z.string().optional(), license: z.string(), nif: z.number() })
   .merge(PersonSchema)
 
 export const AdminSchema = PersonSchema
@@ -61,6 +60,15 @@ export const LoginSchema = z.object({
 })
 
 export const RefreshSchema = z.object({
+  body: z
+    .object({
+      refreshToken: z.string().optional(),
+    })
+    .strict()
+    .required(),
+})
+
+export const AuthToken = z.object({
   body: z
     .object({
       refreshToken: z.string().optional(),

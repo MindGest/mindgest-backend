@@ -50,6 +50,6 @@ app.get("/", (_: Request, res: Response) =>
 app.use(middleware.notFound)
 
 // Run Server
-app.listen(PORT, () => {
+app.listen(PORT, HOST, () => {
   logger.info(`MindGest API is live on http://${HOST}:${PORT}`)
 })

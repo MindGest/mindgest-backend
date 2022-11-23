@@ -8,7 +8,7 @@ import SwaggerUI from "swagger-ui-express"
 const docs: Router = Router()
 
 // Load openapi file
-let document = YAML.load(path.join(__dirname, "..", "utils", "documentation", "openapi.yml"))
+let document = YAML.load(path.join(__dirname, "..", "..", "assets", "documentation", "openapi.yml"))
 
 // Routes
 docs.use(

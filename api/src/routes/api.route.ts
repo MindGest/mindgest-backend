@@ -4,7 +4,8 @@ import AuthRouter from "./auth.route"
 import UserRouter from "./user.route"
 import DocsRouter from "./docs.route"
 import ProcessRouter from "./process.route"
-import { StatusCodes } from "http-status-codes"
+
+import controller from "../controllers/api.controller"
 
 // Mindgest API Router
 const api = Router()
@@ -16,12 +17,6 @@ api.use("/docs", DocsRouter)
 api.use("/process", ProcessRouter)
 
 // Healthcheck
-api.get("/healthcheck", (_, res) => {
-  res.status(StatusCodes.OK).send({
-    uptime: process.uptime(),
-    message: "Healthy",
-    date: new Date(),
-  })
-})
+api.get("/healthcheck", controller.healthcheck)
 
 export default api

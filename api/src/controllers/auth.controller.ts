@@ -7,7 +7,7 @@ import logger from "../utils/logger"
 import prisma from "../utils/prisma"
 
 import { fetchPersonProperties } from "../services/user.service"
-import { sendResetPasswordEmail, sendVerificationEmail } from "../utils/mail/mailler"
+import { sendResetPasswordEmail, sendVerificationEmail } from "../utils/mailler"
 
 import {
   attachCookies,
@@ -99,8 +99,8 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (therapist)...`)
         await prisma.therapist.create({
           data: {
-            cedula: req.body.cedula,
-            healthsystem: req.body.health_system,
+            license: req.body.license,
+            healthsystem: req.body.healthSystem,
             extern: false,
             person: { connect: { id: person.id } },
           },
@@ -119,10 +119,10 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
     }
     logger.info(`REGISTER [${req.body.email}] => Account Created!`)
     res.status(StatusCodes.CREATED).json({
-      message: "The user was created successfully",
+      message: "The user account was created successfully",
     })
   } catch (error) {
-    logger.error(`REFRESH => Server Error: ${error}`)
+    logger.error(`REGISTER => Server Error: ${error}`)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -142,7 +142,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
     if (person === null) {
       logger.info(`LOGIN [${req.body.email}] => User does not exist!`)
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: `The user with email "${req.body.email}" does not exist.`,
+        message: `The user with email ${req.body.email} does not exist.`,
       })
     }
 
@@ -186,17 +186,19 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
 
     // Access Token Information
     const accessTokenPayload = {
-      id: person.id,
+      id: Number(person.id),
       admin: isAdmin,
       role: userRole,
     }
 
     // Refresh Token Information
     const refreshTokenPayload = {
-      person: person.id,
-      ip: req.ip,
-      userAgent: req.headers["user-agent"],
-      creationDate: req.headers.date,
+      person: Number(person.id),
+      session: {
+        ip: req.ip,
+        userAgent: req.headers["user-agent"],
+        creationDate: req.headers.date,
+      },
     }
 
     // Generate/Sign Access Token
@@ -243,7 +245,7 @@ export async function refresh(req: Request<{}, {}, RefreshBody>, res: Response) 
 
         // Access Token Information
         const accessTokenPayload = {
-          id: person.id,
+          id: Number(person.id),
           admin: isAdmin,
           role: userRole,
         }
@@ -300,7 +302,7 @@ export async function verify(req: Request<{}, {}, VerifyAccountBody>, res: Respo
     if (person?.verified) {
       logger.debug(`VERIFY [${person?.email}] => User already verified!`)
       return res.status(StatusCodes.OK).json({
-        message: "The current user was already verified",
+        message: "The current user's account was already verified",
       })
     }
 
@@ -316,6 +318,50 @@ export async function verify(req: Request<{}, {}, VerifyAccountBody>, res: Respo
     })
   } catch (error) {
     logger.error(`VERIFY => Server Error: ${error}`)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export async function accountVerification(
+  req: Request<{}, {}, AccountVerificationSchema>,
+  res: Response
+) {
+  try {
+    const person = await prisma.person.findFirst({
+      where: { email: req.body.email },
+    })
+
+    // Check if the user exists
+    if (person === null) {
+      logger.info(
+        `VERIFY-ACCOUNT [${req.body.email}] => Forgot password failed. User does not exist!`
+      )
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `The user with email "${req.body.email}" does not exist.`,
+      })
+    }
+
+    logger.info(`VERIFY-ACCOUNT  [${req.body.email}] => Verify account token request`)
+
+    logger.debug(`VERIFY-ACCOUNT  [${req.body.email}] => Generation account verification token...`)
+    // Create a simple token for user verification
+    let token = createToken({ person: Number(person.id) })
+
+    // Send email if callback is provided
+    if (req.body.callback) {
+      logger.debug(`VERIFY-ACCOUNT [${req.body.email}] => Sending account verification email...`)
+      await sendVerificationEmail(person.name, person.email, token, req.body.callback)
+    }
+
+    logger.debug(`VERIFY-ACCOUNT [${req.body.email}] => Verify account token generated...`)
+    res.status(StatusCodes.OK).json({
+      message: "Account verification token generated",
+      token: req.body.callback ? "The verification token was sent by email!" : token,
+    })
+  } catch (error) {
+    logger.error(`VERIFY-ACCOUNT => Server Error: ${error}`)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -368,54 +414,10 @@ export async function forgotPassword(req: Request<{}, {}, ForgotPasswordBody>, r
     logger.info(`FORGOT-PASS [${req.body.email}] => Password reset token generated...`)
     res.status(StatusCodes.OK).json({
       message: "Password reset token generated",
-      token: token,
+      token: req.body.callback ? "The password reset token was sent by email" : token,
     })
   } catch (error) {
     logger.error(`FORGOT-PASS => Server Error: ${error}`)
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "Ups... Something went wrong",
-    })
-  }
-}
-
-export async function accountVerification(
-  req: Request<{}, {}, AccountVerificationSchema>,
-  res: Response
-) {
-  try {
-    const person = await prisma.person.findFirst({
-      where: { email: req.body.email },
-    })
-
-    // Check if the user exists
-    if (person === null) {
-      logger.info(
-        `VERIFY-ACCOUNT [${req.body.email}] => Forgot password failed. User does not exist!`
-      )
-      return res.status(StatusCodes.NOT_FOUND).json({
-        message: `The user with email "${req.body.email}" does not exist.`,
-      })
-    }
-
-    logger.info(`VERIFY-ACCOUNT  [${req.body.email}] => Verify account token request`)
-
-    logger.debug(`VERIFY-ACCOUNT  [${req.body.email}] => Generation account verification token...`)
-    // Create a simple token for user verification
-    let token = createToken({ person: Number(person.id) })
-
-    // Send email if callback is provided
-    if (req.body.callback) {
-      logger.debug(`VERIFY-ACCOUNT [${req.body.email}] => Sending account verification email...`)
-      await sendVerificationEmail(person.name, person.email, token, req.body.callback)
-    }
-
-    logger.debug(`VERIFY-ACCOUNT [${req.body.email}] => Verify account token generated...`)
-    res.status(StatusCodes.OK).json({
-      message: "Account verification token generated",
-      token: token,
-    })
-  } catch (error) {
-    logger.error(`VERIFY-ACCOUNT => Server Error: ${error}`)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })

@@ -1,0 +1,732 @@
+openapi: 3.0.3
+info:
+  description: This is the Mindgest Rest API Documentation
+  title: Mindgest API Documentation
+  contact:
+    email: gp2223@gmail.com
+  license:
+    name: MIT
+    url: https://mit-license.org/
+  version: 0.1.0
+servers:
+  - url: http://mindgest.dei.uc.pt/api
+    description: Production Server
+  - url: http://localhost:8080/api
+    description: Development Server
+externalDocs:
+  description: Find out more about us
+  url: http://github.com/Mindgest
+tags:
+  - name: General
+    description: API Utilities
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Authentication
+    description: Authentication Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: User
+    description: User Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Appointment
+    description: Appointment Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Process
+    description: Process Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Room
+    description: Room Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Specialty
+    description: Specialty Managment Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+  - name: Documentation
+    description: Rest API Documentation
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
+paths:
+  /healthcheck:
+    get:
+      tags:
+        - General
+      summary: Mindgest API Documentation Web Page
+      description: Fetch the Swagger UI version of the documentation (static website)
+      operationId: docs
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json: {}
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /docs:
+    get:
+      tags:
+        - Documentation
+      summary: Mindgest API Documentation Web Page
+      description: Fetch the Swagger UI version of the documentation (static website)
+      operationId: docs
+      responses:
+        "200":
+          description: OK
+          content:
+            application/html: {}
+  /docs/json:
+    get:
+      tags:
+        - Documentation
+      summary: Mindgest API Documentation in JSON Format
+      operationId: docs-json
+      description: Fetch the Swagger UI JSON version of the documentation
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              encoding:
+                historyMetadata:
+                  contentType: application/json; charset=utf-8
+  /auth/register:
+    post:
+      summary: Register
+      tags:
+        - Authentication
+      description: User Eegistration Enpoint
+      operationId: register
+      requestBody:
+        $ref: "#/components/requestBodies/Register"
+      responses:
+        "200":
+          $ref: "#/components/responses/RegistrationSuccessful"
+        "409":
+          $ref: "#/components/responses/UserAlreadyExists"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /auth/login:
+    post:
+      summary: Login
+      tags:
+        - Authentication
+      description: User Authentication Enpoint
+      operationId: login
+      requestBody:
+        $ref: "#/components/requestBodies/Login"
+      responses:
+        "200":
+          $ref: "#/components/responses/LoginSuccessFull"
+        "401":
+          $ref: "#/components/responses/LoginUnauthorized"
+        "404":
+          $ref: "#/components/responses/UserNotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /auth/refresh:
+    post:
+      summary: Refresh Access Token
+      tags:
+        - Authentication
+      description: Refresh User Access Tokens
+      operationId: refresh
+      requestBody:
+        $ref: "#/components/requestBodies/Refresh"
+      responses:
+        "201":
+          $ref: "#/components/responses/RefreshSuccessful"
+        "401":
+          $ref: "#/components/responses/UserLoggedOut"
+        "403":
+          $ref: "#/components/responses/RefreshTokenInvalid"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /auth/verify-account:
+    post:
+      summary: Verify Account
+      tags:
+        - Authentication
+      description: Verify a user's account (using the verification token)
+      operationId: verify-account
+      requestBody:
+        $ref: "#/components/requestBodies/Verify"
+      responses:
+        "200":
+          $ref: "#/components/responses/VerificationSuccessful"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /auth/account-verification:
+    post:
+      summary: Send Account Verification Email
+      tags:
+        - Authentication
+      description: |
+        Send the user's account verification token by email together with a 
+        callback to the frontend of the application, to which the user
+        should be redirected when the verification is successful, if 
+        such callback is provided.
+      operationId: account-verification-email
+      requestBody:
+        $ref: "#/components/requestBodies/AccountVerification"
+      responses:
+        "400":
+          $ref: "#/components/responses/UserNotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /auth/forgot-password:
+    post:
+      summary: Send Password Reset Email
+      tags:
+        - Authentication
+      description: |
+        Send the user's account password reset token by email together with a 
+        callback to the frontend of the application, to which the user should
+        be redirected for password reset, if such callback is provided.
+      requestBody:
+        $ref: "#/components/requestBodies/ForgotPassword"
+      responses:
+        "400":
+          $ref: "#/components/responses/UserNotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /auth/reset-password:
+    post:
+      summary: Reset Password
+      tags:
+        - Authentication
+      description: Reset the user's password (using the password reset token)
+      requestBody:
+        $ref: "#/components/requestBodies/ResetPassword"
+      responses:
+        "200":
+          $ref: "#/components/responses/PasswordResetSuccessful"
+        "403":
+          $ref: "#/components/responses/PasswordResetTokenInvalid"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  schemas:
+    Admin:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The admin's name
+        email:
+          type: string
+          format: email
+          description: The admin's email address
+        password:
+          type: string
+          description: The admin's password
+        address:
+          type: string
+          description: The admin's home address
+        birthDate:
+          type: string
+          format: date-time
+          description: The admin's birth date
+        phoneNumber:
+          type: number
+          format: int64
+          description: The admin's phone number
+    Therapist:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The therapist's name
+        email:
+          type: string
+          format: email
+          description: The therapist's email address
+        password:
+          type: string
+          description: The therapist's password
+        address:
+          type: string
+          description: The therapist's home address
+        birthDate:
+          type: string
+          format: date-time
+          description: The therapist's birth date
+        phoneNumber:
+          type: number
+          format: int64
+          description: The therapist's phone number
+        healthSystem:
+          type: string
+          nullable: true
+          description: The therapist's health system
+        license:
+          type: string
+          description: The therapist's fiscal number
+        nif:
+          type: number
+          format: int64
+          description: The therapist's fiscal number
+    Intern:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The intern's name
+        email:
+          type: string
+          format: email
+          description: The intern's email address
+        password:
+          type: string
+          description: The intern's password
+        address:
+          type: string
+          description: The intern's home address
+        birthDate:
+          type: string
+          format: date-time
+          description: The intern's birth date
+        phoneNumber:
+          type: number
+          format: int64
+          description: The intern's phone number
+    Accountant:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The accountant's name
+        email:
+          type: string
+          format: email
+          description: The accountant's email address
+        password:
+          type: string
+          description: The accountant's password
+        address:
+          type: string
+          description: The accountant's home address
+        birthDate:
+          type: string
+          format: date-time
+          description: The accountant's birth date
+        phoneNumber:
+          type: number
+          format: int64
+          description: The accountant's fiscal number
+        nif:
+          type: number
+          format: int64
+          description: The accountant's fiscal number
+    Guard:
+      properties:
+        name:
+          type: string
+          description: The guard's email account
+        email:
+          type: string
+          format: email
+          description: The guard's email address
+        password:
+          type: string
+          format: password
+          description: The guard's password
+        address:
+          type: string
+          description: The guard's home address
+        birthDate:
+          type: string
+          description: The guard's birth date
+          format: date-time
+        phoneNumber:
+          type: number
+          description: The guard's phone number
+          format: int64
+        nif:
+          type: number
+          description: The guard's fiscal number
+          format: int64
+  requestBodies:
+    Login:
+      description: The body payload object
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              email:
+                type: string
+                description: The user's email
+                example: "johndoe@student.dei.uc.pt"
+              password:
+                type: string
+                description: The user's password
+                example: "password1234"
+      required: true
+    Register:
+      description: Information of the user to register
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/Therapist"
+              - $ref: "#/components/schemas/Admin"
+              - $ref: "#/components/schemas/Guard"
+              - $ref: "#/components/schemas/Intern"
+              - $ref: "#/components/schemas/Accountant"
+            properties:
+              role:
+                type: string
+                description: User's role
+                enum:
+                  - therapist
+                  - admin
+                  - guard
+                  - intern
+                  - accountant
+          example:
+            role: therapist
+            name: John Doe
+            email: johndoe@student.dei.uc
+            password: password1234
+            address: Wall Streed
+            birthDate: "1990-11-21T23:50:28.538Z"
+            phoneNumber: 9219231942
+            healthSystem: adse
+            license: "51382"
+            nif: 283192189
+    Refresh:
+      description: The Refresh Token
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              refreshToken:
+                type: string
+                description: The user's refresh token
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwZXJzb24iOjIsInNlc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2NjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
+    Verify:
+      description: The verification token (sent by email)
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              token:
+                type: string
+                description: The user's verification token
+                example: eyJVCJ9.ZXJzb24iOjIsInNlhbGciOiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2NjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
+    AccountVerification:
+      description: |
+        The email address of the account owner to which the verification email should be sent 
+        (if the callback is supplied) otherwise a verification token will be sent on the 
+        response body.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              email:
+                type: string
+                description: The email of the user to verify
+                example: johndoe@student.dei.uc.pt
+              callback:
+                type: string
+                description: |
+                  The callback to the frontend of the application. The verification token 
+                  will be appended to the callback (as a request parameter)
+                example: "http://frontend.com/verification-page"
+                nullable: true
+    ForgotPassword:
+      description: |
+        The email address of the account owner to which the password reset email should be sent 
+        (if the callback is supplied) otherwise a verification token will be sent on the 
+        response body.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              email:
+                type: string
+                description: The email of the user that wants to reset the password
+                example: johndoe@student.dei.uc.pt
+              callback:
+                type: string
+                description: |
+                  The callback to the frontend of the application. The password reset token 
+                  will be appended to the callback (as a request parameter)
+                example: "http://frontend.com/password-reset-page"
+                nullable: true
+    ResetPassword:
+      description: The password reset token (sent by email)
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              token:
+                type: string
+                description: The user's password reset token
+                example: eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
+  responses:
+    LoginSuccessFull:
+      description: Login Successful
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The user was created successfully
+              accessToken:
+                type: string
+                description: The access token to be used for authorization
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiYWRtaW4iOmZhbHNlLCJyb2xlIjoiaW50ZXJuIiwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNjg5NjF9.xMacrxoiqpUg6frCEYCqNnSHedaI1QYiml6RgKmYeL4
+              refreshToken:
+                type: string
+                description: The refresh token to be used for adquiring a new access token
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwZXJzb24iOjIsInNlc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2NjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
+    AccountNotVerified:
+      description: The user did not verify the account
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The account is not verified!
+    AccountNotAproved:
+      description: The account is not approved by an admin. Contant an admin to solve the issue
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The account was not approved!
+    InvalidPassword:
+      description: The user did not verify its account's email
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The account was not approved by an admin!
+    LoginUnauthorized:
+      description: Login Unauthorized.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            example:
+              message: Login. Invalid credentials
+            oneOf:
+              - $ref: "#/components/responses/InvalidPassword"
+              - $ref: "#/components/responses/AccountNotAproved"
+              - $ref: "#/components/responses/AccountNotVerified"
+    InternalServerError:
+      description: An internal error has occurred while processing the request
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            example:
+              message: An internal error has occurred while processing the request
+            properties:
+              message:
+                type: string
+                description: Ups... Something went wrong
+    UserNotFound:
+      description: The user is not registered in the application
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: The user is not registered in the application
+                example: The user does not exist!
+
+    UserAlreadyExists:
+      description: The user already has an account in the application
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: A user with this email already exists!
+    RegistrationSuccessful:
+      description: Registration Successful
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The user account was created successfully!
+    RefreshSuccessful:
+      description: Token Refresh Successful
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: User's access token refreshed
+              accessToken:
+                type: string
+                description: The access token to be used for authorization
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiYWRtaW4iOmZhbHNlLCJyb2xlIjoiaW50ZXJuIiwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNjg5NjF9.xMacrxoiqpUg6frCEYCqNnSHedaI1QYiml6RgKmYeL4
+              refreshToken:
+                type: string
+                description: The refresh token to be used for adquiring a new access token
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwZXJzb24iOjIsInNlc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2NjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
+    UserLoggedOut:
+      description: Refresh request unauthorized.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Unauthorized. The user must login first and obtain an access token
+    RefreshTokenInvalid:
+      description: The user's Refresh Token expired or is invalid
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Refresh token invalid or expired
+    VerificationTokenInvalid:
+      description: The user's Verification Token is expired/invalid
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Verification token invalid or expired
+    VerificationSuccessful:
+      description: Verification Successful.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Account [already] verified successfully!
+    PasswordResetSuccessful:
+      description: Password Reset Successful.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Password Reset Successful!
+    PasswordResetTokenInvalid:
+      description: The user's password reset token is expired/invalid
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Password reset token invalid or expired
+  securitySchemes:
+    Access Token:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
