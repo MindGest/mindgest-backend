@@ -49,7 +49,7 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
   await prisma.therapist.update({
     data: {
       extern: body.extern,
-      license: body.license,
+      //license: body.license,
       person: {
         update: {
           active: body.active,
