@@ -13,7 +13,6 @@ const auth = Router()
 
 // Middleware
 auth.use(cookieParser(COOKIE_SECRET))
-auth.use(bodyParser.urlencoded({ extended: false }))
 
 // Enpoints
 auth.post("/register", middleware.requestValidator(schemas.RegistrationSchema), controller.register)

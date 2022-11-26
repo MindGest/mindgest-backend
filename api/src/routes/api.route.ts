@@ -8,6 +8,11 @@ import AppointmentRouter from "./appointment.route"
 
 import controller from "../controllers/api.controller"
 
+// Util
+;(BigInt.prototype as any).toJSON = function () {
+  return Number(this.toString())
+}
+
 // Mindgest API Router
 const api = Router()
 

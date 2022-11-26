@@ -13,11 +13,7 @@ services:
     volumes:
       - ./data/:/var/lib/postgresql/data/
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
-        ]
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'" ]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -44,11 +40,7 @@ services:
     volumes:
       - ../api:/usr/src/mindgest
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "sh -c 'curl --fail http://localhost:8080/api/healthcheck || exit 1'"
-        ]
+      test: [ "CMD-SHELL", "sh -c 'curl --fail http://localhost:8080/api/healthcheck || exit 1'" ]
       interval: 10s
       timeout: 3s
       retries: 3

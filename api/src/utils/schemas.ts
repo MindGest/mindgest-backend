@@ -158,6 +158,8 @@ export const VerifyAccountSchema = z.object({
     .required(),
 })
 
+export const EditProfileSchema = RegistrationSchema
+
 // it has the token of the user that called the method (token) and the info of the user that is going to be updated
 export const EditUserSchema = z.object({
   body: z.object({
@@ -317,4 +319,7 @@ export default {
   AppointmentsListSchema,
   AppointmentInfoSchema,
   AppointmentEditSchema,
+  EditProfileSchema,
+  TherapistUpdateSchema,
+  InternUpdateSchema
 }

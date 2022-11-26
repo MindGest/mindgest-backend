@@ -126,18 +126,18 @@ model patienttype {
 }
 
 model permissions {
-  editprocess      Boolean @default(false)
-  see              Boolean @default(false)
-  appoint          Boolean @default(false)
-  statitics        Boolean @default(false)
-  editpatitent     Boolean @default(false)
-  archive          Boolean @default(false)
-  isMain           Boolean @default(false)
-  id               BigInt  @id @default(autoincrement())
-  person_id        BigInt
-  person           person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
-  process_id       BigInt
-  process          process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk2")
+  editprocess  Boolean @default(false)
+  see          Boolean @default(false)
+  appoint      Boolean @default(false)
+  statitics    Boolean @default(false)
+  editpatitent Boolean @default(false)
+  archive      Boolean @default(false)
+  isMain       Boolean @default(false)
+  id           BigInt  @id @default(autoincrement())
+  person_id    BigInt
+  person       person  @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
+  process_id   BigInt
+  process      process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk2")
 }
 
 model person {
