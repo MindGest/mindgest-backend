@@ -216,6 +216,151 @@ paths:
           $ref: "#/components/responses/PasswordResetTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /api/process/archive:
+    post:
+      summary: Archives process
+      tags:
+        - Process
+      description: Archives process
+      requestBody:
+        $ref: "#/components/requestBodies/ProcessIdToken"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessArchived"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/process/info:
+    get:
+      summary: All the information of a process
+      tags:
+        - Process
+      description: All the information of a process
+      requestBody:
+        $ref: "#/components/requestBodies/ProcessIdToken"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessInfo"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/process/list:
+    get:
+      summary: Lists every process
+      tags:
+        - Process
+      description: Lists every process
+      requestBody:
+        $ref: "#/components/requestBodies/Token"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessList"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/process/list/active:
+    get:
+      summary: Lists every active process
+      tags:
+        - Process
+      description: Lists every active process
+      requestBody:
+        $ref: "#/components/requestBodies/Token"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessList"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/process/activate:
+    post:
+      summary: Activates a process
+      tags:
+        - Process
+      description: Activates a process
+      requestBody:
+        $ref: "#/components/requestBodies/ProcessIdToken"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessActivated"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/process/create:
+    post:
+      summary: Creates new process
+      tags:
+        - Process
+      description: Creates new process
+      requestBody:
+        $ref: "#/components/requestBodies/ProcessCreate"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessCreated"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/process/edit:
+    post:
+      summary: Edits process
+      tags:
+        - Process
+      description: Edits process
+      requestBody:
+        $ref: "#/components/requestBodies/ProcessEdit"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessEdited"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/process/appointments:
+    get:
+      summary: Lists every appointment from process
+      tags:
+        - Process
+      description: Lists every appointment from process
+      requestBody:
+        $ref: "#/components/requestBodies/ProcessIdToken"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessAppointments"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/process/permissions:
+    post:
+      summary: Edits process permission for user
+      tags:
+        - Process
+      description: Edits process permission for user
+      requestBody:
+        $ref: "#/components/requestBodies/ProcessEditPermissions"
+      responses:
+        "200":
+          $ref: "#/components/responses/ProcessEditedPermissions"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 components:
   schemas:
     Admin:
@@ -496,6 +641,107 @@ components:
                 type: string
                 description: The user's password reset token
                 example: eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
+    ProcessIdToken:
+      description: Process ID and JWT    
+      content:
+        application/json:
+          schema:
+            properties:
+              token:
+                type: string
+                summary: jwt from login
+              processId:
+                type: integer
+                summary: process to archive  
+    Token:
+      description: JWT   
+      content:
+        application/json:
+          schema:
+            properties:
+              token:
+                type: string
+                summary: jwt from login
+    ProcessCreate:
+      description: Creates a new process   
+      content:
+        application/json:
+          schema:
+            properties:
+              token:
+                type: string
+                summary: jwt from login
+              patientId:
+                type: integer
+                summary: id of patient
+              therapistId:
+                type: integer
+                summary: Id of therapist in charge of the proccess
+              speciality:
+                type: string
+                summary: Type of process, types need to be already created beforehand
+              remarks:
+                type: string
+                summary: any extra info the therapeut creating the process might wanna add
+    ProcessEdit:
+      description: Edits process
+      content:
+        application/sjon:
+          schema:
+            properties:
+              token:
+                type: string
+                summary: jwt from login
+              therapistId:
+                type: integer
+                summary: Id of therapist in charge of the proccess
+              speciality:
+                type: string
+                summary: Type of process, types need to be already created beforehand
+              remarks:
+                type: string
+                summary: any extra info the therapeut creating the process might wanna add
+              colaborators:
+                type: array
+                items:
+                  type: integer
+                  summary: ids of collaborates
+              processId:
+                type: string
+                summary: Id of process
+    ProcessEditPermissions:
+      description: Edits process
+      content:
+        application/sjon:
+          schema:
+            properties:
+              token:
+                type: string
+                summary: jwt from login
+              processId:
+                type: integer
+                summary: id of process
+              collaboratorId:
+                type: integer
+                summary: Id of the collaborator to change permissions
+              appoint:
+                type: boolean
+                summary: True if user has permissions to create appointments and False if not
+              statitics:
+                type: boolean
+                summary: True if user has permissions to see statitics and False if not
+              ditProcess:
+                type: boolean
+                summary: True if user has permissions to edit process and False if not
+              editPatient:
+                type: boolean
+                summary: True if user has permissions to edit patient and False if not
+              archive:
+                type: boolean
+                summary: True if user has permissions to archive and False if not
+              see:
+                type: boolean
+                summary: True if user has permissions to see process info and False if not
   responses:
     LoginSuccessFull:
       description: Login Successful
@@ -724,6 +970,163 @@ components:
                 type: string
                 description: A message describing the request result
                 example: Password reset token invalid or expired
+    ProcessInfo:
+      description: Process Information
+      content:
+        application/json:
+          schema:
+            properties:
+              therapistId:
+                type: integer
+                example: 1
+              ref:
+                type: string
+                example: "process ref"
+              colaborators:
+                type: array
+                items:
+                    type: string
+                    example: "Marta Santos (Em Estágio)"
+              utent:
+                type: string
+                example: "Ricardo Maria"
+              active:
+                type: boolean
+                summary: True if process is active, false if archived or not yet approved
+              financialSituation:
+                type: boolean
+                summary: True if everything in order, false if patitent has late payments
+              speciality:
+                type: string
+                example: "Familiar"
+    NoAuthorization:
+      description: User doesn't have authorization
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: User doesn't have authorization
+    ProcessArchived:
+      description: Process Archived
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Process Archived
+    ProcessList:
+      description: List of processes
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              list:
+                type: object
+                properties:
+                  therapistListing:
+                    type: array
+                    items:
+                        type: string
+                        example: Marta Santos
+                  patientName:
+                    type: string
+                    example: Ricardo Maria
+                  refCode:
+                    type: string
+                    example: 23fdfd4e3
+                  nextAppointment:
+                    type: string
+                    summary: \'No next Appointment\' if no appointment has been made or the date, in string format, of next date
+    ProcessActivated:
+      description: Process Activated
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Process Activated
+    ProcessCreated:
+      description: Process Created
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Process Created
+    ProcessEdited:
+      description: Process Edited
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Process Edited
+    ProcessAppointments:
+      description: All appointments from a process
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              online:
+                type: boolean
+                summary: True if appointment is online false if on site
+              start_date:
+                type: string
+                example: FALTA ADICIONAR EXEMPLO
+              end_date:
+                type: string
+                example: FALTA ADICIONAR EXEMPLO 
+              room:
+                type: string
+                example: Sala de aula C4.4
+              type:
+                type: string
+                example: familiar
+    ProcessEditedPermissions:
+      description: Process Permissions Updated
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Permission updated
   securitySchemes:
     Access Token:
       type: http
