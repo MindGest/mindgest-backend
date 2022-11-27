@@ -83,7 +83,7 @@ $ npm run prisma:studio
 ## Testing the project
 To run the integration/unit tests run the following command
 ```sh
-$ npm run test
+$ npm test
 ```
 
 ## Running the project
@@ -110,7 +110,7 @@ the following commands:
 ```sh
 $ npm run clean
 ```
-# Uninstall
+## Uninstalling
 To completely remove all the generated files, including
 the installed packages please run:
 ```sh
