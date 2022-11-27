@@ -2,7 +2,6 @@
 
 ![Build](https://github.com/MindGest/mindgest-backend/actions/workflows/node.js.yml/badge.svg?brach=main)
 
-kkk
 A **nodejs** + **express** implementation of a REST API (backend) for the MindGest application.
 
 ![Image](./docs/assets/logo.png)
