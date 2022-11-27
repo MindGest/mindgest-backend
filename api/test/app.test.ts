@@ -1,14 +1,14 @@
 import request from "supertest"
 import dotenv from "dotenv"
+import { describe, expect, it } from "@jest/globals"
 
 dotenv.config()
 
-import api from "../src/routes/api.route"
+import app from "../src/main"
 
-describe("GET / - a simple api endpoint", () => {
-  it("Hello API Request", async () => {
-    const result = await request(api).get("/api")
-    expect(result.text).toEqual("<h1>Hello World!</h1>")
+describe("Test if the REST API runs", () => {
+  it("Should be healthy", async () => {
+    const result = await request(app).get("/api/healthcheck")
     expect(result.statusCode).toEqual(200)
   })
 })

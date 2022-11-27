@@ -10,7 +10,7 @@
     "start": "node build/src/main.js",
     "dev": "tsc-watch --onSuccess \"ts-node src/main.ts\" ",
     "test": "jest",
-    "prisma:build": "npx prisma generate",
+    "prisma:generate": "npx prisma generate",
     "prisma:push": "npx prisma db push",
     "prisma:studio": "npx prisma studio",
     "prisma:seed": "npx prisma db seed",

@@ -6,8 +6,9 @@ const FILE_UPLOAD_DIR = String(process.env.FILE_UPLOAD_DIR)
 
 const storage = multer.diskStorage({
   destination: (_, __, callback) => {
-    fs.mkdirSync(FILE_UPLOAD_DIR, { recursive: true }) 
-    callback(null, FILE_UPLOAD_DIR)},
+    fs.mkdirSync(FILE_UPLOAD_DIR, { recursive: true })
+    callback(null, FILE_UPLOAD_DIR)
+  },
   filename: (req, file, cb) => {
     let name = file.originalname
     let ext = path.extname(name)

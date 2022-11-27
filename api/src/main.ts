@@ -14,12 +14,13 @@ import api from "./routes/api.route"
 import logger from "./utils/logger"
 import middleware from "./middleware/api.middleware"
 import compression from "compression"
+import e from "express"
 
 // Environment Variables
 const HOST = String(process.env.HOST)
 const PORT = Number(process.env.PORT)
 
-// Utilities 
+// Utilities
 let connections: any = []
 
 function stop(server: Server) {
@@ -88,4 +89,6 @@ app.get("/", (_: Request, res: Response) =>
 app.use(middleware.notFound)
 
 // Start Server
-start(app)
+if (require.main === module) start(app)
+
+export default app

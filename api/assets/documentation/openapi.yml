@@ -418,7 +418,7 @@ components:
         license:
           type: string
           description: The therapist's fiscal number
-        nif:
+        taxNumber:
           type: number
           format: int64
           description: The therapist's fiscal number
@@ -470,7 +470,7 @@ components:
           type: number
           format: int64
           description: The accountant's fiscal number
-        nif:
+        taxNumber:
           type: number
           format: int64
           description: The accountant's fiscal number
@@ -498,7 +498,7 @@ components:
           type: number
           description: The guard's phone number
           format: int64
-        nif:
+        taxNumber:
           type: number
           description: The guard's fiscal number
           format: int64
@@ -555,7 +555,7 @@ components:
             phoneNumber: 9219231942
             healthSystem: adse
             license: "51382"
-            nif: 283192189
+            taxNumber: 283192189
     Refresh:
       description: The Refresh Token
       content:
@@ -642,7 +642,7 @@ components:
                 description: The user's password reset token
                 example: eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
     ProcessIdToken:
-      description: Process ID and JWT    
+      description: Process ID and JWT
       content:
         application/json:
           schema:
@@ -652,9 +652,9 @@ components:
                 summary: jwt from login
               processId:
                 type: integer
-                summary: process to archive  
+                summary: process to archive
     Token:
-      description: JWT   
+      description: JWT
       content:
         application/json:
           schema:
@@ -663,7 +663,7 @@ components:
                 type: string
                 summary: jwt from login
     ProcessCreate:
-      description: Creates a new process   
+      description: Creates a new process
       content:
         application/json:
           schema:
@@ -985,8 +985,8 @@ components:
               colaborators:
                 type: array
                 items:
-                    type: string
-                    example: "Marta Santos (Em Estágio)"
+                  type: string
+                  example: "Marta Santos (Em Estágio)"
               utent:
                 type: string
                 example: "Ricardo Maria"
@@ -995,7 +995,7 @@ components:
                 summary: True if process is active, false if archived or not yet approved
               financialSituation:
                 type: boolean
-                summary: True if everything in order, false if patitent has late payments
+                summary: True if everything in order, false if patient has late payments
               speciality:
                 type: string
                 example: "Familiar"
@@ -1040,8 +1040,8 @@ components:
                   therapistListing:
                     type: array
                     items:
-                        type: string
-                        example: Marta Santos
+                      type: string
+                      example: Marta Santos
                   patientName:
                     type: string
                     example: Ricardo Maria
@@ -1050,7 +1050,9 @@ components:
                     example: 23fdfd4e3
                   nextAppointment:
                     type: string
-                    summary: \'No next Appointment\' if no appointment has been made or the date, in string format, of next date
+                    summary: |
+                      No next Appointment if no appointment has been made or the date, in string
+                      format, of next date
     ProcessActivated:
       description: Process Activated
       content:
@@ -1107,7 +1109,7 @@ components:
                 example: FALTA ADICIONAR EXEMPLO
               end_date:
                 type: string
-                example: FALTA ADICIONAR EXEMPLO 
+                example: FALTA ADICIONAR EXEMPLO
               room:
                 type: string
                 example: Sala de aula C4.4
