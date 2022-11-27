@@ -97,7 +97,6 @@ model notifications {
 }
 
 model patient {
-  tax_number      BigInt
   health_number   BigInt
   request         String            @db.VarChar(512)
   remarks         String?           @db.VarChar(512)
@@ -151,7 +150,8 @@ model person {
   phone_number  BigInt
   verified      Boolean
   active        Boolean
-  aproved       Boolean
+  approved      Boolean
+  tax_number    BigInt?
   accountant    accountant?
   admin         admin?
   guard         guard?
@@ -235,7 +235,7 @@ model speciality {
 model therapist {
   extern                 Boolean
   license                String?                  @db.VarChar(512)
-  healthsystem           String?                  @db.VarChar(512)
+  health_system          String?                  @db.VarChar(512)
   person_id              BigInt                   @id
   person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
   therapist_availability therapist_availability[]

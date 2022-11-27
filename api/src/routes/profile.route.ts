@@ -7,13 +7,13 @@ import controller from "../controllers/profile.controller"
 const profile = Router()
 
 // Endpoints
-
-profile.post("/picture", upload, controller.uploadProfilePicture)
-
-profile.get("/picture", controller.downloadProfilePicture)
+profile
+  .route("/picture")
+  .post(upload, controller.uploadProfilePicture)
+  .get(controller.downloadProfilePicture)
 
 profile.get("/info", controller.fetchProfileInfo)
 
-profile.put("/edit", (req: Request, res: Response) => console.log("TODO"))
+profile.put("/edit", controller.editProfileInfo)
 
 export default profile

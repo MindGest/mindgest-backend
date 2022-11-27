@@ -24,6 +24,6 @@ api.use("/process", ProcessRouter)
 api.use("/appointment", AppointmentRouter)
 
 // Healthcheck
-api.get("/healthcheck", controller.healthcheck)
+api.get("/healthcheck", controller.healthCheck)
 
 export default api

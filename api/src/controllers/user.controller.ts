@@ -4,118 +4,106 @@ import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
 import { EditUserBody } from "../utils/types"
+import {
+  fetchPersonProperties,
+  updateInfoAccountant,
+  updateInfoAdmin,
+  updateInfoGuard,
+  updateInfoIntern,
+  updateInfoTherapist,
+} from "../services/user.service"
+import {
+  AccountantUpdateSchema,
+  AdminUpdateSchema,
+  GuardUpdateSchema,
+  InternUpdateSchema,
+  TherapistUpdateSchema,
+} from "../utils/schemas"
 
-export async function getAllUsers(req: Request, res: Response) {
-  // para filtrar info receber parametros pelo body
-  var users = await prisma.person.findMany({
-    include: {
-      patient: {
+export async function getUsers(req: Request, res: Response) {
+  const { id, role, isAdmin } = res.locals.token
+  try {
+    if (role === "admin" || (role === "therapist" && isAdmin)) {
+      let users = await prisma.person.findMany({
+        where: { id: { not: id } },
         include: {
-          school: true,
-          profession: true,
+          patient: {
+            include: {
+              school: true,
+              profession: true,
+            },
+          },
+          intern: true,
+          therapist: true,
+          accountant: true,
+          guard: true,
         },
-      },
-      intern: true,
-      therapist: true,
-      accountant: true,
-      guard: true,
-    },
-  })
-
-  res.status(StatusCodes.OK).json({
-    users: users,
-  })
+      })
+      return res.status(StatusCodes.OK).json({
+        message: "Successfully retrieved a user list",
+        info: users,
+      })
+    }
+    res.status(StatusCodes.FORBIDDEN).json({
+      message: "The user does not have permission to access this endpoint",
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
 }
 
-/**
- * Acho que para cenas como alterar a role de alguem no sistema, tem de se usar outro endpoint, especifico para isso
- */
+export async function editUser(req: Request<{ user: Number }, {}, EditUserBody>, res: Response) {
+  const { id, role, isAdmin } = res.locals.token
+  try {
+    if (isAdmin) {
+      const userToEdit = await prisma.person.findUnique({
+        where: { id: Number(req.params.user) },
+      })
 
-export async function editUser(req: Request<{}, {}, EditUserBody>, res: Response) {
-  /**
-   * No body do request tem de vir o id da pessoa (preciso de saber quem vai ser alterado)
-   * Com toda a informacao. Campos que nao são preenchidos pelo utilizador devem estar no body do request como null.
-   *
-   * Todos tem de estar como body.<property>, mesmo que sejam pertencentes a um sub-objeto.
-   */
+      if (!userToEdit) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "The user you wish to edit does not exist.",
+        })
+      }
+      const userToEditProps = await fetchPersonProperties(userToEdit.id)
 
-  // TODO
-  // verify that the person who called the method as access to edit the user's info
-  // It should work when:
-  //  - it is called by the actual user
-  //  - it is called by a therapist, admin and maybe an intern
+      if (userToEditProps.isAdmin) {
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: "This user may not be edited since it has admin privileges too!",
+        })
+      }
 
-  var userToEditType = req.body.userToEdit.role
+      try {
+        switch (userToEditProps.userRole) {
+          case "therapist":
+            updateInfoTherapist(Number(userToEdit.id), TherapistUpdateSchema.parse(req.body))
+          case "admin":
+            updateInfoAdmin(Number(userToEdit.id), AdminUpdateSchema.parse(req.body))
+          case "accountant":
+            updateInfoAccountant(Number(userToEdit.id), AccountantUpdateSchema.parse(req.body))
+          case "guard":
+            updateInfoGuard(Number(userToEdit.id), GuardUpdateSchema.parse(req.body))
+          case "intern":
+            updateInfoIntern(Number(userToEdit.id), InternUpdateSchema.parse(req.body))
+        }
+      } catch (error) {
+        return res.status(StatusCodes.NOT_ACCEPTABLE).json({
+          message:
+            "The information provided does not match the information required to edit the user's profile",
+        })
+      }
+    }
 
-  if (!canEdit()) {
     res.status(StatusCodes.FORBIDDEN).json({
       msg: "You cannot edit this user's profile.",
     })
-    return
+  } catch (error) {
+    res.send(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
   }
-
-  // switch (req.body.userToEdit.role) {
-  //   case "admin":
-  //     updateInfoPerson(req.body.userToEdit, res, req.body.id)
-  //   case "therapist":
-  //     updateInfoTherapist(req.body.userToEdit, res, req.body.id)
-  //   case "accountant":
-  //     updateInfoPerson(req.body.userToEdit, res, req.body.id)
-  //   case "guard":
-  //     updateInfoPerson(req.body.userToEdit, res, req.body.id)
-  //   case "intern":
-  //     updateInfoPerson(req.body.userToEdit, res, req.body.id)
-  //   case "patient":
-  //     updateInfoPatient(req.body.userToEdit, res, req.body.id)
-  // }
 }
 
-// interface Dictionary<T> {
-//     [Key: string]: T;
-// }
-
-async function canEdit() {
-  // tem de ter acesso a quem esta a fazer o pedido (jwt?) e de quem se quer alterar.
-
-  // checks if a user can edit or not
-  // if he is the user himself, then can, otherwise only can if he is an admin or one of the patients therapist
-
-  // type: patient -> admin, intern (with permissions?), therapist on the process
-  // type: other -> admin(?), himself
-
-  return true
-}
-
-async function getUserType(id: number) {
-  /**
-   * parameters:
-   * id: id that allows us to search the person in the database
-   *
-   * return:
-   * returns the type of the user that has id as an id.
-   */
-
-  var user
-
-  // check if the user is a patient
-  user = await prisma.patient.findUnique({ where: { person_id: id } })
-  if (user) return "patient"
-
-  // check if the user is an intern
-  user = await prisma.intern.findUnique({ where: { person_id: id } })
-  if (user) return "intern"
-
-  // check if the user is a therapist
-  user = await prisma.therapist.findUnique({ where: { person_id: id } })
-  if (user) return "therapist"
-
-  // check if the user is an accountant
-  user = await prisma.accountant.findUnique({ where: { person_id: id } })
-  if (user) return "accountant"
-
-  // check if the user is a guard
-  user = await prisma.guard.findUnique({ where: { person_id: id } })
-  if (user) return "guard"
-}
-
-export default { getAllUsers, editUser }
+export default { getUsers, editUser }

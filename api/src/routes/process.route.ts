@@ -4,7 +4,11 @@ import controller from "../controllers/process.controller"
 import middleware from "../middleware/api.middleware"
 import schemas from "../utils/schemas"
 
+import PatientRouter from "./patient.route"
+
 const process = Router()
+
+process.use("/:process", PatientRouter)
 
 /**
  * @openapi
@@ -25,13 +29,13 @@ const process = Router()
  *                              summary: jwt from login
  *                          processId:
  *                              type: integer
- *                              summary: process to archive      
+ *                              summary: process to archive
  *      responses:
  *          '200':
  *              description: Process Archived
  *          '403':
  *              description: Invalid Verification Token
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
 process.post(
@@ -59,7 +63,7 @@ process.post(
  *                              summary: jwt from login
  *                          processId:
  *                              type: integer
- *                              summary: process to archive  
+ *                              summary: process to archive
  *      responses:
  *          '200':
  *              description: Process Archived
@@ -93,11 +97,10 @@ process.post(
  *              description: Invalid Verification Token
  *          '401':
  *              description: User doesn't have authorization
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
 process.get("/info", middleware.requestValidator(schemas.ProcessInfoSchema), controller.info)
-
 
 /**
  * @openapi
@@ -107,7 +110,7 @@ process.get("/info", middleware.requestValidator(schemas.ProcessInfoSchema), con
  *      - process
  *      summary: Lists every process
  *      description: Lists every process
-*      requestBody:
+ *      requestBody:
  *          content:
  *              application/json:
  *                  schema:
@@ -138,7 +141,7 @@ process.get("/info", middleware.requestValidator(schemas.ProcessInfoSchema), con
  *                          summary: 'No next Appointment' if no appointment has been made or the date, in string format, of next date
  *          '403':
  *              description: Invalid Verification Token
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
 process.get("/list", middleware.requestValidator(schemas.ProcessListSchema), controller.list)
@@ -182,7 +185,7 @@ process.get("/list", middleware.requestValidator(schemas.ProcessListSchema), con
  *                          summary: 'No next Appointment' if no appointment has been made or the date, in string format, of next date
  *          '403':
  *              description: Invalid Verification Token
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
 process.get(
@@ -210,7 +213,7 @@ process.get(
  *                              summary: jwt from login
  *                          processId:
  *                              type: integer
- *                              summary: process to archive  
+ *                              summary: process to archive
  *      responses:
  *          '200':
  *              description: Process Archived
@@ -244,10 +247,14 @@ process.get(
  *              description: Invalid Verification Token
  *          '401':
  *              description: User doesn't have authorization
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
- process.get("/activate", middleware.requestValidator(schemas.ArchiveProcessSchema), controller.activate)
+process.get(
+  "/activate",
+  middleware.requestValidator(schemas.ArchiveProcessSchema),
+  controller.activate
+)
 
 /**
  * @openapi
@@ -283,7 +290,7 @@ process.get(
  *              description: Process Created
  *          '403':
  *              description: Invalid Verification Token
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
 process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema), controller.create)
@@ -329,14 +336,10 @@ process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema)
  *              description: User doesn't have authorization
  *          '403':
  *              description: Invalid Verification Token
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
-process.post(
-  "/edit",
-  middleware.requestValidator(schemas.ProcessEditSchema),
-  controller.edit
-)
+process.post("/edit", middleware.requestValidator(schemas.ProcessEditSchema), controller.edit)
 
 /**
  * @openapi
@@ -374,7 +377,7 @@ process.post(
  *                              example: FALTA ADICIONAR EXEMPLO
  *                          end_date:
  *                              type: string
- *                              example: FALTA ADICIONAR EXEMPLO 
+ *                              example: FALTA ADICIONAR EXEMPLO
  *                          room:
  *                              type: string
  *                              example: Sala de aula C4.4
@@ -385,7 +388,7 @@ process.post(
  *              description: User doesn't have authorization
  *          '403':
  *              description: Invalid Verification Token
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
 process.get(
@@ -442,7 +445,7 @@ process.get(
  *              description: User doesn't have authorization
  *          '403':
  *              description: Invalid Verification Token
- *          '500': 
+ *          '500':
  *              description: Ups... Something went wrong
  */
 process.post(
@@ -450,6 +453,5 @@ process.post(
   middleware.requestValidator(schemas.ProcessEditPermissionsSchema),
   controller.editPermissions
 )
-
 
 export default process

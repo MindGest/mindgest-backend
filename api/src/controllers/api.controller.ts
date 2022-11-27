@@ -9,7 +9,7 @@ enum Health {
   RIP = "Unhealthy",
 }
 
-export async function healthcheck(req: Request, res: Response) {
+export async function healthCheck(req: Request, res: Response) {
   try {
     // Check Database Connection Status
     let dbStatus = Health.OK
@@ -45,4 +45,4 @@ export async function healthcheck(req: Request, res: Response) {
   }
 }
 
-export default { healthcheck }
+export default { healthCheck }

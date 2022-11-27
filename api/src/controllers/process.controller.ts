@@ -13,14 +13,6 @@ import {
   ProcessEditBody,
   ProcessEditPermissionsBody,
 } from "../utils/types"
-import logger from "../utils/logger"
-import type {
-  appointment_process,
-  intern_process,
-  process,
-  therapist,
-  therapist_process,
-} from "@prisma/client"
 
 export async function archive(req: Request<{}, {}, ArchiveProcessBody>, res: Response) {
   try {

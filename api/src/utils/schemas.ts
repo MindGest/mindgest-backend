@@ -13,55 +13,18 @@ export const PersonSchema = z.object({
   phoneNumber: z.number(),
 })
 
-export const PersonUpdateSchema = z
-  .object({
-    active: z.boolean(),
-    aproved: z.boolean(),
-  })
-  .merge(PersonSchema)
-
 export const TherapistSchema = z
   .object({
     healthSystem: z.string().optional(),
     license: z.string(),
   })
   .merge(PersonSchema)
+  .merge(z.object({ taxNumber: z.number() }))
 
-export const TherapistUpdateSchema = z
-  .object({
-    healthSystem: z.string().optional(),
-    license: z.string(),
-    extern: z.boolean(),
-  })
-  .merge(PersonUpdateSchema)
-
-export const PatientSchema = z
-  .object({
-    tax_number: z.number(),
-    healthNumber: z.number(),
-    request: z.string(),
-    remarks: z.string(),
-    patienttype_id: z.number(),
-
-    // school parameters (can be optional)
-    schoolName: z.string().optional(),
-    schoolCourse: z.string().optional(),
-    schoolGrade: z.string().optional(),
-
-    // profession parameters (can be optional)
-    professionName: z.string().optional(),
-  })
-  .merge(PersonUpdateSchema)
-
-export const AdminSchema = PersonSchema
-export const GuardSchema = PersonSchema.merge(z.object({ nif: z.number() }))
+export const AdminSchema = PersonSchema.merge(z.object({ taxNumber: z.number() }))
+export const GuardSchema = PersonSchema.merge(z.object({ taxNumber: z.number() }))
+export const AccountantSchema = PersonSchema.merge(z.object({ taxNumber: z.number() }))
 export const InternSchema = PersonSchema
-export const AccountantSchema = PersonSchema.merge(z.object({ nif: z.number() }))
-
-export const AdminUpdateSchema = PersonUpdateSchema
-export const GuardUpdateSchema = PersonUpdateSchema
-export const InternUpdateSchema = PersonUpdateSchema
-export const AccountantUpdateSchema = PersonUpdateSchema
 
 export const RegistrationSchema = z.object({
   body: z.discriminatedUnion("role", [
@@ -158,7 +121,54 @@ export const VerifyAccountSchema = z.object({
     .required(),
 })
 
-export const EditProfileSchema = RegistrationSchema
+export const PersonUpdateSchema = z
+  .object({
+    active: z.boolean(),
+    approved: z.boolean(),
+  })
+  .merge(PersonSchema)
+
+export const TherapistUpdateSchema = z
+  .object({
+    healthSystem: z.string().optional(),
+    license: z.string(),
+    extern: z.boolean(),
+    taxNumber: z.object({ taxNumber: z.number() }),
+  })
+  .merge(PersonUpdateSchema)
+
+export const AdminUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: z.number() }))
+export const GuardUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: z.number() }))
+export const AccountantUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: z.number() }))
+export const InternUpdateSchema = PersonUpdateSchema
+
+export const PatientSchema = z
+  .object({
+    tax_number: z.number(),
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patienttype_id: z.number(),
+
+    // school parameters (can be optional)
+    schoolName: z.string().optional(),
+    schoolCourse: z.string().optional(),
+    schoolGrade: z.string().optional(),
+
+    // profession parameters (can be optional)
+    professionName: z.string().optional(),
+  })
+  .merge(PersonUpdateSchema)
+
+export const EditProfileSchema = z.object({
+  body: z.union([
+    AdminUpdateSchema.strict(),
+    GuardUpdateSchema.strict(),
+    TherapistUpdateSchema.strict(),
+    InternUpdateSchema.strict(),
+    AccountantUpdateSchema.strict(),
+  ]),
+})
 
 // it has the token of the user that called the method (token) and the info of the user that is going to be updated
 export const EditUserSchema = z.object({
@@ -321,5 +331,8 @@ export default {
   AppointmentEditSchema,
   EditProfileSchema,
   TherapistUpdateSchema,
-  InternUpdateSchema
+  InternUpdateSchema,
+  GuardUpdateSchema,
+  AccountantUpdateSchema,
+  AdminUpdateSchema,
 }

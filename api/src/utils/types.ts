@@ -56,5 +56,8 @@ export type AppointmentEdit = z.TypeOf<typeof schemas.AppointmentEditSchema>["bo
 export type EditProfileBody = z.TypeOf<typeof schemas.EditProfileSchema>["body"]
 
 export type TherapistUpdateBody = z.TypeOf<typeof schemas.TherapistUpdateSchema>
-
 export type InternUpdateBody = z.TypeOf<typeof schemas.InternUpdateSchema>
+export type GuardUpdateBody = z.TypeOf<typeof schemas.GuardUpdateSchema>
+
+export type AccountantUpdateBody = z.TypeOf<typeof schemas.AccountantUpdateSchema>
+export type AdminUpdateBody = z.TypeOf<typeof schemas.AdminUpdateSchema>

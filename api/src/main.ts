@@ -19,7 +19,7 @@ import compression from "compression"
 const HOST = String(process.env.HOST)
 const PORT = Number(process.env.PORT)
 
-// Utililities
+// Utilities 
 let connections: any = []
 
 function stop(server: Server) {

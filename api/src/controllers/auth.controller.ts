@@ -54,13 +54,14 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
       data: {
         active: true,
         verified: false,
-        aproved: false,
+        approved: false,
         name: req.body.name,
         email: req.body.email,
         password: await argon2.hash(req.body.password),
         address: req.body.address,
         birth_date: new Date(req.body.birthDate),
         phone_number: req.body.phoneNumber,
+        tax_number: req.body.role !== "intern" ? req.body.taxNumber : null,
       },
     })
 
@@ -100,7 +101,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
         await prisma.therapist.create({
           data: {
             license: req.body.license,
-            healthsystem: req.body.healthSystem,
+            health_system: req.body.healthSystem,
             extern: false,
             person: { connect: { id: person.id } },
           },
@@ -114,15 +115,6 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
             },
           })
         }
-        // Insert therapist in the therapist table
-        await prisma.therapist.create({
-          data: {
-            license: req.body.license,
-            healthsystem: req.body.healthSystem,
-            extern: false,
-            person: { connect: { id: person.id } },
-          },
-        })
         break
       }
     }
@@ -175,7 +167,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
     }
 
     // Check if the user account is approved by an administrator
-    if (!person.aproved) {
+    if (!person.approved) {
       logger.info(`LOGIN [${req.body.email}] => Login failed. Account not approved!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "The account is not approved. Contact an admin to solve this issue!",
@@ -402,7 +394,7 @@ export async function forgotPassword(req: Request<{}, {}, ForgotPasswordBody>, r
     }
 
     // Check if the user account is approved by an administrator
-    if (!person.aproved) {
+    if (!person.approved) {
       logger.info(`FORGOT-PASS [${req.body.email}] => Forgot password failed. User not approved!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "The account is not approved. Contact an admin to solve this issue!",
