@@ -8,10 +8,85 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model person {
+  id            BigInt          @id @default(autoincrement())
+  name          String          @db.VarChar(512)
+  email         String          @db.VarChar(512)
+  password      String          @db.VarChar(512)
+  address       String          @db.VarChar(512)
+  birth_date    DateTime        @db.Date
+  photo         String?         @db.VarChar(512)
+  phone_number  BigInt
+  verified      Boolean
+  active        Boolean
+  approved      Boolean
+  tax_number    BigInt?
+  accountant    accountant?
+  admin         admin?
+  guard         guard?
+  intern        intern?
+  notifications notifications[]
+  permissions   permissions[]
+  patient       patient?
+  therapist     therapist?
+}
+
+model therapist {
+  extern                 Boolean
+  license                String?                  @db.VarChar(512)
+  health_system          String?                  @db.VarChar(512)
+  person_id              BigInt                   @id
+  person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
+  therapist_availability therapist_availability[]
+  therapist_process      therapist_process[]
+  therapist_speciality   therapist_speciality[]
+}
+
+model guard {
+  person_id BigInt @id
+  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guard_fk1")
+}
+
+model admin {
+  person_id BigInt @id
+  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "admin_fk1")
+}
+
+model intern {
+  person_id           BigInt                @id
+  person              person                @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
+  intern_availability intern_availability[]
+  intern_process      intern_process[]
+}
+
 model accountant {
   person_id BigInt @id
   person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountant_fk1")
 }
+
+
+model patient {
+  health_number   BigInt
+  request         String            @db.VarChar(512)
+  remarks         String?           @db.VarChar(512)
+  patienttype_id  BigInt
+  person_id       BigInt            @id
+  patienttype     patienttype       @relation(fields: [patienttype_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk1")
+  person          person            @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk2")
+  patient_process patient_process[]
+  profession      profession[]
+  school          school[]
+}
+
+model school {
+  id                BigInt  @id @default(autoincrement())
+  name              BigInt
+  course            String  @db.VarChar(512)
+  grade             BigInt? @unique
+  patient_person_id BigInt
+  patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "school_fk1")
+}
+
 
 model appointment {
   online              Boolean?
@@ -41,23 +116,6 @@ model availability {
   slot_end_date          DateTime                 @db.Timestamp(6)
   intern_availability    intern_availability[]
   therapist_availability therapist_availability[]
-}
-
-model guard {
-  person_id BigInt @id
-  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guard_fk1")
-}
-
-model admin {
-  person_id BigInt @id
-  person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "admin_fk1")
-}
-
-model intern {
-  person_id           BigInt                @id
-  person              person                @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
-  intern_availability intern_availability[]
-  intern_process      intern_process[]
 }
 
 model intern_availability {
@@ -96,19 +154,6 @@ model notifications {
   person    person   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notifications_fk1")
 }
 
-model patient {
-  health_number   BigInt
-  request         String            @db.VarChar(512)
-  remarks         String?           @db.VarChar(512)
-  patienttype_id  BigInt
-  person_id       BigInt            @id
-  patienttype     patienttype       @relation(fields: [patienttype_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk1")
-  person          person            @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk2")
-  patient_process patient_process[]
-  profession      profession[]
-  school          school[]
-}
-
 model patient_process {
   patient_person_id BigInt
   process_id        BigInt
@@ -137,29 +182,6 @@ model permissions {
   person       person  @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
   process_id   BigInt
   process      process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk2")
-}
-
-model person {
-  id            BigInt          @id @default(autoincrement())
-  name          String          @db.VarChar(512)
-  email         String          @db.VarChar(512)
-  password      String          @db.VarChar(512)
-  address       String          @db.VarChar(512)
-  birth_date    DateTime        @db.Date
-  photo         String?         @db.VarChar(512)
-  phone_number  BigInt
-  verified      Boolean
-  active        Boolean
-  approved      Boolean
-  tax_number    BigInt?
-  accountant    accountant?
-  admin         admin?
-  guard         guard?
-  intern        intern?
-  notifications notifications[]
-  permissions   permissions[]
-  patient       patient?
-  therapist     therapist?
 }
 
 model pricetable {
@@ -217,30 +239,10 @@ model room {
   appointment appointment[]
 }
 
-model school {
-  id                BigInt  @id @default(autoincrement())
-  name              BigInt
-  course            String  @db.VarChar(512)
-  grade             BigInt? @unique
-  patient_person_id BigInt
-  patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "school_fk1")
-}
-
 model speciality {
   speciality           String                 @id @db.VarChar(512)
   process              process[]
   therapist_speciality therapist_speciality[]
-}
-
-model therapist {
-  extern                 Boolean
-  license                String?                  @db.VarChar(512)
-  health_system          String?                  @db.VarChar(512)
-  person_id              BigInt                   @id
-  person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
-  therapist_availability therapist_availability[]
-  therapist_process      therapist_process[]
-  therapist_speciality   therapist_speciality[]
 }
 
 model therapist_availability {

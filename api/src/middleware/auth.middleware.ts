@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express"
 import { StatusCodes } from "http-status-codes"
 
 import { verifyAccessToken } from "../services/auth.service"
+import { User } from "../utils/schemas"
 import { AccessToken } from "../utils/types"
 
 export function authorize() {
@@ -23,13 +24,17 @@ export function authorize() {
   }
 }
 
-export function authorizeRoles(...roles: any) {
+export function authorizeAdmin() {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!roles.includes(res.locals.token)) {
-      res.sendStatus(StatusCodes.UNAUTHORIZED)
+    const { id, role, admin } = res.locals.token
+    if (!admin) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message:
+          "Permission Denied. This operation can only be performed by a user with admin privileges",
+      })
     }
-    next()
+    return next()
   }
 }
 
-export default { authorize }
+export default { authorize, authorizeAdmin }

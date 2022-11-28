@@ -1,137 +1,168 @@
-import fs, { read, readSync } from "fs"
-import path from "path"
-
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
+import assert from "assert"
 
 import prisma from "../utils/prisma"
 import logger from "../utils/logger"
-import assert from "assert"
 
 import {
-  updateInfoAccountant,
-  updateInfoAdmin,
-  updateInfoGuard,
-  updateInfoIntern,
-  updateInfoTherapist,
+  selfUpdateInfoAccountant,
+  selfUpdateInfoAdmin,
+  selfUpdateInfoGuard,
+  selfUpdateInfoIntern,
+  selfUpdateInfoTherapist,
 } from "../services/user.service"
 
-import { EditProfileBody } from "../utils/types"
+import { saveProfilePicture, getProfilePicture } from "../services/profile.service"
 
+import { SelfEditProfileBody } from "../utils/types"
 import {
-  AccountantUpdateSchema,
-  AdminUpdateSchema,
-  GuardUpdateSchema,
-  InternUpdateSchema,
-  TherapistUpdateSchema,
+  AccountantSchema,
+  AdminSchema,
+  GuardSchema,
+  InternSchema,
+  TherapistSchema,
+  User,
 } from "../utils/schemas"
-
-const FILE_UPLOAD_DIR = String(process.env.FILE_UPLOAD_DIR)
+import uploadPicture from "../utils/upload"
 
 export async function uploadProfilePicture(req: Request, res: Response) {
   try {
+    // Upload Profile picture
+    uploadPicture(req, res, (err) => {
+      if (err) {
+        logger.debug(`UPLOAD [user-id: ${id}] => Upload Failed. Invalid file format!`)
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: "Invalid picture format (must be jpg, png, jpeg)",
+        })
+      }
+    })
+
+    // Authenticate / Authorize user
     const { id } = res.locals.token
+    logger.info(`UPLOAD [user-id: ${id}] => Profile Picture upload authorized...`)
+
+    // Save File, Update Database
+    logger.debug(`UPLOAD [user-id: ${id}] => Saving user's profile picture & updating database`)
     const picture = req.file
     if (picture === null || picture === undefined) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         message: "Picture is missing in the request",
       })
     }
+    saveProfilePicture(id, picture)
 
-    const person = await prisma.person.findUnique({ where: { id: id } })
-    assert(person !== null)
-
-    if (person.photo) {
-      fs.rm(path.join(FILE_UPLOAD_DIR, person.photo), () => {})
-      console.log(person.photo)
-    }
-
-    await prisma.person.update({
-      where: { id: id },
-      data: {
-        photo: picture.filename,
-      },
-    })
-
+    logger.info(`UPLOAD [user-id: ${id}] => Upload successful!`)
     return res.status(StatusCodes.CREATED).json({
       message: "Profile picture uploaded successfully",
     })
   } catch (error) {
     logger.error(error)
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
   }
 }
 
 export async function downloadProfilePicture(req: Request, res: Response) {
   try {
+    // Authenticate / Authorize user
     const { id } = res.locals.token
-    const person = await prisma.person.findUnique({ where: { id: id } })
-    assert(person !== null)
+    logger.info(`DOWNLOAD [user-id: ${id}] => Profile Picture download authorized...`)
 
-    res.download(path.join(FILE_UPLOAD_DIR, String(person.photo)))
+    // Retrieve profile picture path
+    const picture: string = await getProfilePicture(id)
+
+    if (!picture.length) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "This user does not have a profile picture...",
+      })
+    }
+
+    // Return information
+    logger.info(`DOWNLOAD [user-id: ${id}] => User profile picture retrieved successfully!`)
+    res.status(StatusCodes.OK).download(picture)
   } catch (error) {
     logger.error(error)
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
   }
 }
 
 export async function fetchProfileInfo(req: Request, res: Response) {
   try {
+    // Authenticate / Authorize user
     const { id, role } = res.locals.token
+    logger.info(
+      `PROFILE-INFO [user-id: ${id}] => Profile Info access granted. Fetching information...`
+    )
 
+    // Retrieve Profile Info
+    logger.debug(
+      `PROFILE-INFO [user-id: ${id}] => Locating and retrieving user info from the database...`
+    )
     const person = await prisma.person.findUnique({
       where: { id: id },
       include: {
-        therapist: role === "therapist",
-        guard: role === "guard",
-        accountant: role === "accountant",
-        intern: role === "intern",
+        therapist:
+          role === User.THERAPIST
+            ? { select: { extern: true, license: true, health_system: true } }
+            : false,
       },
     })
 
+    // Return information
     assert(person != null)
+    logger.info(`PROFILE-INFO [user-id: ${id}] => Profile information fetched successfully...`)
     res.status(StatusCodes.OK).json({
       message: `${person.name} profile information fetched successfully`,
       info: person,
     })
   } catch (error) {
     logger.error(error)
-  }
-}
-
-export async function editProfileInfo(req: Request<{}, {}, EditProfileBody>, res: Response) {
-  try {
-  } catch (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
   }
-  const { id, role } = res.locals.token
+}
+
+export async function editProfileInfo(req: Request<{}, {}, SelfEditProfileBody>, res: Response) {
   try {
+    // Authenticate / Authorize User
+    const { id, role } = res.locals.token
+    logger.info(`EDIT-PROFILE [user-id: ${id}] => Access granted. Editing profile...`)
+
+    // Edit User Profile depending on the user type.
     switch (role) {
-      case "therapist":
-        updateInfoTherapist(id, TherapistUpdateSchema.parse(req.body))
+      case User.THERAPIST:
+        selfUpdateInfoTherapist(id, TherapistSchema.parse(req.body))
         break
-      case "accountant":
-        updateInfoAccountant(id, AccountantUpdateSchema.parse(req.body))
+      case User.ACCOUNTANT:
+        selfUpdateInfoAccountant(id, AccountantSchema.parse(req.body))
         break
-      case "guard":
-        updateInfoGuard(id, GuardUpdateSchema.parse(req.body))
+      case User.GUARD:
+        selfUpdateInfoGuard(id, GuardSchema.parse(req.body))
         break
-      case "intern":
-        updateInfoIntern(id, InternUpdateSchema.parse(req.body))
+      case User.INTERN:
+        selfUpdateInfoIntern(id, InternSchema.parse(req.body))
         break
-      case "admin":
-        updateInfoAdmin(id, AdminUpdateSchema.parse(req.body))
+      case User.ADMIN:
+        selfUpdateInfoAdmin(id, AdminSchema.parse(req.body))
         break
     }
+
+    // Update complete!
+    logger.info(`EDIT-PROFILE [user-id: ${id}] => Profile edited successfully!`)
+    return res.status(StatusCodes.OK).json({
+      message: "The user's profile was updated successfully",
+    })
   } catch (error) {
-    return res.status(StatusCodes.NOT_ACCEPTABLE).json({
-      message:
-        "The information provided does not match the information required to update the user's profile",
+    logger.error(error)
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
     })
   }
-  return res.status(StatusCodes.OK).json({
-    message: "The user's profile was updated successfully",
-  })
 }
 
 export default { uploadProfilePicture, downloadProfilePicture, fetchProfileInfo, editProfileInfo }

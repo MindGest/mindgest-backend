@@ -1,5 +1,13 @@
 import z from "zod"
 
+export enum User {
+  ADMIN = "admin",
+  THERAPIST = "therapist",
+  INTERN = "intern",
+  ACCOUNTANT = "accountant",
+  GUARD = "guard",
+}
+
 export const DateSchema = z.preprocess((arg) => {
   if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
 }, z.date())
@@ -30,27 +38,27 @@ export const RegistrationSchema = z.object({
   body: z.discriminatedUnion("role", [
     AdminSchema.merge(
       z.object({
-        role: z.literal("admin"),
+        role: z.literal(User.ADMIN),
       })
     ).strict(),
     GuardSchema.merge(
       z.object({
-        role: z.literal("guard"),
+        role: z.literal(User.GUARD),
       })
     ).strict(),
     TherapistSchema.merge(
       z.object({
-        role: z.literal("therapist"),
+        role: z.literal(User.THERAPIST),
       })
     ).strict(),
     InternSchema.merge(
       z.object({
-        role: z.literal("intern"),
+        role: z.literal(User.INTERN),
       })
     ).strict(),
     AccountantSchema.merge(
       z.object({
-        role: z.literal("accountant"),
+        role: z.literal(User.ACCOUNTANT),
       })
     ).strict(),
   ]),
@@ -142,6 +150,16 @@ export const GuardUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: 
 export const AccountantUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: z.number() }))
 export const InternUpdateSchema = PersonUpdateSchema
 
+export const SelfEditProfileSchema = z.object({
+  body: z.union([
+    AdminSchema.strict(),
+    GuardSchema.strict(),
+    TherapistSchema.strict(),
+    InternSchema.strict(),
+    AccountantSchema.strict(),
+  ]),
+})
+
 export const PatientSchema = z
   .object({
     tax_number: z.number(),
@@ -160,7 +178,26 @@ export const PatientSchema = z
   })
   .merge(PersonUpdateSchema)
 
+export const EditProfileParamsSchema = z.object({
+  params: z
+    .object({
+      user: z
+        .string()
+        .min(1)
+        .transform((s) => Number(s)),
+    })
+    .strict(),
+})
+
 export const EditProfileSchema = z.object({
+  params: z
+    .object({
+      user: z
+        .string()
+        .min(1)
+        .transform((s) => Number(s)),
+    })
+    .strict(),
   body: z.union([
     AdminUpdateSchema.strict(),
     GuardUpdateSchema.strict(),
@@ -168,46 +205,6 @@ export const EditProfileSchema = z.object({
     InternUpdateSchema.strict(),
     AccountantUpdateSchema.strict(),
   ]),
-})
-
-// it has the token of the user that called the method (token) and the info of the user that is going to be updated
-export const EditUserSchema = z.object({
-  body: z.object({
-    token: z.string(),
-    id: z.number(), // o id do user que se vai atualizar
-    userToEdit: z.discriminatedUnion("role", [
-      AdminUpdateSchema.merge(
-        z.object({
-          role: z.literal("admin"),
-        })
-      ).strict(),
-      GuardUpdateSchema.merge(
-        z.object({
-          role: z.literal("guard"),
-        })
-      ).strict(),
-      TherapistUpdateSchema.merge(
-        z.object({
-          role: z.literal("therapist"),
-        })
-      ).strict(),
-      InternUpdateSchema.merge(
-        z.object({
-          role: z.literal("intern"),
-        })
-      ).strict(),
-      AccountantUpdateSchema.merge(
-        z.object({
-          role: z.literal("accountant"),
-        })
-      ).strict(),
-      PatientSchema.merge(
-        z.object({
-          role: z.literal("patient"),
-        })
-      ).strict(),
-    ]),
-  }),
 })
 
 export const ArchiveProcessSchema = z.object({
@@ -308,6 +305,15 @@ export const AppointmentEditSchema = z.object({
   }),
 })
 
+export enum NotificationFilterType {
+  READ = "read",
+  UNREAD = "unread",
+}
+
+export const NotificationFilterSchema = z.object({
+  filter: z.enum([NotificationFilterType.READ, NotificationFilterType.UNREAD]).optional(),
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -322,7 +328,6 @@ export default {
   ProcessInfoSchema,
   ProcessCreateSchema,
   ProcessEditSchema,
-  EditUserSchema,
   ProcessEditPermissionsSchema,
   AppointmentArchiveSchema,
   AppointmentCreateSchema,
@@ -335,4 +340,12 @@ export default {
   GuardUpdateSchema,
   AccountantUpdateSchema,
   AdminUpdateSchema,
+  NotificationFilterSchema,
+  TherapistSchema,
+  AccountantSchema,
+  GuardSchema,
+  AdminSchema,
+  InternSchema,
+  SelfEditProfileSchema,
+  EditProfileParamsSchema,
 }

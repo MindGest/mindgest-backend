@@ -30,6 +30,7 @@ import {
   PasswordResetToken,
   AccountVerificationSchema,
 } from "../utils/types"
+import { User } from "../utils/schemas"
 
 export async function register(req: Request<{}, {}, RegistrationBody>, res: Response) {
   try {
@@ -67,27 +68,27 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
 
     // Create entry in the table, associated with the user's role
     switch (req.body.role) {
-      case "accountant":
+      case User.ACCOUNTANT:
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (accountant)...`)
         await prisma.accountant.create({
           data: { person: { connect: { id: person.id } } },
         })
         break
-      case "guard": {
+      case User.GUARD: {
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (guard)...`)
         await prisma.guard.create({
           data: { person: { connect: { id: person.id } } },
         })
         break
       }
-      case "intern": {
+      case User.INTERN: {
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (intern)...`)
         await prisma.intern.create({
           data: { person: { connect: { id: person.id } } },
         })
         break
       }
-      case "admin":
+      case User.ADMIN:
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (admin)...`)
         await prisma.admin.create({
           data: {
@@ -95,7 +96,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
           },
         })
         break
-      case "therapist": {
+      case User.THERAPIST: {
         // Insert therapist in the therapist table
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (therapist)...`)
         await prisma.therapist.create({
@@ -183,7 +184,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
     }
 
     logger.debug(`LOGIN [${req.body.email}] => Generating tokens...`)
-    const { userRole, isAdmin } = await fetchPersonProperties(person.id)
+    const { isAdmin, userRole } = await fetchPersonProperties(person.id)
 
     // Access Token Information
     const accessTokenPayload = {
@@ -214,7 +215,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
 
     logger.info(`LOGIN [${req.body.email}] => Authentication Successful!`)
     return res.status(StatusCodes.OK).json({
-      message: "User authentication sucessfull!",
+      message: "User authentication successful!",
       accessToken: accessToken,
       refreshToken: refreshToken,
     })

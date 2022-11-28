@@ -14,30 +14,21 @@ import api from "./routes/api.route"
 import logger from "./utils/logger"
 import middleware from "./middleware/api.middleware"
 import compression from "compression"
-import e from "express"
 
 // Environment Variables
 const HOST = String(process.env.HOST)
 const PORT = Number(process.env.PORT)
 
 // Utilities
-let connections: any = []
-
 function stop(server: Server) {
   return () => {
     logger.info("Received kill signal, shutting down gracefully")
     server.close(() => {
-      logger.info("Closed out remaining connections")
       process.exit(0)
     })
-
     setTimeout(() => {
-      logger.error("Could not close connections in time, forcefully shutting down")
       process.exit(1)
     }, 10000)
-
-    connections.forEach((curr: any) => curr.end())
-    setTimeout(() => connections.forEach((curr: any) => curr.destroy()), 5000)
   }
 }
 
@@ -46,17 +37,8 @@ function start(app: express.Application) {
   const server = app.listen(PORT, HOST, () => {
     logger.info(`MindGest API is live on http://${HOST}:${PORT}`)
   })
-
   process.on("SIGTERM", stop(server))
   process.on("SIGINT", stop(server))
-
-  server.on("connection", (connection) => {
-    connections.push(connection)
-    connection.on(
-      "close",
-      () => (connections = connections.filter((curr: any) => curr !== connection))
-    )
-  })
 }
 
 // Express Application
@@ -65,7 +47,7 @@ const app = express()
 // Security
 app.disable("x-powered-by")
 
-// Midleware
+// Middleware
 app.use(helmet())
 app.use(express.json())
 app.use(cors())
@@ -75,7 +57,7 @@ app.use(middleware.bodyParserErrorValidator())
 
 // Routes
 
-/// Mindgest API Route
+/// MindGest API Route
 app.use("/api", api)
 
 // Endpoints

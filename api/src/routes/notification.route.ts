@@ -1,14 +1,12 @@
 import { Request, Response } from "express"
 import { Router } from "express"
 
+import controller from "../controllers/notification.controller"
+
 const notification = Router()
 
-notification.put("/mark", (req: Request, res: Response) => console.log("TODO"))
-
-notification.get("/list", (req: Request, res: Response) => console.log("TODO"))
-
-notification.get("/list-read", (req: Request, res: Response) => console.log("TODO"))
-
-notification.get("/list-unread", (req: Request, res: Response) => console.log("TODO"))
+// Endpoints
+notification.put("/mark/:notification", controller.mark)
+notification.get("/list", controller.list)
 
 export default notification
