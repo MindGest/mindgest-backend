@@ -7,7 +7,10 @@ import { AccessToken } from "../utils/types"
 
 export function authorize() {
   return (req: Request, res: Response, next: NextFunction) => {
-    const accessToken = (req.headers.authorization || req.signedCookies.accessToken || "").replace(/Bearer\s/, "")
+    const accessToken = (req.headers.authorization || req.signedCookies.accessToken || "").replace(
+      /Bearer\s/,
+      ""
+    )
     if (!accessToken) {
       return res.status(StatusCodes.FORBIDDEN).json({
         message: "Access token was not provided",
