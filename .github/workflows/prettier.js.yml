@@ -2,32 +2,34 @@ name: Prettier CI
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: ["main", "dev"]
   push:
-    branches: ["main"]
+    branches: ["main", "dev"]
 
 jobs:
-  prettier:
-    name: Prettier Check
+  build:
     runs-on: ubuntu-latest
 
     defaults:
       run:
         working-directory: api
 
+    strategy:
+      matrix:
+        node-version: [18.x]
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Run Prettier
-        id: prettier-run
-        uses: rutajdash/prettier-cli-action@v1.0.0
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          config_path: ./api/.prettierrc.json
-
-      - name: Prettier Output
-        if: ${{ failure() }}
-        shell: bash
-        run: |
-          echo "The following files are not formatted:"
-          echo "${{steps.prettier-run.outputs.prettier_output}}"
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: "./api/package-lock.json"
+      - run: npm ci
+      - run: npm run format
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply formatting changes
+          branch: ${{ github.head_ref }}
