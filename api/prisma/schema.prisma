@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["debian-openssl-3.0.x", "native"]
+  binaryTargets = ["debian-openssl-3.0.x", "debian-openssl-1.1.x", "native"]
 }
 
 datasource db {
@@ -64,7 +64,6 @@ model accountant {
   person    person @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountant_fk1")
 }
 
-
 model patient {
   health_number   BigInt
   request         String            @db.VarChar(512)
@@ -86,7 +85,6 @@ model school {
   patient_person_id BigInt
   patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "school_fk1")
 }
-
 
 model appointment {
   online              Boolean?

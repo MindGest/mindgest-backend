@@ -259,9 +259,9 @@ export async function refresh(req: Request<{}, {}, RefreshBody>, res: Response) 
         // Attach tokens as cookies (update refresh token)
         attachCookies(res, accessToken, refreshToken)
 
-        logger.info(`REFRESH [${person.email}] => Token Refresh Successfull!`)
+        logger.info(`REFRESH [${person.email}] => Token Refresh Successful!`)
         return res.status(StatusCodes.CREATED).json({
-          message: "User access token refresh sucessfull!",
+          message: "User access token refresh successful!",
           accessToken: accessToken,
           refreshToken: refreshToken,
         })

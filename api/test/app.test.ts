@@ -1,6 +1,6 @@
 import request from "supertest"
 import dotenv from "dotenv"
-import { describe, expect, it} from "@jest/globals"
+import { describe, expect, it } from "@jest/globals"
 
 dotenv.config()
 

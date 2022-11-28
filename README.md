@@ -66,10 +66,13 @@ To deploy this project you may use the docker containers provided:
   cd util
 
   # Build and run the containers in the background
-  docker compose up -d
+  docker compose up --build -d
 
   # To stop the containers do
   docker compose down
+
+  # To run the containers (again) in the background
+  docker compose up -d 
   ```
 
 
