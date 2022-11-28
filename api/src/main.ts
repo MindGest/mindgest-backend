@@ -18,6 +18,7 @@ import compression from "compression"
 // Environment Variables
 const HOST = String(process.env.HOST)
 const PORT = Number(process.env.PORT)
+const FRONTEND_URL = String(process.env.FRONTEND_URL)
 
 // Utilities
 function stop(server: Server) {
@@ -50,7 +51,12 @@ app.disable("x-powered-by")
 // Middleware
 app.use(helmet())
 app.use(express.json())
-app.use(cors())
+app.use(
+  cors({
+    origin: FRONTEND_URL,
+    credentials: true,
+  })
+)
 app.use(compression({ filter: middleware.shouldCompress }))
 app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
 app.use(middleware.bodyParserErrorValidator())

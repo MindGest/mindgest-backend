@@ -51,6 +51,7 @@ export function attachCookies(res: Response, accessToken: string, refreshToken: 
     signed: true,
     secure: NODE_ENV !== "development",
     maxAge: 15 * 60 * 1000,
+    sameSite: "none",
   })
 
   // Assigning Refresh token in http-only cookie
@@ -59,6 +60,7 @@ export function attachCookies(res: Response, accessToken: string, refreshToken: 
     signed: true,
     secure: NODE_ENV !== "development",
     maxAge: 60 * 60 * 1000,
+    sameSite: "none",
   })
 }
 
