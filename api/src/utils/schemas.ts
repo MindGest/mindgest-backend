@@ -208,11 +208,12 @@ export const EditProfileSchema = z.object({
 })
 
 export const ProcessIDSchema = z.object({
-  params: z.object({
-    processId: z.string()
-  }).strict(),
+  params: z
+    .object({
+      processId: z.string(),
+    })
+    .strict(),
 })
-
 
 export const ProcessCreateSchema = z.object({
   body: z.object({
@@ -328,5 +329,5 @@ export default {
   InternSchema,
   SelfEditProfileSchema,
   EditProfileParamsSchema,
-  ProcessIDSchema
+  ProcessIDSchema,
 }
