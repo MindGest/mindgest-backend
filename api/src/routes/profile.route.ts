@@ -1,19 +1,21 @@
 import { Request, Response } from "express"
 import { Router } from "express"
 
-import upload from "../utils/upload"
 import controller from "../controllers/profile.controller"
+import middleware from "../middleware/api.middleware"
+import schemas from "../utils/schemas"
 
 const profile = Router()
 
 // Endpoints
 profile
   .route("/picture")
-  .post(upload, controller.uploadProfilePicture)
+  .put(controller.uploadProfilePicture)
   .get(controller.downloadProfilePicture)
 
-profile.get("/info", controller.fetchProfileInfo)
-
-profile.put("/edit", controller.editProfileInfo)
+profile
+  .route("/info")
+  .put(middleware.requestValidator(schemas.SelfEditProfileSchema), controller.editProfileInfo)
+  .get(controller.fetchProfileInfo)
 
 export default profile

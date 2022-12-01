@@ -5,7 +5,7 @@ import compression from "compression"
 import type { NextFunction, Request, Response } from "express"
 
 export function requestValidator(schema: AnyZodObject) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request<any, any, any>, res: Response, next: NextFunction) => {
     try {
       schema.parse({
         body: req.body,
@@ -46,4 +46,9 @@ export function shouldCompress(req: Request, res: Response) {
   return req.headers["x-no-compression"] ? false : compression.filter(req, res)
 }
 
-export default { requestValidator, bodyParserErrorValidator, notFound, shouldCompress }
+export default {
+  requestValidator,
+  bodyParserErrorValidator,
+  notFound,
+  shouldCompress,
+}

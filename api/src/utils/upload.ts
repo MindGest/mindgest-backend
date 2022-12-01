@@ -1,6 +1,8 @@
+import { Request } from "express"
 import multer from "multer"
 import fs from "fs"
 import path from "path"
+import logger from "./logger"
 
 const FILE_UPLOAD_DIR = String(process.env.FILE_UPLOAD_DIR)
 
@@ -10,15 +12,16 @@ const storage = multer.diskStorage({
     callback(null, FILE_UPLOAD_DIR)
   },
   filename: (req, file, cb) => {
+    logger.debug(`UPLOAD => Uploading file...`)
     let name = file.originalname
     let ext = path.extname(name)
     cb(null, Date.now() + ext)
   },
 })
 
-const upload = multer({
+const uploadPicture = multer({
   storage: storage,
-  fileFilter: function (_, file, callback) {
+  fileFilter: function (req, file, callback) {
     if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
       return callback(new Error("Only images are allowed"))
     }
@@ -27,6 +30,6 @@ const upload = multer({
   limits: {
     fileSize: 1024 * 1024,
   },
-}).single("profile")
+}).single("picture")
 
-export default upload
+export default uploadPicture

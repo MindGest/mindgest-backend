@@ -1,20 +1,24 @@
 import argon2 from "argon2"
-import { Response, Request } from "express"
-import { StatusCodes } from "http-status-codes"
+
+import {
+  AccountantUpdateBody,
+  AdminUpdateBody,
+  GuardUpdateBody,
+  InternUpdateBody,
+  SelfAccountantUpdateBody,
+  SelfAdminUpdateBody,
+  SelfGuardUpdateBody,
+  SelfInternUpdateBody,
+  SelfTherapistUpdateBody,
+  TherapistUpdateBody,
+} from "../utils/types"
 
 import prisma from "../utils/prisma"
-import { InternUpdateBody, TherapistUpdateBody } from "../utils/types"
+import { User } from "../utils/schemas"
 
 // If it is a bug (or bad implementation) that you rely on.
 // It's not a bug. It's a feature.
 export async function fetchPersonProperties(personId: bigint) {
-  let admin = await prisma.admin.findUnique({
-    where: { person_id: personId },
-  })
-  if (admin) {
-    return { isAdmin: true, userRole: "admin" }
-  }
-
   let therapist = await prisma.therapist.findUnique({
     where: { person_id: personId },
   })
@@ -24,25 +28,30 @@ export async function fetchPersonProperties(personId: bigint) {
         (await prisma.admin.findUnique({
           where: { person_id: personId },
         })) !== null,
-      userRole: "therapist",
+      userRole: User.THERAPIST,
     }
+
+  let admin = await prisma.admin.findUnique({
+    where: { person_id: personId },
+  })
+  if (admin) return { isAdmin: true, userRole: User.ADMIN }
 
   let intern = await prisma.intern.findUnique({
     where: { person_id: personId },
   })
-  if (intern) return { isAdmin: false, userRole: "intern" }
+  if (intern) return { isAdmin: false, userRole: User.INTERN }
 
   let guard = await prisma.guard.findUnique({
     where: { person_id: personId },
   })
-  if (guard) return { isAdmin: false, userRole: "guard" }
+  if (guard) return { isAdmin: false, userRole: User.GUARD }
 
   let accountant = await prisma.accountant.findUnique({
     where: { person_id: personId },
   })
-  if (accountant) return { isAdmin: false, userRole: "accountant" }
+  if (accountant) return { isAdmin: false, userRole: User.ACCOUNTANT }
 
-  return { isAdmin: true, userRole: "therapist" }
+  return { isAdmin: true, userRole: User.THERAPIST }
 }
 
 export async function updateInfoTherapist(id: number, body: TherapistUpdateBody) {
@@ -67,8 +76,27 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
   })
 }
 
-async function updateInfoIntern(id: number, body: InternUpdateBody) {
-  prisma.intern.update({
+export async function selfUpdateInfoTherapist(id: number, body: SelfTherapistUpdateBody) {
+  await prisma.therapist.update({
+    data: {
+      license: body.license,
+      person: {
+        update: {
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          birth_date: body.birthDate,
+          password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
+        },
+      },
+    },
+    where: { person_id: id },
+  })
+}
+
+export async function updateInfoIntern(id: number, body: InternUpdateBody) {
+  await prisma.intern.update({
     data: {
       person: {
         update: {
@@ -87,23 +115,26 @@ async function updateInfoIntern(id: number, body: InternUpdateBody) {
   })
 }
 
-async function updateInfoGuard(body: any, res: Response, userId: number) {
-  var userType = body.userToEdit.role
-
-  // fetch the current record from the database -> needed for the update
-  // also usefull to guarantee that the user actually exists and is a therapist
-  var oldData = await prisma.guard.findUnique({
-    where: { person_id: userId },
+export async function selfUpdateInfoIntern(id: number, body: SelfInternUpdateBody) {
+  await prisma.intern.update({
+    data: {
+      person: {
+        update: {
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          birth_date: body.birthDate,
+          password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
+        },
+      },
+    },
+    where: { person_id: id },
   })
+}
 
-  if (!oldData) {
-    res.status(StatusCodes.NOT_FOUND).json({
-      msg: `The given id does not belong to an ${userType}. It might not exist at all, or just is not an ${userType}.`,
-    })
-    return
-  }
-
-  prisma.guard.update({
+export async function updateInfoAdmin(id: number, body: AdminUpdateBody) {
+  await prisma.admin.update({
     data: {
       person: {
         update: {
@@ -126,23 +157,27 @@ async function updateInfoGuard(body: any, res: Response, userId: number) {
   })
 }
 
-async function updateInfoAccountant(body: any, res: Response, userId: number) {
-  var userType = body.userToEdit.role
-
-  // fetch the current record from the database -> needed for the update
-  // also usefull to guarantee that the user actually exists and is a therapist
-  var oldData = await prisma.accountant.findUnique({
-    where: { person_id: userId },
+export async function selfUpdateInfoAdmin(id: number, body: SelfAdminUpdateBody) {
+  await prisma.admin.update({
+    data: {
+      person: {
+        update: {
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          birth_date: body.birthDate,
+          password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
+        },
+      },
+    },
+    where: { person_id: id },
   })
+}
 
-  if (!oldData) {
-    res.status(StatusCodes.NOT_FOUND).json({
-      msg: `The given id does not belong to an ${userType}. It might not exist at all, or just is not an ${userType}.`,
-    })
-    return
-  }
-
-  prisma.accountant.update({
+export async function updateInfoGuard(id: number, body: GuardUpdateBody) {
+  await prisma.guard.update({
     data: {
       person: {
         update: {
@@ -165,13 +200,43 @@ async function updateInfoAccountant(body: any, res: Response, userId: number) {
   })
 }
 
-async function updateInfoPatient(body: any, res: Response, userId: number) {
-  var userType = body.userToEdit.role
+export async function selfUpdateInfoGuard(id: number, body: SelfGuardUpdateBody) {
+  await prisma.guard.update({
+    data: {
+      person: {
+        update: {
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          birth_date: body.birthDate,
+          password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
+        },
+      },
+    },
+    where: { person_id: id },
+  })
+}
 
-  // fetch the current record from the database -> needed for the update
-  // also usefull to guarantee that the user actually exists and is a therapist
-  var oldData = await prisma.patient.findUnique({
-    where: { person_id: userId },
+export async function updateInfoAccountant(id: number, body: AccountantUpdateBody) {
+  await prisma.accountant.update({
+    data: {
+      person: {
+        update: {
+          active: body.active,
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          approved: body.approved,
+          birth_date: body.birthDate,
+          password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
+        },
+      },
+    },
+    where: { person_id: id },
   })
 
   if (!oldData) {
@@ -181,7 +246,27 @@ async function updateInfoPatient(body: any, res: Response, userId: number) {
     return
   }
 
-  prisma.patient.update({
+export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantUpdateBody) {
+  await prisma.accountant.update({
+    data: {
+      person: {
+        update: {
+          address: body.address,
+          name: body.name,
+          email: body.email,
+          birth_date: body.birthDate,
+          password: await argon2.hash(body.password),
+          phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
+        },
+      },
+    },
+    where: { person_id: id },
+  })
+}
+
+export async function updateInfoPatient(id: number, body: any) {
+  await prisma.patient.update({
     data: {
       tax_number: body.taxNumber,
       health_number: body.healthNumber,
@@ -243,39 +328,16 @@ async function updateInfoPatient(body: any, res: Response, userId: number) {
   })
 }
 
-async function updateInfoPerson(body: any, res: Response, userId: number) {
-  /**
-   * Use this one to update accountant, guard and intern.
-   * They don't have parameters in the respective entity.
-   */
-  var userType = body.userToEdit.role
-
-  // fetch the current record from the database -> needed for the update
-  // also usefull to guarantee that the user actually exists and is a therapist
-  var oldData = await prisma.person.findUnique({ where: { id: userId } })
-
-  if (!oldData) {
-    res.status(StatusCodes.NOT_FOUND).json({
-      msg: `The given id does not belong to an ${userType}. It might not exist at all, or just is not an ${userType}.`,
-    })
-    return
-  }
-
-  prisma.person.update({
-    data: {
-      active: body.active,
-      address: body.address,
-      name: body.name,
-      email: body.email,
-      aproved: body.aproved,
-      birth_date: body.birthDate,
-      // password: await argon2.hash(body.password),
-      phone_number: body.phoneNumber,
-    },
-    where: { id: userId },
-  })
-
-  res.status(StatusCodes.OK).json({
-    msg: "Sucssess.",
-  })
+export default {
+  updateInfoTherapist,
+  selfUpdateInfoTherapist,
+  updateInfoGuard,
+  selfUpdateInfoGuard,
+  updateInfoAccountant,
+  selfUpdateInfoAccountant,
+  updateInfoIntern,
+  selfUpdateInfoIntern,
+  updateInfoAdmin,
+  selfUpdateInfoAdmin,
+  updateInfoPatient,
 }
