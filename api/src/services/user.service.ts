@@ -16,8 +16,6 @@ import {
 import prisma from "../utils/prisma"
 import { User } from "../utils/schemas"
 
-// If it is a bug (or bad implementation) that you rely on.
-// It's not a bug. It's a feature.
 export async function fetchPersonProperties(personId: bigint) {
   let therapist = await prisma.therapist.findUnique({
     where: { person_id: personId },
@@ -65,7 +63,7 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
           address: body.address,
           name: body.name,
           email: body.email,
-          aproved: body.aproved,
+          approved: body.approved,
           birth_date: body.birthDate,
           password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
@@ -104,7 +102,7 @@ export async function updateInfoIntern(id: number, body: InternUpdateBody) {
           address: body.address,
           name: body.name,
           email: body.email,
-          aproved: body.aproved,
+          approved: body.approved,
           birth_date: body.birthDate,
           password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
@@ -142,18 +140,15 @@ export async function updateInfoAdmin(id: number, body: AdminUpdateBody) {
           address: body.address,
           name: body.name,
           email: body.email,
-          aproved: body.aproved,
+          approved: body.approved,
           birth_date: body.birthDate,
-          // password: await argon2.hash(body.password),
+          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
         },
       },
     },
-    where: { person_id: userId },
-  })
-
-  res.status(StatusCodes.OK).json({
-    msg: "Sucssess.",
+    where: { person_id: id },
   })
 }
 
@@ -185,18 +180,15 @@ export async function updateInfoGuard(id: number, body: GuardUpdateBody) {
           address: body.address,
           name: body.name,
           email: body.email,
-          aproved: body.aproved,
+          approved: body.approved,
           birth_date: body.birthDate,
-          // password: await argon2.hash(body.password),
+          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
         },
       },
     },
-    where: { person_id: userId },
-  })
-
-  res.status(StatusCodes.OK).json({
-    msg: "Sucssess.",
+    where: { person_id: id },
   })
 }
 
@@ -238,13 +230,7 @@ export async function updateInfoAccountant(id: number, body: AccountantUpdateBod
     },
     where: { person_id: id },
   })
-
-  if (!oldData) {
-    res.status(StatusCodes.NOT_FOUND).json({
-      msg: `The given id does not belong to an ${userType}. It might not exist at all, or just is not an ${userType}.`,
-    })
-    return
-  }
+}
 
 export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantUpdateBody) {
   await prisma.accountant.update({
@@ -268,7 +254,6 @@ export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantU
 export async function updateInfoPatient(id: number, body: any) {
   await prisma.patient.update({
     data: {
-      tax_number: body.taxNumber,
       health_number: body.healthNumber,
       request: body.request,
       remarks: body.remarks,
@@ -283,19 +268,20 @@ export async function updateInfoPatient(id: number, body: any) {
           address: body.address,
           name: body.name,
           email: body.email,
-          aproved: body.aproved,
+          approved: body.approved,
           birth_date: body.birthDate,
-          // password: await argon2.hash(body.password),
+          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
+          tax_number: body.tax_number,
         },
       },
     },
-    where: { person_id: userId },
+    where: { person_id: id },
   })
 
   // update school info
   var oldSchool = await prisma.school.findFirst({
-    where: { patient_person_id: userId },
+    where: { patient_person_id: id },
   })
 
   if (oldSchool) {
@@ -311,7 +297,7 @@ export async function updateInfoPatient(id: number, body: any) {
 
   // update profession info
   var oldProfession = await prisma.profession.findFirst({
-    where: { patient_person_id: userId },
+    where: { patient_person_id: id },
   })
 
   if (oldProfession) {
@@ -322,10 +308,6 @@ export async function updateInfoPatient(id: number, body: any) {
       },
     })
   }
-
-  res.status(StatusCodes.OK).json({
-    msg: "Success.",
-  })
 }
 
 export default {
