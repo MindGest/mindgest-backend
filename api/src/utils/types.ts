@@ -27,11 +27,7 @@ export type AccountVerificationSchema = z.TypeOf<typeof schemas.AccountVerificat
 
 export type ResetPasswordBody = z.TypeOf<typeof schemas.ResetPasswordSchema>["body"]
 
-export type ArchiveProcessBody = z.TypeOf<typeof schemas.ArchiveProcessSchema>["body"]
-
-export type ProcessListBody = z.TypeOf<typeof schemas.ProcessListSchema>["body"]
-
-export type ProcessInfoBody = z.TypeOf<typeof schemas.ProcessInfoSchema>["body"]
+export type ProcessIDPrams = z.TypeOf<typeof schemas.ProcessIDSchema>["params"]
 
 export type ProcessCreateBody = z.TypeOf<typeof schemas.ProcessCreateSchema>["body"]
 

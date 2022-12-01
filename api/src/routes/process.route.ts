@@ -5,29 +5,30 @@ import schemas from "../utils/schemas"
 
 import PatientRouter from "./patient.route"
 
+import authMiddleware from "../middleware/auth.middleware"
+
 const process = Router()
+
+process.use(authMiddleware.authorize())
 
 process.use("/:process", PatientRouter)
 
 process.post(
-  "/archive",
-  middleware.requestValidator(schemas.ArchiveProcessSchema),
+  "/archive/:processId",
   controller.archive
 )
 
-process.get("/info", middleware.requestValidator(schemas.ProcessInfoSchema), controller.info)
+process.get("/info/:processId", controller.info)
 
-process.get("/list", middleware.requestValidator(schemas.ProcessListSchema), controller.list)
+process.get("/list", controller.list)
 
-process.get(
+/*process.get(
   "/list/active",
-  middleware.requestValidator(schemas.ProcessListSchema),
   controller.listActive
-)
+)*/ //MUDAR ISTO E POR PARA SER DEFINIDO COMO FILTRO
 
 process.post(
-  "/activate",
-  middleware.requestValidator(schemas.ArchiveProcessSchema),
+  "/activate/:processId",
   controller.activate
 )
 
@@ -37,7 +38,6 @@ process.post("/edit", middleware.requestValidator(schemas.ProcessEditSchema), co
 
 process.get(
   "/appointments",
-  middleware.requestValidator(schemas.ProcessInfoSchema),
   controller.appointments
 )
 

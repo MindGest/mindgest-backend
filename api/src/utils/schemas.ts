@@ -207,29 +207,15 @@ export const EditProfileSchema = z.object({
   ]),
 })
 
-export const ArchiveProcessSchema = z.object({
-  body: z.object({
-    token: z.string(),
-    processId: z.number(),
-  }),
+export const ProcessIDSchema = z.object({
+  params: z.object({
+    processId: z.string()
+  }).strict(),
 })
 
-export const ProcessInfoSchema = z.object({
-  body: z.object({
-    token: z.string(),
-    processId: z.number(),
-  }),
-})
-
-export const ProcessListSchema = z.object({
-  body: z.object({
-    token: z.string(),
-  }),
-})
 
 export const ProcessCreateSchema = z.object({
   body: z.object({
-    token: z.string(),
     patientId: z.number(),
     therapistId: z.number(),
     speciality: z.string(),
@@ -239,7 +225,6 @@ export const ProcessCreateSchema = z.object({
 
 export const ProcessEditSchema = z.object({
   body: z.object({
-    token: z.string(),
     therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
@@ -250,8 +235,6 @@ export const ProcessEditSchema = z.object({
 
 export const ProcessEditPermissionsSchema = z.object({
   body: z.object({
-    token: z.string(),
-    processId: z.number(),
     collaboratorId: z.number(),
     appoint: z.boolean(),
     statitics: z.boolean(),
@@ -321,11 +304,8 @@ export default {
   ForgotPasswordSchema,
   ResetPasswordSchema,
   VerifyAccountSchema,
-  ArchiveProcessSchema,
   AccountVerificationSchema,
   DateSchema,
-  ProcessListSchema,
-  ProcessInfoSchema,
   ProcessCreateSchema,
   ProcessEditSchema,
   ProcessEditPermissionsSchema,
@@ -348,4 +328,5 @@ export default {
   InternSchema,
   SelfEditProfileSchema,
   EditProfileParamsSchema,
+  ProcessIDSchema
 }

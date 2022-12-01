@@ -4,69 +4,58 @@ import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { verifyAccessToken, verifyToken } from "../services/auth.service"
 import {
-  ArchiveProcessBody,
-  VerificationToken,
-  ProcessListBody,
-  ProcessInfoBody,
   ProcessCreateBody,
-  ValidationToken,
   ProcessEditBody,
   ProcessEditPermissionsBody,
+  ProcessIDPrams
 } from "../utils/types"
+import logger from "../utils/logger"
 
-export async function archive(req: Request<{}, {}, ArchiveProcessBody>, res: Response) {
+export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
-    // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
-
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
+    var decoded = res.locals.token
+    var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findFirst({
       where: {
-        process_id: req.body.processId,
+        process_id: processId,
         person_id: decoded.id,
       },
     })
+
 
     if (decoded.admin == false || permissions!.archive == false) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
     }
+  
 
-    var processId = req.body.processId
     await prisma.process.update({
       data: { active: false },
       where: { id: processId },
     })
+    
     return res.status(StatusCodes.OK).json({
       message: "Process Archived!",
     })
   } catch (error) {
+    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
   }
 }
 
-export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response) {
+export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
-    // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
 
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
+    var decoded = res.locals.token
+    var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findFirst({
       where: {
-        process_id: req.body.processId,
+        process_id: processId,
         person_id: decoded.id,
       },
     })
@@ -77,7 +66,6 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
       })
     }
 
-    var processId = req.body.processId
 
     var therapists = await prisma.therapist_process.findMany({
       where: {
@@ -184,17 +172,8 @@ export async function info(req: Request<{}, {}, ProcessInfoBody>, res: Response)
   }
 }
 
-export async function list(req: Request<{}, {}, ProcessListBody>, res: Response) {
+export async function list(req: Request<{}, {}, {}>, res: Response) {
   try {
-    // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<VerificationToken>(req.body.token)
-
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
-
     var processes = await prisma.process.findMany()
 
     var listing: any = []
@@ -205,6 +184,7 @@ export async function list(req: Request<{}, {}, ProcessListBody>, res: Response)
           process_id: process.id,
         },
       })
+
 
       var therapistListing: string[] = []
 
@@ -272,13 +252,15 @@ export async function list(req: Request<{}, {}, ProcessListBody>, res: Response)
       list: listing,
     })
   } catch (error) {
+    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
   }
 }
 
-export async function listActive(req: Request<{}, {}, ProcessListBody>, res: Response) {
+//MUDAR ISTO PARA SER COM FILTROS
+/*export async function listActive(req: Request<{}, {}, >, res: Response) {
   try {
     // Fetch and decoded the verification token
     let decoded = verifyAccessToken<VerificationToken>(req.body.token)
@@ -374,18 +356,13 @@ export async function listActive(req: Request<{}, {}, ProcessListBody>, res: Res
       message: "Ups... Something went wrong",
     })
   }
-}
+}*/
 
-export async function activate(req: Request<{}, {}, ArchiveProcessBody>, res: Response) {
+export async function activate(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
     // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
-
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
+    var decoded = res.locals.token
+    var processId = parseInt(req.params.processId)
 
     //Falta saber se o user é admin ou n
     if (decoded.admin == false) {
@@ -394,7 +371,6 @@ export async function activate(req: Request<{}, {}, ArchiveProcessBody>, res: Re
       })
     }
 
-    var processId = req.body.processId
     await prisma.process.update({
       data: { active: true },
       where: { id: processId },
@@ -411,14 +387,7 @@ export async function activate(req: Request<{}, {}, ArchiveProcessBody>, res: Re
 
 export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Response) {
   try {
-    // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
-
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
+    var decoded = res.locals.token
 
     var admin = false
     //FALTA CRIAR NOTIFICACAO
@@ -468,22 +437,16 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
       message: "Process Created!",
     })
   } catch (error) {
+    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
   }
 }
 
-export async function edit(req: Request<{}, {}, ProcessEditBody>, res: Response) {
+export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, res: Response) {
   try {
-    // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
-
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
+    var decoded = res.locals.token
 
     var permissions = await prisma.permissions.findFirst({
       where: {
@@ -591,20 +554,14 @@ export async function edit(req: Request<{}, {}, ProcessEditBody>, res: Response)
 }
 
 //Nao sei bem oq este é suposto devolver tbh
-export async function appointments(req: Request<{}, {}, ProcessInfoBody>, res: Response) {
+export async function appointments(req: Request<ProcessIDPrams, {},{}>, res: Response) {
   try {
-    // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<VerificationToken>(req.body.token)
-
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
+    var decoded = res.locals.token
+    var processId = parseInt(req.params.processId)
 
     var appointments = await prisma.appointment_process.findMany({
       where: {
-        process_id: req.body.processId,
+        process_id: processId,
       },
     })
 
@@ -649,22 +606,16 @@ export async function appointments(req: Request<{}, {}, ProcessInfoBody>, res: R
 }
 
 export async function editPermissions(
-  req: Request<{}, {}, ProcessEditPermissionsBody>,
+  req: Request<ProcessIDPrams, {}, ProcessEditPermissionsBody>,
   res: Response
 ) {
   try {
-    // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<ValidationToken>(req.body.token)
-
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
+    var decoded = res.locals.token
+    var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findFirst({
       where: {
-        process_id: req.body.processId,
+        process_id: processId,
         person_id: decoded.id,
       },
     })
@@ -678,7 +629,7 @@ export async function editPermissions(
     var permission = await prisma.permissions.findFirst({
       where: {
         person_id: req.body.collaboratorId,
-        process_id: req.body.processId,
+        process_id: processId,
       },
     })
 
@@ -710,7 +661,6 @@ export default {
   archive,
   info,
   list,
-  listActive,
   create,
   activate,
   edit,
