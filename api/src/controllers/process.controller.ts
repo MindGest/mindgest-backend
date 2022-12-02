@@ -24,19 +24,17 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
       },
     })
 
-
     if (decoded.admin == false || permissions!.archive == false) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
     }
-  
 
     await prisma.process.update({
       data: { active: false },
       where: { id: processId },
     })
-    
+
     return res.status(StatusCodes.OK).json({
       message: "Process Archived!",
     })
@@ -50,7 +48,6 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
 
 export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
-
     var decoded = res.locals.token
     var processId = parseInt(req.params.processId)
 
@@ -66,7 +63,6 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
         message: "User doesn't have authorization",
       })
     }
-
 
     var therapists = await prisma.therapist_process.findMany({
       where: {
@@ -478,7 +474,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
 }
 
 //Nao sei bem oq este é suposto devolver tbh
-export async function appointments(req: Request<ProcessIDPrams, {},{}>, res: Response) {
+export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
     var decoded = res.locals.token
     var processId = parseInt(req.params.processId)

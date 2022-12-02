@@ -208,9 +208,11 @@ export const EditProfileSchema = z.object({
 })
 
 export const ProcessIDSchema = z.object({
-  params: z.object({
-    processId: z.string()
-  }).strict(),
+  params: z
+    .object({
+      processId: z.string(),
+    })
+    .strict(),
 })
 
 export const QueryListProcess = z.object({

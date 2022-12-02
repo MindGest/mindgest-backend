@@ -13,10 +13,7 @@ process.use(authMiddleware.authorize())
 
 process.use("/:process", PatientRouter)
 
-process.post(
-  "/archive/:processId",
-  controller.archive
-)
+process.post("/archive/:processId", controller.archive)
 
 process.get("/info/:processId", controller.info)
 
@@ -27,19 +24,13 @@ process.get("/list", controller.list)
   controller.listActive
 )*/ //MUDAR ISTO E POR PARA SER DEFINIDO COMO FILTRO
 
-process.post(
-  "/activate/:processId",
-  controller.activate
-)
+process.post("/activate/:processId", controller.activate)
 
 process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema), controller.create)
 
 process.post("/edit", middleware.requestValidator(schemas.ProcessEditSchema), controller.edit)
 
-process.get(
-  "/appointments",
-  controller.appointments
-)
+process.get("/appointments", controller.appointments)
 
 process.post(
   "/edit/permissions",
