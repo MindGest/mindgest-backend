@@ -67,3 +67,5 @@ export type SelfAdminUpdateBody = z.TypeOf<typeof schemas.AdminSchema>
 export type MarkNotificationQueryParams = { notification: Number }
 
 export type NotificationListQueryParams = z.TypeOf<typeof schemas.NotificationFilterSchema>
+
+export type QueryListProcess = z.TypeOf<typeof schemas.QueryListProcess>["query"]

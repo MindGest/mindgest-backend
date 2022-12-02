@@ -7,7 +7,8 @@ import {
   ProcessCreateBody,
   ProcessEditBody,
   ProcessEditPermissionsBody,
-  ProcessIDPrams
+  ProcessIDPrams,
+  QueryListProcess
 } from "../utils/types"
 import logger from "../utils/logger"
 
@@ -172,9 +173,31 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
   }
 }
 
-export async function list(req: Request<{}, {}, {}>, res: Response) {
+export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Response) {
   try {
-    var processes = await prisma.process.findMany()
+
+    var queryParams = req.query
+
+    if(queryParams.active == null){
+      queryParams.active = 'false'
+    }
+    var active = (queryParams.active === 'true');
+
+    if(queryParams.speciality == null){
+      var processes = await prisma.process.findMany(
+        {where:{
+          active: active,
+        }}
+      )
+    }
+    else{
+      var processes = await prisma.process.findMany(
+        {where:{
+          active: active,
+          speciality_speciality: queryParams.speciality
+        }}
+      )
+    }
 
     var listing: any = []
 
@@ -258,105 +281,6 @@ export async function list(req: Request<{}, {}, {}>, res: Response) {
     })
   }
 }
-
-//MUDAR ISTO PARA SER COM FILTROS
-/*export async function listActive(req: Request<{}, {}, >, res: Response) {
-  try {
-    // Fetch and decoded the verification token
-    let decoded = verifyAccessToken<VerificationToken>(req.body.token)
-
-    if (!decoded) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "Invalid Verification Token",
-      })
-    }
-
-    var processes = await prisma.process.findMany({
-      where: {
-        active: true,
-      },
-    })
-
-    var listing: any = []
-
-    for (var process of processes) {
-      var therapists = await prisma.therapist_process.findMany({
-        where: {
-          process_id: process.id,
-        },
-      })
-
-      var therapistListing: string[] = []
-
-      for (var therapist_process of therapists) {
-        var therapist = await prisma.person.findUnique({
-          where: {
-            id: therapist_process.therapist_person_id,
-          },
-        })
-
-        therapistListing.push(therapist!.name)
-      }
-
-      var ref = process.ref
-
-      var utentProcess = await prisma.patient_process.findFirst({
-        where: {
-          process_id: process.id,
-        },
-      })
-
-      var utentName = await prisma.person.findUnique({
-        where: {
-          id: utentProcess?.patient_person_id,
-        },
-      })
-
-      var appointments = await prisma.appointment_process.findMany({
-        where: {
-          process_id: process.id,
-        },
-      })
-
-      var nextAppointment = Date.now()
-      var dateChanged = false
-
-      for (var appointmentProcess of appointments) {
-        var apointment = await prisma.appointment.findUnique({
-          where: {
-            slot_id: appointmentProcess.appointment_slot_id,
-          },
-        })
-
-        if (apointment!.slot_start_date.getTime() > nextAppointment) {
-          nextAppointment = apointment!.slot_start_date.getTime()
-          dateChanged = true
-        }
-      }
-
-      var nextAppointmentString: string = ""
-      if (dateChanged) {
-        nextAppointmentString = new Date(nextAppointment).toString()
-      } else {
-        nextAppointmentString = "No next Appointment"
-      }
-
-      listing.push({
-        therapistListing: therapistListing,
-        patientName: utentName?.name,
-        refCode: ref,
-        nextAppointment: nextAppointmentString,
-      })
-    }
-    return res.status(StatusCodes.OK).json({
-      list: listing,
-    })
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "Ups... Something went wrong",
-    })
-  }
-}*/
 
 export async function activate(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
