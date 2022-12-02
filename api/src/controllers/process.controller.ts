@@ -8,7 +8,7 @@ import {
   ProcessEditBody,
   ProcessEditPermissionsBody,
   ProcessIDPrams,
-  QueryListProcess
+  QueryListProcess,
 } from "../utils/types"
 import logger from "../utils/logger"
 
@@ -171,28 +171,26 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
 
 export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Response) {
   try {
-
     var queryParams = req.query
 
-    if(queryParams.active == null){
-      queryParams.active = 'false'
+    if (queryParams.active == null) {
+      queryParams.active = "false"
     }
-    var active = (queryParams.active === 'true');
+    var active = queryParams.active === "true"
 
-    if(queryParams.speciality == null){
-      var processes = await prisma.process.findMany(
-        {where:{
+    if (queryParams.speciality == null) {
+      var processes = await prisma.process.findMany({
+        where: {
           active: active,
-        }}
-      )
-    }
-    else{
-      var processes = await prisma.process.findMany(
-        {where:{
+        },
+      })
+    } else {
+      var processes = await prisma.process.findMany({
+        where: {
           active: active,
-          speciality_speciality: queryParams.speciality
-        }}
-      )
+          speciality_speciality: queryParams.speciality,
+        },
+      })
     }
 
     var listing: any = []
@@ -203,7 +201,6 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
           process_id: process.id,
         },
       })
-
 
       var therapistListing: string[] = []
 

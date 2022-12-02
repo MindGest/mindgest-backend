@@ -218,10 +218,9 @@ export const ProcessIDSchema = z.object({
 export const QueryListProcess = z.object({
   query: z.object({
     active: z.string(),
-    speciality: z.string()
-  })
+    speciality: z.string(),
+  }),
 })
-
 
 export const ProcessCreateSchema = z.object({
   body: z.object({
@@ -338,5 +337,5 @@ export default {
   SelfEditProfileSchema,
   EditProfileParamsSchema,
   ProcessIDSchema,
-  QueryListProcess
+  QueryListProcess,
 }
