@@ -33,4 +33,6 @@ describe("Test if auth is working", () => {
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.OK)
   }) //user has to be verified and it has to be approved by a therapist or admin b4 this works
+
+  // teste de push
 })
