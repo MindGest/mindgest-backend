@@ -9,156 +9,146 @@ dotenv.config()
 import app from "../src/main"
 
 describe("Test admin registration", () => {
+  it("0.0 test - Validate admin register", async () => {
+    const payload = {
+      role: "admin",
+      name: "Sara Brito",
+      email: "sarab@student.dei.uc",
+      password: "password1234",
+      address: "Ferreira Borges, n 10",
+      birthDate: "1988-11-21T0:00:00.000Z",
+      phoneNumber: 919191000,
+    }
 
-    it("0.0 test - Validate admin register", async () => {
-        const payload = {
-            "role": "admin",
-            "name": "Sara Brito",
-            "email": "sarab@student.dei.uc",
-            "password": "password1234",
-            "address": "Ferreira Borges, n 10",
-            "birthDate": "1988-11-21T0:00:00.000Z",
-            "phoneNumber": 919191000
-        }
+    // in json format
+    const message = {
+      message: "The user account was created successfully!",
+    }
 
-        // in json format
-        const message = {
-            message: "The user account was created successfully!"
-        }
-          
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
-
 
 describe("Test therapist registration", () => {
+  it("0.1 test - Validate therapist register", async () => {
+    const payload = {
+      role: "therapist",
+      name: "John Doe",
+      email: "johndoe@student.dei.uc",
+      password: "password1234",
+      address: "Wall Streed",
+      birthDate: "1990-11-21T23:50:28.538Z",
+      phoneNumber: 9219231942,
+      healthSystem: "adse",
+      license: "51382",
+      taxNumber: 283192189,
+    }
 
-    it("0.1 test - Validate therapist register", async () => {
-        const payload = {
-            "role": "therapist",
-            "name": "John Doe",
-            "email": "johndoe@student.dei.uc",
-            "password": "password1234",
-            "address": "Wall Streed",
-            "birthDate": "1990-11-21T23:50:28.538Z",
-            "phoneNumber": 9219231942,
-            "healthSystem": "adse",
-            "license": "51382",
-            "taxNumber": 283192189
-        }
+    // in json format
+    const message = {
+      message: "The user account was created successfully!",
+    }
 
-        // in json format
-        const message = {
-            message: "The user account was created successfully!"
-        }
-          
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
-
 
 describe("Test security personnel registration", () => {
+  it("0.2 test - Validate security register", async () => {
+    const payload = {
+      role: "guard",
+      name: "Pedro Oblíquo",
+      email: "obliquo@student.dei.uc",
+      password: "password1234",
+      address: "Rua paralela",
+      birthDate: "1964-04-12T00:00:00.000Z",
+      phoneNumber: 963918402,
+      taxNumber: 193619773,
+    }
 
-    it("0.2 test - Validate security register", async () => {
-        const payload = {
-            "role": "guard",
-            "name": "Pedro Oblíquo",
-            "email": "obliquo@student.dei.uc",
-            "password": "password1234",
-            "address": "Rua paralela",
-            "birthDate": "1964-04-12T00:00:00.000Z",
-            "phoneNumber": 963918402,
-            "taxNumber": 193619773
-        }
+    // in json format
+    const message = {
+      message: "The user account was created successfully!",
+    }
 
-        // in json format
-        const message = {
-            message: "The user account was created successfully!"
-        }
-          
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
-
 
 describe("Test accountant registration", () => {
+  it("0.3 test - Validate accountant register", async () => {
+    const payload = {
+      role: "accountant",
+      name: "Carolina Damásio",
+      email: "caroldam@student.dei.uc",
+      password: "password1234",
+      address: "Rua do pessegueiro",
+      birthDate: "1992-10-04T00:00:00.000Z",
+      phoneNumber: 969951849,
+      taxNumber: 191770341,
+    }
 
-    it("0.3 test - Validate accountant register", async () => {
-        const payload = {
-            "role": "accountant",
-            "name": "Carolina Damásio",
-            "email": "caroldam@student.dei.uc",
-            "password": "password1234",
-            "address": "Rua do pessegueiro",
-            "birthDate": "1992-10-04T00:00:00.000Z",
-            "phoneNumber": 969951849,
-            "taxNumber": 191770341
-        }          
-          
-        // in json format
-        const message = {
-            message: "The user account was created successfully!"
-        }
-        
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    // in json format
+    const message = {
+      message: "The user account was created successfully!",
+    }
+
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
 
-
 describe("Test intern registration", () => {
+  it("0.4 test - Validate intern register", async () => {
+    const payload = {
+      role: "intern",
+      name: "Maria Menezes",
+      email: "mmenezes@student.dei.uc",
+      password: "password1234",
+      address: "Rua do Brigadeiro Cardoso, n 369",
+      birthDate: "2000-4-13T00:00:00.000Z",
+      phoneNumber: 919193948,
+    }
 
-    it("0.4 test - Validate intern register", async () => {
-        const payload = {
-            "role": "intern",
-            "name": "Maria Menezes",
-            "email": "mmenezes@student.dei.uc",
-            "password": "password1234",
-            "address": "Rua do Brigadeiro Cardoso, n 369",
-            "birthDate": "2000-4-13T00:00:00.000Z",
-            "phoneNumber": 919193948
-        }                    
-          
-        const message = {
-            message: "The user account was created successfully!"
-        }
+    const message = {
+      message: "The user account was created successfully!",
+    }
 
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
 
 describe("Test response to wrong registration data", () => {
-
-    /* missing output
+  /* missing output
     it("0.4.2 test - Test duplicate email in registration", async () => {
         const payload = {
             "role": "intern",
@@ -183,9 +173,7 @@ describe("Test response to wrong registration data", () => {
         expect(result.status).toEqual(StatusCodes.OK)
         expect(result.body).toEqual(message)
     })*/
-
-
-    /* missing output
+  /* missing output
     it("0.11 test - Wrong mail", async () => {
         const payload = {
             "role": "therapist",
@@ -209,5 +197,4 @@ describe("Test response to wrong registration data", () => {
         expect(result.status).toEqual(StatusCodes.OK)
         expect(result.body).toEqual(message)
     })*/
-
 })
