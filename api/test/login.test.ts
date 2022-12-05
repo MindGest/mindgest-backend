@@ -8,7 +8,7 @@ dotenv.config()
 
 import app from "../src/main"
 
-describe("Test if auth is working", () => {
+describe("Test if auth login is working", () => {
   it("Should not login", async () => {
     const payload = {
       email: "johndoe@student.dei.uc.pt",
@@ -34,5 +34,4 @@ describe("Test if auth is working", () => {
     expect(result.status).toEqual(StatusCodes.OK)
   }) //user has to be verified and it has to be approved by a therapist or admin b4 this works
 
-  // teste de push
 })
