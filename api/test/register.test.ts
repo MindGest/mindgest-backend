@@ -8,9 +8,9 @@ dotenv.config()
 
 import app from "../src/main"
 
-describe("Test admin registration", () => {
+describe("0.0 Test admin registration", () => {
 
-    it("0.0 test - Validate admin register", async () => {
+    it("0.0.0 test - Validate admin register", async () => {
         const payload = {
             "role": "admin",
             "name": "Sara Brito",
@@ -37,9 +37,9 @@ describe("Test admin registration", () => {
 })
 
 
-describe("Test therapist registration", () => {
+describe("0.1 Test therapist registration", () => {
 
-    it("0.1 test - Validate therapist register", async () => {
+    it("0.1.0 test - Validate therapist register", async () => {
         const payload = {
             "role": "therapist",
             "name": "John Doe",
@@ -69,9 +69,9 @@ describe("Test therapist registration", () => {
 })
 
 
-describe("Test security personnel registration", () => {
+describe("0.2 Test security personnel registration", () => {
 
-    it("0.2 test - Validate security register", async () => {
+    it("0.2.0 test - Validate security register", async () => {
         const payload = {
             "role": "guard",
             "name": "Pedro Oblíquo",
@@ -99,9 +99,9 @@ describe("Test security personnel registration", () => {
 })
 
 
-describe("Test accountant registration", () => {
+describe("0.3 Test accountant registration", () => {
 
-    it("0.3 test - Validate accountant register", async () => {
+    it("0.3.0 test - Validate accountant register", async () => {
         const payload = {
             "role": "accountant",
             "name": "Carolina Damásio",
@@ -129,9 +129,9 @@ describe("Test accountant registration", () => {
 })
 
 
-describe("Test intern registration", () => {
+describe("0.4 Test intern registration", () => {
 
-    it("0.4 test - Validate intern register", async () => {
+    it("0.4.0 test - Validate intern register", async () => {
         const payload = {
             "role": "intern",
             "name": "Maria Menezes",
@@ -156,7 +156,7 @@ describe("Test intern registration", () => {
     })
 })
 
-describe("Test response to wrong registration data", () => {
+describe("0.4 Test response to wrong registration data", () => {
 
     /* missing output
     it("0.4.2 test - Test duplicate email in registration", async () => {

@@ -8,10 +8,10 @@ dotenv.config()
 
 import app from "../src/main"
 
-describe("Test password reset", () => {
+describe("(x+1).0 Test password reset", () => {
 
     /* missing token - i don't know hoe to generate
-    it("(x+1).0 test - token is valid", async () => {
+    it("(x+1).0.0 test - token is valid", async () => {
 
         const payload = {
             "token": "token_gerado"
@@ -31,7 +31,7 @@ describe("Test password reset", () => {
         expect(result.body).toEqual(message)
     })*/
 
-    it("(x+1).1 test - token is invalid", async () => {
+    it("(x+1).0.1 test - token is invalid", async () => {
 
         const payload = {
             "token": "eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iO00iaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ"
