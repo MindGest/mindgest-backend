@@ -32,22 +32,22 @@ describe("(x+1).0 Test password reset", () => {
     })*/
 
     it("(x+1).0.1 test - token is invalid", async () => {
+      const payload = {
+        token:
+          "eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iO00iaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ",
+      }
 
-        const payload = {
-            "token": "eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iO00iaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ"
-        }
-        
-        // in json format
-        const message = {
-            message: "Password reset token invalid or expired!"
-        }
-          
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-        expect(result.body).toEqual(message)
-    })
+    // in json format
+    const message = {
+      message: "Password reset token invalid or expired!",
+    }
+
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.FORBIDDEN)
+    expect(result.body).toEqual(message)
+  })
 })

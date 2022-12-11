@@ -22,18 +22,18 @@ describe("0.0 Test admin registration", () => {
         }
 
         // in json format
-        const message = {
-            message: "The user account was created successfully!"
-        }
-          
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    const message = {
+      message: "The user account was created successfully!",
+    }
+
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
 
 
@@ -53,19 +53,19 @@ describe("0.1 Test therapist registration", () => {
             "taxNumber": 283192189
         }
 
-        // in json format
-        const message = {
-            message: "The user account was created successfully!"
-        }
-          
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    // in json format
+    const message = {
+      message: "The user account was created successfully!",
+    }
+
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
 
 
@@ -83,19 +83,19 @@ describe("0.2 Test security personnel registration", () => {
             "taxNumber": 193619773
         }
 
-        // in json format
-        const message = {
-            message: "The user account was created successfully!"
-        }
-          
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    // in json format
+    const message = {
+      message: "The user account was created successfully!",
+    }
+
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
 
 
@@ -146,14 +146,14 @@ describe("0.4 Test intern registration", () => {
             message: "The user account was created successfully!"
         }
 
-        const result = await request(app)
-          .post("/api/auth/register")
-          .send(payload)
-          .set("Content-Type", "application/json")
-          .set("Accept", "application/json")
-        expect(result.status).toEqual(StatusCodes.OK)
-        expect(result.body).toEqual(message)
-    })
+    const result = await request(app)
+      .post("/api/auth/register")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.body).toEqual(message)
+  })
 })
 
 describe("0.4 Test response to wrong registration data", () => {
@@ -183,9 +183,7 @@ describe("0.4 Test response to wrong registration data", () => {
         expect(result.status).toEqual(StatusCodes.OK)
         expect(result.body).toEqual(message)
     })*/
-
-
-    /* missing output
+  /* missing output
     it("0.11 test - Wrong mail", async () => {
         const payload = {
             "role": "therapist",
@@ -209,5 +207,4 @@ describe("0.4 Test response to wrong registration data", () => {
         expect(result.status).toEqual(StatusCodes.OK)
         expect(result.body).toEqual(message)
     })*/
-
 })
