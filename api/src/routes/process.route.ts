@@ -19,7 +19,11 @@ process.post("/activate/:processId", controller.activate)
 
 process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema), controller.create)
 
-process.post("/edit/:processId", middleware.requestValidator(schemas.ProcessEditSchema), controller.edit)
+process.post(
+  "/edit/:processId",
+  middleware.requestValidator(schemas.ProcessEditSchema),
+  controller.edit
+)
 
 process.get("/appointments/:processId", controller.appointments)
 
