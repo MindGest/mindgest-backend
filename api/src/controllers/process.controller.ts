@@ -330,13 +330,6 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
       },
     })
 
-    await prisma.patient_process.create({
-      data: {
-        patient_person_id: req.body.patientId,
-        process_id: process.id,
-      },
-    })
-
     await prisma.permissions.create({
       data: {
         editpatitent: true,
@@ -349,6 +342,48 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
         person_id: req.body.therapistId,
       },
     })
+
+    for (let patientId of req.body.patientIds) {
+      await prisma.patient_process.create({
+        data: {
+          patient_person_id: patientId,
+          process_id: process.id,
+        },
+      })
+    }
+
+    for (let collaboratorId of req.body.colaborators) {
+      var type = await prisma.intern.findUnique({
+        where: {
+          person_id: collaboratorId,
+        },
+      })
+
+      if (type != null) {
+        //é interno
+        await prisma.intern_process.create({
+          data: {
+            process_id: process.id,
+            intern_person_id: collaboratorId,
+          },
+        })
+      } else {
+        //é terapeuta
+        await prisma.therapist_process.create({
+          data: {
+            process_id: process.id,
+            therapist_person_id: collaboratorId,
+          },
+        })
+      }
+
+      await prisma.permissions.create({
+        data: {
+          process_id: process.id,
+          person_id: collaboratorId,
+        },
+      })
+    }
 
     return res.status(StatusCodes.OK).json({
       message: "Process Created!",
@@ -364,10 +399,11 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
 export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, res: Response) {
   try {
     var decoded = res.locals.token
+    var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findFirst({
       where: {
-        process_id: req.body.processId,
+        process_id: processId,
         person_id: decoded.id,
       },
     })
@@ -380,7 +416,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
 
     let permissionMainTherapist = await prisma.permissions.findFirst({
       where: {
-        process_id: req.body.processId,
+        process_id: processId,
         isMain: true,
       },
     })
@@ -400,7 +436,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
 
     await prisma.therapist_process.create({
       data: {
-        process_id: req.body.processId,
+        process_id: processId,
         therapist_person_id: req.body.therapistId,
       },
     })
@@ -413,14 +449,14 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
         statitics: true,
         editprocess: true,
         isMain: true,
-        process_id: req.body.processId,
+        process_id: processId,
         person_id: req.body.therapistId,
       },
     })
 
     await prisma.process.update({
       where: {
-        id: req.body.processId,
+        id: processId,
       },
       data: {
         speciality_speciality: req.body.speciality,
@@ -438,7 +474,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
         //é interno
         await prisma.intern_process.create({
           data: {
-            process_id: req.body.processId,
+            process_id: processId,
             intern_person_id: colaboratorId,
           },
         })
@@ -446,7 +482,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
         //é terapeuta
         await prisma.therapist_process.create({
           data: {
-            process_id: req.body.processId,
+            process_id: processId,
             therapist_person_id: colaboratorId,
           },
         })
@@ -454,7 +490,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
 
       await prisma.permissions.create({
         data: {
-          process_id: req.body.processId,
+          process_id: processId,
           person_id: colaboratorId,
         },
       })
