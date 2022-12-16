@@ -435,7 +435,7 @@ paths:
         "401":
           $ref: "#/components/responses/NoAuthorization"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /receipts/create:
     post:
       summary: Creates new receipt
@@ -456,7 +456,7 @@ paths:
         "401":
           $ref: "#/components/responses/NoAuthorization"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
 components:
   schemas:
     Admin:

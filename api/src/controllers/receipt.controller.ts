@@ -218,29 +218,28 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
   }
 }
 
-export async function create(req: Request, res: Response){
-    try{
-        var appointmentId = parseInt(req.params.appointmentId)
-        var ref = (Math.random() + 1).toString(36).substring(7) //isto ta a fazer random, depois mudar i guess
-        var datetime = new Date()
+export async function create(req: Request, res: Response) {
+  try {
+    var appointmentId = parseInt(req.params.appointmentId)
+    var ref = (Math.random() + 1).toString(36).substring(7) //isto ta a fazer random, depois mudar i guess
+    var datetime = new Date()
 
-        await prisma.receipt.create({
-            data:{
-                ref: ref,
-                appointment_slot_id: appointmentId,
-                datetime: datetime
-            }
-        })
+    await prisma.receipt.create({
+      data: {
+        ref: ref,
+        appointment_slot_id: appointmentId,
+        datetime: datetime,
+      },
+    })
 
-        res.status(StatusCodes.OK).json({
-            message: "Receipt Created",
-          })
-
-    }catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-          message: "Ups... Something went wrong",
-        })
-      }
+    res.status(StatusCodes.OK).json({
+      message: "Receipt Created",
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
 }
 
 export async function pay(req: Request, res: Response) {
@@ -262,7 +261,7 @@ export async function pay(req: Request, res: Response) {
 }
 
 export default {
-    list,
-    create,
-    pay
-  }
+  list,
+  create,
+  pay,
+}
