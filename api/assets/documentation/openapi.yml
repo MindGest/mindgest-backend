@@ -416,7 +416,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError" 
   /receipts/pay:
-    get:
+    put:
       summary: Puts receipt as paid
       tags:
         - Receipts
@@ -430,6 +430,27 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/ReceiptPayed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError" 
+  /receipts/create:
+    post:
+      summary: Creates new receipt
+      tags:
+        - Receipts
+      description: Creates new receipt
+      parameters:
+        - in: path
+          name: appointmentId
+          schema:
+            type: string
+          description: ID of appointment to create receipt
+      responses:
+        "200":
+          $ref: "#/components/responses/ReceiptCreated"
         "403":
           $ref: "#/components/responses/VerificationTokenInvalid"
         "401":
@@ -1222,7 +1243,20 @@ components:
               message:
                 type: string
                 description: A message describing the request result
-                example: Receipt Payed
+                example: Receipt Payed!
+    ReceiptCreated:
+      description: Receipt Payed
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Receipt Created
   securitySchemes:
     AccessToken:
       type: apiKey

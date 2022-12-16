@@ -11,8 +11,8 @@ receipt.use(authMiddleware.authorize())
 
 receipt.get("/list", controller.list)
 
-receipt.post("/create", controller.create)
+receipt.post("/create/:appointmentId", controller.create)
 
-receipt.put("/pay/:receiptId", (req: Request, res: Response) => console.log("TODO"))
+receipt.put("/pay/:receiptId", controller.pay)
 
 export default receipt
