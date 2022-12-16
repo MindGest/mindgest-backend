@@ -228,7 +228,7 @@ export const ProcessCreateSchema = z.object({
     therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
-    colaborators: z.array(z.number())
+    colaborators: z.array(z.number()),
   }),
 })
 
@@ -237,7 +237,7 @@ export const ProcessEditSchema = z.object({
     therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
-    colaborators: z.array(z.number())
+    colaborators: z.array(z.number()),
   }),
 })
 
@@ -261,7 +261,7 @@ export const AppointmentCreateSchema = z.object({
     roomId: z.number(),
     priceTableId: z.string(),
     startDate: DateSchema,
-    endDate: DateSchema
+    endDate: DateSchema,
   }),
 })
 
@@ -346,5 +346,5 @@ export default {
   EditProfileParamsSchema,
   ProcessIDSchema,
   QueryListProcess,
-  ReceiptListQuery
+  ReceiptListQuery,
 }

@@ -414,7 +414,7 @@ paths:
         "401":
           $ref: "#/components/responses/NoAuthorization"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /receipts/pay:
     put:
       summary: Puts receipt as paid
@@ -796,27 +796,27 @@ components:
       content:
         application/json:
           schema:
-              collaboratorId:
-                type: integer
-                summary: Id of the collaborator to change permissions
-              appoint:
-                type: boolean
-                summary: True if user has permissions to create appointments and False if not
-              statitics:
-                type: boolean
-                summary: True if user has permissions to see statitics and False if not
-              ditProcess:
-                type: boolean
-                summary: True if user has permissions to edit process and False if not
-              editPatient:
-                type: boolean
-                summary: True if user has permissions to edit patient and False if not
-              archive:
-                type: boolean
-                summary: True if user has permissions to archive and False if not
-              see:
-                type: boolean
-                summary: True if user has permissions to see process info and False if not 
+            collaboratorId:
+              type: integer
+              summary: Id of the collaborator to change permissions
+            appoint:
+              type: boolean
+              summary: True if user has permissions to create appointments and False if not
+            statitics:
+              type: boolean
+              summary: True if user has permissions to see statitics and False if not
+            ditProcess:
+              type: boolean
+              summary: True if user has permissions to edit process and False if not
+            editPatient:
+              type: boolean
+              summary: True if user has permissions to edit patient and False if not
+            archive:
+              type: boolean
+              summary: True if user has permissions to archive and False if not
+            see:
+              type: boolean
+              summary: True if user has permissions to see process info and False if not
   responses:
     LoginSuccessFull:
       description: Login Successful
