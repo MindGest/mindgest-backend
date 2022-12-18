@@ -1,19 +1,42 @@
 version: "3.9"
 
 services:
+  test-db:
+    image: postgres:14.5-alpine
+    container_name: mindgest-test-db
+    restart: unless-stopped
+    env_file:
+      - .env.test
+    ports:
+      - ${POSTGRES_PORT}:5432
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles:
+      - testing
   db:
     image: postgres:14.5-alpine
     container_name: mindgest-db
     hostname: db
     restart: unless-stopped
-    ports:
-      - 5432:5432
     env_file:
       - .env
+    ports:
+      - ${POSTGRES_PORT}:5432
     volumes:
       - ./data/:/var/lib/postgresql/data/
     healthcheck:
-      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'" ]
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
+        ]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -30,9 +53,8 @@ services:
       - 8080:8080
     env_file:
       - .env
-      - ../api/.env
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
       HOST: 0.0.0.0
       PORT: 8080
     links:
@@ -40,7 +62,11 @@ services:
     volumes:
       - ../api:/usr/src/mindgest
     healthcheck:
-      test: [ "CMD-SHELL", "sh -c 'curl --fail http://localhost:8080/api/healthcheck || exit 1'" ]
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'curl --fail http://localhost:8080/api/healthcheck || exit 1'"
+        ]
       interval: 10s
       timeout: 3s
       retries: 3
