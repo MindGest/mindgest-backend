@@ -148,7 +148,7 @@ describe("0.4 Test intern registration", () => {
 
   it("0.4.1 Test if the above user was criated", async() => {
     //falta info sobre o endpoint
-  })
+})
 
   /* missing output
     it("0.4.2 Test duplicate email in registration", async () => {

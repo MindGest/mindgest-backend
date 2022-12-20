@@ -216,14 +216,18 @@ paths:
           $ref: "#/components/responses/PasswordResetTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/archive:
+  /process/archive:
     post:
       summary: Archives process
       tags:
         - Process
       description: Archives process
-      requestBody:
-        $ref: "#/components/requestBodies/ProcessIdToken"
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       responses:
         "200":
           $ref: "#/components/responses/ProcessArchived"
@@ -231,14 +235,18 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/info:
+  /process/info:
     get:
       summary: All the information of a process
       tags:
         - Process
       description: All the information of a process
-      requestBody:
-        $ref: "#/components/requestBodies/ProcessIdToken"
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       responses:
         "200":
           $ref: "#/components/responses/ProcessInfo"
@@ -248,14 +256,23 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/list:
+  /process/list:
     get:
       summary: Lists every process
       tags:
         - Process
       description: Lists every process
-      requestBody:
-        $ref: "#/components/requestBodies/Token"
+      parameters:
+        - in: query
+          name: active
+          schema:
+            type: string
+          description: \"true\" or \"false\", any other will cause erro, only lists active processes
+        - in: query
+          name: speciality
+          schema:
+            type: string
+          description: name of speciality, if speciality doesn't exist an error will occur
       responses:
         "200":
           $ref: "#/components/responses/ProcessList"
@@ -263,29 +280,18 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/list/active:
-    get:
-      summary: Lists every active process
-      tags:
-        - Process
-      description: Lists every active process
-      requestBody:
-        $ref: "#/components/requestBodies/Token"
-      responses:
-        "200":
-          $ref: "#/components/responses/ProcessList"
-        "403":
-          $ref: "#/components/responses/VerificationTokenInvalid"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-  /api/process/activate:
+  /process/activate:
     post:
       summary: Activates a process
       tags:
         - Process
       description: Activates a process
-      requestBody:
-        $ref: "#/components/requestBodies/ProcessIdToken"
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       responses:
         "200":
           $ref: "#/components/responses/ProcessActivated"
@@ -295,12 +301,13 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/create:
+  /process/create:
     post:
       summary: Creates new process
       tags:
         - Process
       description: Creates new process
+      parameters:
       requestBody:
         $ref: "#/components/requestBodies/ProcessCreate"
       responses:
@@ -310,12 +317,18 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/edit:
+  /process/edit:
     post:
       summary: Edits process
       tags:
         - Process
       description: Edits process
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       requestBody:
         $ref: "#/components/requestBodies/ProcessEdit"
       responses:
@@ -327,14 +340,18 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/appointments:
+  /process/appointments:
     get:
       summary: Lists every appointment from process
       tags:
         - Process
       description: Lists every appointment from process
-      requestBody:
-        $ref: "#/components/requestBodies/ProcessIdToken"
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       responses:
         "200":
           $ref: "#/components/responses/ProcessAppointments"
@@ -344,17 +361,96 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/permissions:
+  /process/permissions:
     post:
       summary: Edits process permission for user
       tags:
         - Process
       description: Edits process permission for user
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       requestBody:
         $ref: "#/components/requestBodies/ProcessEditPermissions"
       responses:
         "200":
           $ref: "#/components/responses/ProcessEditedPermissions"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /receipts/list:
+    get:
+      summary: Lists every receipt, all or by user (if is queried by user)
+      tags:
+        - Receipts
+      description: Lists every receipt, all or by user (if is queried by user)
+      parameters:
+        - in: query
+          name: payed
+          schema:
+            type: string
+          description: \"true\" to list payed receipts, \"false\" to not list them
+        - in: query
+          name: notPayed
+          schema:
+            type: string
+          description: \"true\" to list not payed receipts, \"false\" to not list them
+        - in: query
+          name: userId
+          schema:
+            type: string
+          description: if none is selected, lists every receipt, else only lists users receipts
+      responses:
+        "200":
+          $ref: "#/components/responses/ReceiptsListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /receipts/pay:
+    put:
+      summary: Puts receipt as paid
+      tags:
+        - Receipts
+      description: Puts receipt as paid
+      parameters:
+        - in: path
+          name: receiptId
+          schema:
+            type: string
+          description: ID of the receipt
+      responses:
+        "200":
+          $ref: "#/components/responses/ReceiptPayed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /receipts/create:
+    post:
+      summary: Creates new receipt
+      tags:
+        - Receipts
+      description: Creates new receipt
+      parameters:
+        - in: path
+          name: appointmentId
+          schema:
+            type: string
+          description: ID of appointment to create receipt
+      responses:
+        "200":
+          $ref: "#/components/responses/ReceiptCreated"
         "403":
           $ref: "#/components/responses/VerificationTokenInvalid"
         "401":
@@ -641,18 +737,6 @@ components:
                 type: string
                 description: The user's password reset token
                 example: eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
-    ProcessIdToken:
-      description: Process ID and JWT
-      content:
-        application/json:
-          schema:
-            properties:
-              token:
-                type: string
-                summary: jwt from login
-              processId:
-                type: integer
-                summary: process to archive
     Token:
       description: JWT
       content:
@@ -668,30 +752,11 @@ components:
         application/json:
           schema:
             properties:
-              token:
-                type: string
-                summary: jwt from login
-              patientId:
-                type: integer
-                summary: id of patient
-              therapistId:
-                type: integer
-                summary: Id of therapist in charge of the proccess
-              speciality:
-                type: string
-                summary: Type of process, types need to be already created beforehand
-              remarks:
-                type: string
-                summary: any extra info the therapeut creating the process might wanna add
-    ProcessEdit:
-      description: Edits process
-      content:
-        application/sjon:
-          schema:
-            properties:
-              token:
-                type: string
-                summary: jwt from login
+              patientIds:
+                type: array
+                items:
+                  type: integer
+                  summary: ids of patients (in case its a process for more than 1 patient)
               therapistId:
                 type: integer
                 summary: Id of therapist in charge of the proccess
@@ -705,43 +770,53 @@ components:
                 type: array
                 items:
                   type: integer
-                  summary: ids of collaborates
-              processId:
+                  summary: ids of collaborators
+    ProcessEdit:
+      description: Edits process
+      content:
+        application/json:
+          schema:
+            properties:
+              therapistId:
+                type: integer
+                summary: Id of therapist in charge of the proccess
+              speciality:
                 type: string
-                summary: Id of process
+                summary: Type of process, types need to be already created beforehand
+              remarks:
+                type: string
+                summary: any extra info the therapeut creating the process might wanna add
+              colaborators:
+                type: array
+                items:
+                  type: integer
+                  summary: ids of collaborators
     ProcessEditPermissions:
       description: Edits process
       content:
-        application/sjon:
+        application/json:
           schema:
-            properties:
-              token:
-                type: string
-                summary: jwt from login
-              processId:
-                type: integer
-                summary: id of process
-              collaboratorId:
-                type: integer
-                summary: Id of the collaborator to change permissions
-              appoint:
-                type: boolean
-                summary: True if user has permissions to create appointments and False if not
-              statitics:
-                type: boolean
-                summary: True if user has permissions to see statitics and False if not
-              ditProcess:
-                type: boolean
-                summary: True if user has permissions to edit process and False if not
-              editPatient:
-                type: boolean
-                summary: True if user has permissions to edit patient and False if not
-              archive:
-                type: boolean
-                summary: True if user has permissions to archive and False if not
-              see:
-                type: boolean
-                summary: True if user has permissions to see process info and False if not
+            collaboratorId:
+              type: integer
+              summary: Id of the collaborator to change permissions
+            appoint:
+              type: boolean
+              summary: True if user has permissions to create appointments and False if not
+            statitics:
+              type: boolean
+              summary: True if user has permissions to see statitics and False if not
+            ditProcess:
+              type: boolean
+              summary: True if user has permissions to edit process and False if not
+            editPatient:
+              type: boolean
+              summary: True if user has permissions to edit patient and False if not
+            archive:
+              type: boolean
+              summary: True if user has permissions to archive and False if not
+            see:
+              type: boolean
+              summary: True if user has permissions to see process info and False if not
   responses:
     LoginSuccessFull:
       description: Login Successful
@@ -1129,8 +1204,63 @@ components:
                 type: string
                 description: A message describing the request result
                 example: Permission updated
+    ReceiptsListed:
+      description: Item returned
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                description: array with receipts
+                items:
+                  type: object
+                  properties:
+                    patientName:
+                      type: string
+                      description: The patients's name
+                    mainTherapist:
+                      type: string
+                      description: Process responsable therapist
+                    ref:
+                      type: string
+                      description: reference of receipt
+                    date:
+                      type: string
+                      description: date of appointment
+    ReceiptPayed:
+      description: Receipt Payed
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Receipt Payed!
+    ReceiptCreated:
+      description: Receipt Payed
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Receipt Created
   securitySchemes:
-    Access Token:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    AccessToken:
+      type: apiKey
+      in: header
+      name: authorization
+security:
+  - AccessToken: []

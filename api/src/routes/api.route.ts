@@ -10,6 +10,7 @@ import UserRouter from "./user.route"
 import DocsRouter from "./docs.route"
 import ProcessRouter from "./process.route"
 import AppointmentRouter from "./appointment.route"
+import ReceiptRouter from "./receipt.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
@@ -43,6 +44,7 @@ api.use("/user", UserRouter)
 api.use("/docs", DocsRouter)
 api.use("/process", ProcessRouter)
 api.use("/appointment", AppointmentRouter)
+api.use("/receipts", ReceiptRouter)
 
 // Healthcheck
 api.get("/healthcheck", controller.healthCheck)

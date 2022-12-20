@@ -224,10 +224,11 @@ export const QueryListProcess = z.object({
 
 export const ProcessCreateSchema = z.object({
   body: z.object({
-    patientId: z.number(),
+    patientIds: z.array(z.number()),
     therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
+    colaborators: z.array(z.number()),
   }),
 })
 
@@ -237,7 +238,6 @@ export const ProcessEditSchema = z.object({
     speciality: z.string(),
     remarks: z.string(),
     colaborators: z.array(z.number()),
-    processId: z.number(),
   }),
 })
 
@@ -256,12 +256,12 @@ export const ProcessEditPermissionsSchema = z.object({
 export const AppointmentCreateSchema = z.object({
   body: z.object({
     token: z.string(),
+    processId: z.number(),
     online: z.boolean(),
     roomId: z.number(),
     priceTableId: z.string(),
     startDate: DateSchema,
     endDate: DateSchema,
-    processId: z.number(),
   }),
 })
 
@@ -305,6 +305,14 @@ export const NotificationFilterSchema = z.object({
   filter: z.enum([NotificationFilterType.READ, NotificationFilterType.UNREAD]).optional(),
 })
 
+export const ReceiptListQuery = z.object({
+  query: z.object({
+    payed: z.string(),
+    notPayed: z.string(),
+    userId: z.string(),
+  }),
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -338,4 +346,5 @@ export default {
   EditProfileParamsSchema,
   ProcessIDSchema,
   QueryListProcess,
+  ReceiptListQuery,
 }

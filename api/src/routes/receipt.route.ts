@@ -1,12 +1,18 @@
-import { Request, Response } from "express"
-import { Router } from "express"
+import { Router, Request, Response } from "express"
+import controller from "../controllers/receipt.controller"
+import middleware from "../middleware/api.middleware"
+import schemas from "../utils/schemas"
+
+import authMiddleware from "../middleware/auth.middleware"
 
 const receipt = Router()
 
-receipt.get("/list", (req: Request, res: Response) => console.log("TODO"))
+receipt.use(authMiddleware.authorize())
 
-receipt.post("/create", (req: Request, res: Response) => console.log("TODO"))
+receipt.get("/list", controller.list)
 
-receipt.put("/pay", (req: Request, res: Response) => console.log("TODO"))
+receipt.post("/create/:appointmentId", controller.create)
+
+receipt.put("/pay/:receiptId", controller.pay)
 
 export default receipt
