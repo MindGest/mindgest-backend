@@ -14,7 +14,7 @@ describe("4.0 if an account is already verified", () => {
       token: "",
     } // é ainda preciso gerar um token
     const message = {
-      "message": "Account [already] verified successfully!"
+      message: "Account [already] verified successfully!",
     }
 
     const result = await request(app)
@@ -23,7 +23,7 @@ describe("4.0 if an account is already verified", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message);
+    expect(result.body).toEqual(message)
   })
 })
 
@@ -31,9 +31,9 @@ describe("4.1 if an account is already verified but invalid token", () => {
   it("4.1.0 with invalid token", async () => {
     const payload = {
       token: "invalid token",
-    } 
+    }
     const message = {
-      "message":  "Verification token invalid or expired"
+      message: "Verification token invalid or expired",
     }
 
     const result = await request(app)
@@ -42,6 +42,6 @@ describe("4.1 if an account is already verified but invalid token", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message);
+    expect(result.body).toEqual(message)
   })
 })

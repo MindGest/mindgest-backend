@@ -14,7 +14,7 @@ describe("(3.0 Test password reset", () => {
       email: "johndoe@student.dei.uc.pt",
       callback: "http://frontend.com/password-reset-page",
     }
-    
+
     const result = await request(app)
       .post("/api/auth/forgot-password")
       .send(payload)
@@ -52,7 +52,7 @@ describe("(3.1 Test password reset with an invalid token", () => {
   it("3.1.0 Password reset with invalid token", async () => {
     const payload = {
       token: "invalid token",
-    } 
+    }
 
     // in json format
     const message = {
