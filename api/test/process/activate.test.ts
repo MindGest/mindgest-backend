@@ -11,14 +11,14 @@ import app from "../../src/main"
 describe("(y+7).0 ativar um processo", () => {
   it("(y+7).0.0 ativar um processo já existente", async () => {
     const payload = {
-      "token": "auth_token",
-      "processId": "<refCode>"
+      token: "auth_token",
+      processId: "<refCode>",
     } //é preciso gerar o token e definir um process id
-    
+
     const message = {
-      "message": "Process Activated"
+      message: "Process Activated",
     }
-    
+
     const result = await request(app)
       .post("/api/proccess/activate")
       .send(payload)
@@ -32,11 +32,11 @@ describe("(y+7).0 ativar um processo", () => {
 describe("(y+7).1 User that has no permission to alter process tries to", () => {
   it("(y+7).1.0 fails to alter process", async () => {
     const payload = {
-      "token": "auth_token",
-      "processId": "<refCode>"
+      token: "auth_token",
+      processId: "<refCode>",
     } //é preciso gerar o token de uma pessoa sem autorização e definir um process id
     const message = {
-      "message": "User doesn't have authorization"
+      message: "User doesn't have authorization",
     }
     const result = await request(app)
       .post("/api/process/activate")
@@ -51,14 +51,14 @@ describe("(y+7).1 User that has no permission to alter process tries to", () => 
 describe("(y+7).2 invalid token for ", () => {
   it("(y+7).2.0 user is not in the database so it cannot recover password", async () => {
     const payload = {
-      "token": "invalid token",
-      "processId": "<refCode>"
+      token: "invalid token",
+      processId: "<refCode>",
     } //é preciso definir um process id
 
     const message = {
-      "message": "Verification token invalid or expired"
-    }    
-    
+      message: "Verification token invalid or expired",
+    }
+
     const result = await request(app)
       .post("/api/process/activate")
       .send(payload)
