@@ -9,7 +9,6 @@ dotenv.config()
 import app from "../../src/main"
 
 describe("(y+6).0 test editing user process permissions", () => {
-
   it("(y+6).0.0 test edit user process permission successfully", async () => {
     const payload = {
       token: "<therapist_auth_token>",
@@ -60,18 +59,18 @@ describe("(y+6).0 test editing user process permissions", () => {
 
   it("(y+6).2.0 test edit user process permission with expired token", async () => {
     const payload = {
-        token: "<expired_token>",
-        processId: 0,
-        collaboratorId: 0,
-        appoint: true,
-        statitics: true,
-        ditProcess: true,
-        editPatient: true,
-        archive: true,
-        see: true
+      token: "<expired_token>",
+      processId: 0,
+      collaboratorId: 0,
+      appoint: true,
+      statitics: true,
+      ditProcess: true,
+      editPatient: true,
+      archive: true,
+      see: true,
     }
     const message = {
-        message: "Verification token invalid or expired"
+      message: "Verification token invalid or expired",
     }
     const result = await request(app)
       .post("/api/process/permissions")
@@ -81,5 +80,4 @@ describe("(y+6).0 test editing user process permissions", () => {
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
     expect(result.body).toEqual(message)
   })
-
 })
