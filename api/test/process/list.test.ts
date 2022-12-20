@@ -8,22 +8,18 @@ dotenv.config()
 
 import app from "../../src/main"
 
-
 describe("(y+2).0 test getters for listing processes", () => {
-
   it("(y+2).0.0 test user trying to list processes successfully", async () => {
     const payload = {
-      token: "<token>"
+      token: "<token>",
     }
     const message = {
-        list: {
-            therapistListing: [
-              "Marta Santos"
-            ],
-            patientName: "Ricardo Maria",
-            refCode: "23fdfd4e3",
-            nextAppointment: "string"
-        }
+      list: {
+        therapistListing: ["Marta Santos"],
+        patientName: "Ricardo Maria",
+        refCode: "23fdfd4e3",
+        nextAppointment: "string",
+      },
     }
     const result = await request(app)
       .get("/api/process/list")
@@ -36,10 +32,10 @@ describe("(y+2).0 test getters for listing processes", () => {
 
   it("(y+2).1.0 test user trying to list processes unsuccessfully", async () => {
     const payload = {
-      token: "<token>"
+      token: "<token>",
     }
     const message = {
-      message: "An internal error has occurred while processing the request"
+      message: "An internal error has occurred while processing the request",
     }
     const result = await request(app)
       .get("/api/process/list")
@@ -52,15 +48,15 @@ describe("(y+2).0 test getters for listing processes", () => {
 
   it("(y+2).2.0 test user trying to get empty process list", async () => {
     const payload = {
-      token: "<token>"
+      token: "<token>",
     }
-    const message = { 
-        list: {
-            therapistListing: [],
-            patientName: "",
-            refCode: "",
-            nextAppointment: ""
-        }    
+    const message = {
+      list: {
+        therapistListing: [],
+        patientName: "",
+        refCode: "",
+        nextAppointment: "",
+      },
     }
     const result = await request(app)
       .get("/api/process/list")
@@ -70,5 +66,4 @@ describe("(y+2).0 test getters for listing processes", () => {
     expect(result.status).toEqual(StatusCodes.OK)
     expect(result.body).toEqual(message)
   })
-  
 })

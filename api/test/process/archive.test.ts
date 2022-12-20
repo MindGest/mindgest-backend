@@ -9,14 +9,13 @@ dotenv.config()
 import app from "../../src/main"
 
 describe("y.0 check if process is archived correctly", () => {
-
   it("y.0.0 archive a process correctly", async () => {
     const payload = {
       token: "<token>",
-      processId: 0
+      processId: 0,
     }
     const message = {
-      message: "Process Archived"
+      message: "Process Archived",
     }
     const result = await request(app)
       .post("/api/process/archive")
@@ -30,10 +29,10 @@ describe("y.0 check if process is archived correctly", () => {
   it("y.1.0 Try to archive unexisting process", async () => {
     const payload = {
       token: "<token>",
-      processId: null
+      processId: null,
     }
     const message = {
-      message: "An internal error has occurred while processing the request"
+      message: "An internal error has occurred while processing the request",
     }
     const result = await request(app)
       .post("/api/process/archive")
@@ -43,5 +42,4 @@ describe("y.0 check if process is archived correctly", () => {
     expect(result.status).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
     expect(result.body).toEqual(message)
   })
-  
 })
