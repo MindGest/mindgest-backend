@@ -8,7 +8,11 @@ const process = Router()
 
 process.use(authMiddleware.authorize())
 
-process.use("/:processId/createNote", middleware.requestValidator(schemas.NotesCreate), controller.createNote)
+process.use(
+  "/:processId/createNote",
+  middleware.requestValidator(schemas.NotesCreate),
+  controller.createNote
+)
 process.use("/:processId/listNotes", controller.listNotes)
 
 process.post("/archive/:processId", controller.archive)

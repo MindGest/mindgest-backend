@@ -1348,8 +1348,7 @@ components:
                     date:
                       type: string
                       description: Date the note was created
-                    
-                  
+
   securitySchemes:
     AccessToken:
       type: apiKey
