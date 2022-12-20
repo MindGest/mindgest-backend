@@ -9,6 +9,7 @@ import {
   ProcessEditPermissionsBody,
   ProcessIDPrams,
   QueryListProcess,
+  NotesCreateBody
 } from "../utils/types"
 import logger from "../utils/logger"
 
@@ -610,6 +611,59 @@ export async function editPermissions(
   }
 }
 
+export async function createNote(req: Request<ProcessIDPrams,{}, NotesCreateBody >, res: Response) {
+  try{
+      var date = new Date()
+      var processId = parseInt(req.params.processId)
+
+      await prisma.notes.create({
+          data:{
+              datetime: date,
+              title: req.body.title,
+              body: req.body.title,
+              process_id: processId
+          },
+      })
+
+      return res.status(StatusCodes.OK).json({
+          message: "Note Created",
+        })
+  } catch (error) {
+      console.log(error)
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: "Ups... Something went wrong",
+      })
+    }
+}
+
+export async function listNotes(req: Request, res: Response) {
+  try{
+    var date = new Date()
+    var processId = parseInt(req.params.processId)
+
+    var notes = await prisma.notes.findMany({
+        where:{
+          process_id: processId
+        }
+    })
+
+    var list = []
+
+    for(let note of notes){
+      list.push({'title': note.title, 'body': note.body, 'date': note.datetime})
+    }
+
+    return res.status(StatusCodes.OK).json({
+        message: list
+      })
+  } catch (error) {
+      console.log(error)
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: "Ups... Something went wrong",
+      })
+    }
+}
+
 export default {
   archive,
   info,
@@ -619,4 +673,6 @@ export default {
   edit,
   appointments,
   editPermissions,
+  createNote,
+  listNotes
 }

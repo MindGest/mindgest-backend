@@ -384,6 +384,50 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /process/{processId}/createNote:
+    post:
+      summary: Edits process permission for user
+      tags:
+        - Process
+      description: Edits process permission for user
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
+      requestBody:
+        $ref: "#/components/requestBodies/CreateNote"
+      responses:
+        "200":
+          $ref: "#/components/responses/CreatedNote"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /process/{processId}/listNotes:
+    post:
+      summary: Edits process permission for user
+      tags:
+        - Process
+      description: Edits process permission for user
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
+      responses:
+        "200":
+          $ref: "#/components/responses/ListedNote"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /receipts/list:
     get:
       summary: Lists every receipt, all or by user (if is queried by user)
@@ -817,6 +861,17 @@ components:
             see:
               type: boolean
               summary: True if user has permissions to see process info and False if not
+    CreateNote:
+      description: Creates new note in process
+      content:
+        application/json:
+          schema:
+            title:
+              type: string
+              summary: title of note
+            body:
+              type: string
+              summary: what's being written in the note
   responses:
     LoginSuccessFull:
       description: Login Successful
@@ -1257,6 +1312,44 @@ components:
                 type: string
                 description: A message describing the request result
                 example: Receipt Created
+      CreatedNote:
+        description: Note Created
+        content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Note Created
+      ListedNote:
+        description: List of process notes
+        content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: Title of Note
+                    body:
+                      type: string
+                      description: Body of the note
+                    date:
+                      type: string
+                      description: Date the note was created
+                    
+                  
   securitySchemes:
     AccessToken:
       type: apiKey
