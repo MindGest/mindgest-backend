@@ -6,12 +6,28 @@ import { describe, expect, it } from "@jest/globals"
 
 dotenv.config()
 
-import app from "../src/main"
+import app from "../../src/main"
 
-describe("(x+1).0 Test password reset", () => {
+describe("(3.0 Test password reset", () => {
+  it("3.0.0 existing user sends request to change password", async () => {
+    const payload = {
+      email: "johndoe@student.dei.uc.pt",
+      callback: "http://frontend.com/password-reset-page",
+    }
+    
+    const result = await request(app)
+      .post("/api/auth/forgot-password")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.OK)
+    // falta o código de sucesso na documentação então não sei o que esperar
+  })
 
-    /* missing token - i don't know hoe to generate
-    it("(x+1).0.0 test - token is valid", async () => {
+  //need to save this token and use it on the next one
+
+  /* missing token - i don't know how to generate
+    it("3.0.1 test - token is valid", async () => {
 
         const payload = {
             "token": "token_gerado"
@@ -30,12 +46,13 @@ describe("(x+1).0 Test password reset", () => {
         expect(result.status).toEqual(StatusCodes.OK)
         expect(result.body).toEqual(message)
     })*/
+})
 
-    it("(x+1).0.1 test - token is invalid", async () => {
-      const payload = {
-        token:
-          "eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iO00iaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ",
-      }
+describe("(3.1 Test password reset with an invalid token", () => {
+  it("3.1.0 Password reset with invalid token", async () => {
+    const payload = {
+      token: "invalid token",
+    } 
 
     // in json format
     const message = {
@@ -43,7 +60,7 @@ describe("(x+1).0 Test password reset", () => {
     }
 
     const result = await request(app)
-      .post("/api/auth/register")
+      .post("/api/auth/reset-password")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
