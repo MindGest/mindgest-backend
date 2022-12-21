@@ -70,3 +70,5 @@ export type NotificationListQueryParams = z.TypeOf<typeof schemas.NotificationFi
 
 export type QueryListProcess = z.TypeOf<typeof schemas.QueryListProcess>["query"]
 export type QueryListReceipt = z.TypeOf<typeof schemas.ReceiptListQuery>["query"]
+
+export type NotesCreateBody = z.TypeOf<typeof schemas.NotesCreate>["body"]

@@ -6,10 +6,10 @@ import { describe, expect, it } from "@jest/globals"
 
 dotenv.config()
 
-import app from "../src/main"
+import app from "../../src/main"
 
-describe("1.2 the user does not exist", () => {
-  it("1.2.0 login with a user that does not exist", async () => {
+describe("1.1 the user does not exist", () => {
+  it("1.1.0 login with a user that does not exist", async () => {
     const payload = {
       email: "email@student.dei.uc.pt",
       password: "password1234",
@@ -27,8 +27,8 @@ describe("1.2 the user does not exist", () => {
   })
 })
 
-describe("1.3 wrong password", () => {
-  it("1.3.0 wrong password with an existing user", async () => {
+describe("1.2 wrong password", () => {
+  it("1.2.0 wrong password with an existing user", async () => {
     const payload = {
       email: "johndoe@student.dei.uc.pt",
       password: "password1235",
@@ -45,8 +45,8 @@ describe("1.3 wrong password", () => {
   })
 })
 
-describe("1.4 Test if login is working", () => {
-  it("1.4.0 Should login", async () => {
+describe("1.3 Test if login is working", () => {
+  it("1.3.0 Should login", async () => {
     const payload = {
       email: "johndoe@student.dei.uc.pt",
       password: "password1234",

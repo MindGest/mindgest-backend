@@ -6,7 +6,7 @@ import { describe, expect, it } from "@jest/globals"
 
 dotenv.config()
 
-import app from "../src/main"
+import app from "../../src/main"
 
 describe("0.0 Test admin registration", () => {
   it("0.0.0 test - Validate admin register", async () => {
@@ -145,11 +145,13 @@ describe("0.4 Test intern registration", () => {
     expect(result.status).toEqual(StatusCodes.OK)
     expect(result.body).toEqual(message)
   })
-})
 
-describe("0.4 Test response to wrong registration data", () => {
+  it("0.4.1 Test if the above user was criated", async () => {
+    //falta info sobre o endpoint
+  })
+
   /* missing output
-    it("0.4.2 test - Test duplicate email in registration", async () => {
+    it("0.4.2 Test duplicate email in registration", async () => {
         const payload = {
             "role": "intern",
             "name": "Mário Menezes",
@@ -173,7 +175,28 @@ describe("0.4 Test response to wrong registration data", () => {
         expect(result.status).toEqual(StatusCodes.OK)
         expect(result.body).toEqual(message)
     })*/
-  /* missing output
+
+  it("0.4.3 test - Test if the above above test didn't alter user info", async () => {
+    const payload = {
+      email: "mmenezes@student.dei.uc.pt",
+      password: "different_password",
+    }
+
+    const message = {
+      message: "Login. Invalid credentials",
+    }
+
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
+    expect(result.body).toEqual(message)
+  })
+})
+
+/* missing output
     it("0.11 test - Wrong mail", async () => {
         const payload = {
             "role": "therapist",
@@ -197,4 +220,3 @@ describe("0.4 Test response to wrong registration data", () => {
         expect(result.status).toEqual(StatusCodes.OK)
         expect(result.body).toEqual(message)
     })*/
-})

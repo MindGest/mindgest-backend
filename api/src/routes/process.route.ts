@@ -2,12 +2,18 @@ import { Router, Request, Response } from "express"
 import controller from "../controllers/process.controller"
 import middleware from "../middleware/api.middleware"
 import schemas from "../utils/schemas"
-
 import authMiddleware from "../middleware/auth.middleware"
 
 const process = Router()
 
 process.use(authMiddleware.authorize())
+
+process.use(
+  "/:processId/createNote",
+  middleware.requestValidator(schemas.NotesCreate),
+  controller.createNote
+)
+process.use("/:processId/listNotes", controller.listNotes)
 
 process.post("/archive/:processId", controller.archive)
 
