@@ -369,5 +369,5 @@ export default {
   ReceiptListQuery,
   NotesCreate,
   QueryListRooms,
-  RoomCreate
+  RoomCreate,
 }

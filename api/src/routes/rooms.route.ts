@@ -13,5 +13,4 @@ rooms.get("/list", controller.list)
 rooms.get("/listAppointmentsRoom", controller.listAppointmentRooms)
 rooms.post("/create", middleware.requestValidator(schemas.RoomCreate), controller.create)
 
-
 export default rooms
