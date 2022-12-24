@@ -320,6 +320,19 @@ export const NotesCreate = z.object({
   }),
 })
 
+export const QueryListRooms = z.object({
+  query: z.object({
+    date: z.string(),
+    room: z.string(),
+  }),
+})
+
+export const RoomCreate = z.object({
+  body: z.object({
+    name: z.string(),
+  }),
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -355,4 +368,6 @@ export default {
   QueryListProcess,
   ReceiptListQuery,
   NotesCreate,
+  QueryListRooms,
+  RoomCreate
 }

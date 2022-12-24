@@ -501,6 +501,65 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /rooms/create:
+    post:
+      summary: Creates new room
+      tags:
+        - Room
+      description: Creates new room
+      requestBody:
+        $ref: "#/components/requestBodies/CreateRoom"
+      responses:
+        "200":
+          $ref: "#/components/responses/RoomCreated"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /rooms/list:
+    get:
+      summary: Lists all rooms
+      tags:
+        - Room
+      description: Lists all rooms
+      responses:
+        "200":
+          $ref: "#/components/responses/RoomsListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /rooms/listAppointmentsRoom:
+    get:
+      summary: Lists all appointments of the rooms or a specific room on a specific date
+      tags:
+        - Room
+      description: Lists all appointments of the rooms or a specific room on a specific date
+      parameters:
+        - in: path
+          name: date
+          schema:
+            type: string
+          description: Date to get the appointments
+          example: YYYY/MM/DD
+        - in: path
+          name: room
+          schema:
+            type: string
+          description: ID of the specific room to get appointments
+      responses:
+        "200":
+          $ref: "#/components/responses/RoomsAppointmentListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 components:
   schemas:
     Admin:
@@ -840,38 +899,52 @@ components:
       content:
         application/json:
           schema:
-            collaboratorId:
-              type: integer
-              summary: Id of the collaborator to change permissions
-            appoint:
-              type: boolean
-              summary: True if user has permissions to create appointments and False if not
-            statitics:
-              type: boolean
-              summary: True if user has permissions to see statitics and False if not
-            ditProcess:
-              type: boolean
-              summary: True if user has permissions to edit process and False if not
-            editPatient:
-              type: boolean
-              summary: True if user has permissions to edit patient and False if not
-            archive:
-              type: boolean
-              summary: True if user has permissions to archive and False if not
-            see:
-              type: boolean
-              summary: True if user has permissions to see process info and False if not
+            properties:
+              collaboratorId:
+                type: integer
+                summary: Id of the collaborator to change permissions
+              appoint:
+                type: boolean
+                summary: True if user has permissions to create appointments and False if not
+              statitics:
+                type: boolean
+                summary: True if user has permissions to see statitics and False if not
+              ditProcess:
+                type: boolean
+                summary: True if user has permissions to edit process and False if not
+              editPatient:
+                type: boolean
+                summary: True if user has permissions to edit patient and False if not
+              archive:
+                type: boolean
+                summary: True if user has permissions to archive and False if not
+              see:
+                type: boolean
+                summary: True if user has permissions to see process info and False if not
     CreateNote:
       description: Creates new note in process
       content:
         application/json:
           schema:
-            title:
-              type: string
-              summary: title of note
-            body:
-              type: string
-              summary: what's being written in the note
+            properties:
+              title:
+                type: string
+                summary: title of note
+              body:
+                type: string
+                summary: what's being written in the note
+    CreateRoom:
+      description: Create a new Room
+      content:
+        application/json:
+          encoding:
+              historyMetadata:
+                contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              name:
+                type: string
+                summary: name for room
   responses:
     LoginSuccessFull:
       description: Login Successful
@@ -1312,9 +1385,9 @@ components:
                 type: string
                 description: A message describing the request result
                 example: Receipt Created
-      CreatedNote:
-        description: Note Created
-        content:
+    CreatedNote:
+      description: Note Created
+      content:
         application/json:
           encoding:
             historyMetadata:
@@ -1325,9 +1398,9 @@ components:
                 type: string
                 description: A message describing the request result
                 example: Note Created
-      ListedNote:
-        description: List of process notes
-        content:
+    ListedNote:
+      description: List of process notes
+      content:
         application/json:
           encoding:
             historyMetadata:
@@ -1348,7 +1421,80 @@ components:
                     date:
                       type: string
                       description: Date the note was created
-
+    RoomCreated:
+      description: Room Created
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Room Created
+    RoomsListed:
+      description: List of Rooms
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: name of room
+                    id:
+                      type: number
+                      name: id of room
+    RoomsAppointmentListed:
+      description: List of Rooms
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    room:
+                      type: string
+                      description: name of the room
+                    roomId: 
+                      type: number
+                      description: id of the room
+                    appointmentsRoom:
+                      type: array
+                      description: appointments of the room
+                      items:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            description: Title of the appointment
+                            example: Dr João Pedro Esp-A
+                          id:
+                            type: number
+                            description: if of appointment
+                          startDate:
+                            type: string
+                            description: start-date of appointment
+                            example: 2022-12-24T15:03:00.000Z
+                          endDate:
+                            type: string
+                            description: start-date of appointment
+                            example: 2022-12-24T15:03:00.000Z
   securitySchemes:
     AccessToken:
       type: apiKey
