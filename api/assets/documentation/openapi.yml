@@ -981,8 +981,8 @@ components:
       content:
         application/json:
           encoding:
-              historyMetadata:
-                contentType: application/json; charset=utf-8
+            historyMetadata:
+              contentType: application/json; charset=utf-8
           schema:
             properties:
               name:
@@ -1514,7 +1514,7 @@ components:
                     room:
                       type: string
                       description: name of the room
-                    roomId: 
+                    roomId:
                       type: number
                       description: id of the room
                     appointmentsRoom:
