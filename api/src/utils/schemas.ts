@@ -339,7 +339,7 @@ export const QueryStatistics = z.object({
     endDate: z.string(),
     therapistId: z.string(),
     specialityId: z.string(),
-    processId: z.string()
+    processId: z.string(),
   }),
 })
 
@@ -380,5 +380,5 @@ export default {
   NotesCreate,
   QueryListRooms,
   RoomCreate,
-  QueryStatistics
+  QueryStatistics,
 }

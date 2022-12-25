@@ -562,10 +562,12 @@ paths:
           $ref: "#/components/responses/InternalServerError"
   /statistics/:
     get:
-      summary: Statistics information sent to email (not currently sending email only returning the info)
+      summary:
+        Statistics information sent to email (not currently sending email only returning the info)
       tags:
         - Statistics
-      description: Statistics information sent to email (not currently sending email only returning the info)
+      description:
+        Statistics information sent to email (not currently sending email only returning the info)
       parameters:
         - in: path
           name: startDate
@@ -1555,7 +1557,8 @@ components:
                     description: total number of appointments from active processes
                   specialitiesAppointments:
                     type: array
-                    description: total number of appointments from active processes from each speciality
+                    description:
+                      total number of appointments from active processes from each speciality
                     items:
                       type: object
                       properties:
@@ -1565,7 +1568,8 @@ components:
                           type: number
                   processAppointments:
                     type: array
-                    description: total number of appointments from active processes from each process
+                    description:
+                      total number of appointments from active processes from each process
                     items:
                       type: object
                       properties:
@@ -1575,7 +1579,8 @@ components:
                           type: number
                   therapistsApointments:
                     type: array
-                    description: total number of appointments from active processes from each therapist
+                    description:
+                      total number of appointments from active processes from each therapist
                     items:
                       type: object
                       properties:
