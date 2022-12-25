@@ -333,6 +333,16 @@ export const RoomCreate = z.object({
   }),
 })
 
+export const QueryStatistics = z.object({
+  query: z.object({
+    startDate: z.string(),
+    endDate: z.string(),
+    therapistId: z.string(),
+    specialityId: z.string(),
+    processId: z.string()
+  }),
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -369,5 +379,6 @@ export default {
   ReceiptListQuery,
   NotesCreate,
   QueryListRooms,
-  RoomCreate
+  RoomCreate,
+  QueryStatistics
 }

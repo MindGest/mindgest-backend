@@ -560,6 +560,49 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /statistics/:
+    get:
+      summary: Statistics information sent to email (not currently sending email only returning the info)
+      tags:
+        - Statistics
+      description: Statistics information sent to email (not currently sending email only returning the info)
+      parameters:
+        - in: path
+          name: startDate
+          schema:
+            type: string
+          description: Date to get the appointments
+          example: YYYY/MM/DD
+        - in: path
+          name: endDate
+          schema:
+            type: string
+          description: Date to get the appointments
+          example: YYYY/MM/DD
+        - in: path
+          name: therapistId
+          schema:
+            type: string
+          description: id of therapist to filter
+        - in: path
+          name: specialityId
+          schema:
+            type: string
+          description: id of speciality to filter
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: id of processId to filter
+      responses:
+        "200":
+          $ref: "#/components/responses/Statistics"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 components:
   schemas:
     Admin:
@@ -1495,6 +1538,51 @@ components:
                             type: string
                             description: start-date of appointment
                             example: 2022-12-24T15:03:00.000Z
+    Statistics:
+      description: Statistics information
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: object
+                properties:
+                  totalAppointments:
+                    type: number
+                    description: total number of appointments from active processes
+                  specialitiesAppointments:
+                    type: array
+                    description: total number of appointments from active processes from each speciality
+                    items:
+                      type: object
+                      properties:
+                        speciality:
+                          type: string
+                        total:
+                          type: number
+                  processAppointments:
+                    type: array
+                    description: total number of appointments from active processes from each process
+                    items:
+                      type: object
+                      properties:
+                        processId:
+                          type: string
+                        total:
+                          type: number
+                  therapistsApointments:
+                    type: array
+                    description: total number of appointments from active processes from each therapist
+                    items:
+                      type: object
+                      properties:
+                        therapist:
+                          type: string
+                        total:
+                          type: number
   securitySchemes:
     AccessToken:
       type: apiKey
