@@ -605,6 +605,221 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /speciality/list:
+    get:
+      summary:
+        Returns a list with all the specialities in the database.
+      tags:
+        - Speciality
+      description:
+        Returns a list with all the specialities in the database.
+      responses:
+        "200":
+          $ref: "#/components/responses/SpecialitiesListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /speciality/create:
+    post:
+      summary: Creates a new speciality.
+      tags:
+        - Speciality
+      description: Creates a new speciality.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                speciality:
+                  type: string
+                  description: name of the speciality.
+              example: Especialidade-A
+      responses:
+        "200":
+          $ref: "#/components/responses/SpecialitiesCreate"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/list:
+    get:
+      summary: Lists all of the appointments of the given user id, or all if the id = -1.
+      tags:
+        - Appointment
+      description: Lists all of the appointments of the given user id, or all if the id = -1.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filterId:
+                  type: number
+                  description: id of the user or -1 for all the users.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentsListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/list/active:
+    get:
+      summary: Lists all of the active appointments of the given user id, or all if the id = -1.
+      tags:
+        - Appointment
+      description: Lists all of the active appointments of the given user id, or all if the id = -1.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filterId:
+                  type: number
+                  description: id of the user or -1 for all the users.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentsActiveListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/info:
+    get:
+      summary: Returns the information of an appointment
+      tags:
+        - Appointment
+      description: Returns the information of an appointment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appointmentId:
+                  type: number
+                  description: id of the appointment.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentInfo"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/create:
+    post:
+      summary: Creates an appointment in the database.
+      tags:
+        - Appointment
+      description: Creates an appointment in the database.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processId:
+                  type: number
+                  description: id of the process.
+                online:
+                  type: boolean
+                  description: True if the appointment is going to be online, otherwise, false.
+                roomId:
+                  type: number
+                  description: The id of the room for the appointment.
+                priceTableId:
+                  type: number
+                  description: The id of the price in the table of prices.
+                startDate:
+                  type: string
+                  description: start-date of the appointment
+                  example: 2022-12-24T15:03:00.000Z
+                endDate:
+                  type: string
+                  description: end-date of the appointment
+                  example: 2022-12-24T15:03:00.000Z
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentCreate"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /appointment/archive:
+    put:
+      summary: Archives an appointment in the database.
+      tags:
+        - Appointment
+      description: Archives an appointment in the database.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appointmentId:
+                  type: number
+                  description: id of the appointment.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentArchive"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/edit:
+    put:
+      summary: Edits an appointment in the database.
+      tags:
+        - Appointment
+      description: Edits an appointment in the database.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appointmentId:
+                  type: number
+                  description: id of the appointment.
+                appointmentRoomId:
+                  type: number
+                  description: The id of the room for the appointment.
+                appointmentStart:
+                  type: string
+                  description: start-date of the appointment
+                  example: 2022-12-24T15:03:00.000Z
+                appointmentEnd:
+                  type: string
+                  description: end-date of the appointment
+                  example: 2022-12-24T15:03:00.000Z
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentEdit"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 components:
   schemas:
     Admin:
@@ -1588,6 +1803,207 @@ components:
                           type: string
                         total:
                           type: number
+    SpecialitiesListed:
+      description: List of Specialities
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    speciality:
+                      type: string
+                      description: name of the speciality
+    SpecialitiesCreate:
+      description: Create a speciality.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The speciality has been successfully created.
+    AppointmentsListed:
+      description: List of appointments
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    appointmentStartTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentEndTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentRoom:
+                      type: string
+                      description: The name of the room of the appoitment
+                    therapists:
+                      type: array
+                      description: list of the processe's therapists
+                      items:
+                        type: object
+                        properties:
+                          name: 
+                            type: string
+                            description: name of the therapist
+                    speciality:
+                      type: string
+                      description: name of the speciality
+    AppointmentsActiveListed:
+      description: List of the active appointments
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    appointmentStartTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentEndTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentRoom:
+                      type: string
+                      description: The name of the room of the appoitment
+                    therapists:
+                      type: array
+                      description: list of the processe's therapists
+                      items:
+                        type: object
+                        properties:
+                          name: 
+                            type: string
+                            description: name of the therapist
+                    speciality:
+                      type: string
+                      description: name of the speciality
+    AppoitmentInfo:
+      description: Appointment's information
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    appointmentStartTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentEndTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentRoom:
+                      type: string
+                      description: The name of the room of the appoitment
+                    therapists:
+                      type: array
+                      description: list of the processe's therapists
+                      items:
+                        type: object
+                        properties:
+                          name: 
+                            type: string
+                            description: name of the therapist
+                    interns:
+                      type: array
+                      description: list of the processe's interns
+                      items:
+                        type: object
+                        properties:
+                          name: 
+                            type: string
+                            description: name of the intern
+                    patients:
+                      type: array
+                      description: list of the processe's patients
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: name of the patient
+                    speciality:
+                      type: string
+                      description: name of the speciality
+                    processRef:
+                      type: string
+                      description: Reference of the process.
+    AppointmentCreate:
+      description: Create an appointment.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The appointment has been successfully created.
+    AppointmentEdit:
+      description: Edits an appointment.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The appointment has been successfully updated.
+    AppointmentArchive:
+      description: Archive an appointment.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The appointment has been successfully archived.
   securitySchemes:
     AccessToken:
       type: apiKey

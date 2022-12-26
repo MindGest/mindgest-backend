@@ -13,6 +13,7 @@ import AppointmentRouter from "./appointment.route"
 import ReceiptRouter from "./receipt.route"
 import RoomsRouter from "./rooms.route"
 import StatisticsRouter from "./statistics.route"
+import SpecialityRouter from "./speciality.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
@@ -49,6 +50,7 @@ api.use("/appointment", AppointmentRouter)
 api.use("/receipts", ReceiptRouter)
 api.use("/rooms", RoomsRouter)
 api.use("/statistics", StatisticsRouter)
+api.use("/speciality", SpecialityRouter)
 
 // Healthcheck
 api.get("/healthcheck", controller.healthCheck)

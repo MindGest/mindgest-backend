@@ -343,6 +343,19 @@ export const QueryStatistics = z.object({
   }),
 })
 
+export const SpecialityListSchema = z.object({
+  body: z.object({
+    token: z.string(),
+  }),
+})
+
+export const SpecialityCreateSchema = z.object({
+  body: z.object({
+    token: z.string(),
+    speciality: z.string(),
+  }),
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -381,4 +394,6 @@ export default {
   QueryListRooms,
   RoomCreate,
   QueryStatistics,
+  SpecialityListSchema,
+  SpecialityCreateSchema,
 }

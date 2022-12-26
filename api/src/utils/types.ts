@@ -75,3 +75,6 @@ export type QueryStatistics = z.TypeOf<typeof schemas.QueryStatistics>["query"]
 
 export type NotesCreateBody = z.TypeOf<typeof schemas.NotesCreate>["body"]
 export type RoomCreateBody = z.TypeOf<typeof schemas.RoomCreate>["body"]
+
+export type SpecialityListBody = z.TypeOf<typeof schemas.SpecialityListSchema>["body"]
+export type SpecialityCreateBody = z.TypeOf<typeof schemas.SpecialityCreateSchema>["body"]
