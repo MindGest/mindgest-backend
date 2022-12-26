@@ -607,12 +607,10 @@ paths:
           $ref: "#/components/responses/InternalServerError"
   /speciality/list:
     get:
-      summary:
-        Returns a list with all the specialities in the database.
+      summary: Returns a list with all the specialities in the database.
       tags:
         - Speciality
-      description:
-        Returns a list with all the specialities in the database.
+      description: Returns a list with all the specialities in the database.
       responses:
         "200":
           $ref: "#/components/responses/SpecialitiesListed"
@@ -1864,7 +1862,7 @@ components:
                       items:
                         type: object
                         properties:
-                          name: 
+                          name:
                             type: string
                             description: name of the therapist
                     speciality:
@@ -1901,7 +1899,7 @@ components:
                       items:
                         type: object
                         properties:
-                          name: 
+                          name:
                             type: string
                             description: name of the therapist
                     speciality:
@@ -1938,7 +1936,7 @@ components:
                       items:
                         type: object
                         properties:
-                          name: 
+                          name:
                             type: string
                             description: name of the therapist
                     interns:
@@ -1947,7 +1945,7 @@ components:
                       items:
                         type: object
                         properties:
-                          name: 
+                          name:
                             type: string
                             description: name of the intern
                     patients:

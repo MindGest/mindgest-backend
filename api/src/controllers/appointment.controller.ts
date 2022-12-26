@@ -121,9 +121,9 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       where: { process_id: processes[i].id },
     })
     var interns: any = []
-    var intern;
+    var intern
     for (let e = 0; e < intern_process.length; e++) {
-      intern =         await prisma.intern.findFirst({
+      intern = await prisma.intern.findFirst({
         where: { person_id: intern_process[e].intern_person_id },
         include: {
           person: {
@@ -145,7 +145,7 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       where: { process_id: processes[i].id },
     })
     var therapists: any = []
-    var therapist;
+    var therapist
     for (let e = 0; e < therapist_process.length; e++) {
       therapist = await prisma.therapist.findFirst({
         where: { person_id: therapist_process[e].therapist_person_id },
@@ -403,7 +403,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
   }
   // get the terapists
   var therapists: any = []
-  var therapist;
+  var therapist
   var therapist_process = await prisma.therapist_process.findMany({
     where: { process_id: process.id },
   })
@@ -424,12 +424,12 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
   }
   //get the interns
   var interns: any = []
-  var intern;
+  var intern
   var intern_process = await prisma.intern_process.findMany({
     where: { process_id: process.id },
   })
   for (let i = 0; i < intern_process.length; i++) {
-    intern =       await prisma.intern.findFirst({
+    intern = await prisma.intern.findFirst({
       where: { person_id: intern_process[i].intern_person_id },
       select: { person: { select: { name: true } } },
     })
@@ -448,7 +448,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
 
   // get the patients
   var patients: any = []
-  var patient;
+  var patient
   var patient_process = await prisma.patient_process.findMany({
     where: { process_id: process.id },
   })
@@ -458,7 +458,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     })
   }
   for (let i = 0; i < patient_process.length; i++) {
-    patient =       await prisma.patient.findFirst({
+    patient = await prisma.patient.findFirst({
       where: { person_id: patient_process[i].patient_person_id },
       select: { person: { select: { name: true } } },
     })
@@ -695,9 +695,9 @@ export async function getAllActiveAppointments(
   } else if (callerRole == "intern") {
     isIntern = true
     internId = req.body.filterId
-  } else{
+  } else {
     res.status(StatusCodes.UNAUTHORIZED).json({
-      message: "You do not have permission to see this information."
+      message: "You do not have permission to see this information.",
     })
   }
 
@@ -763,7 +763,7 @@ export async function getAllActiveAppointments(
       where: { process_id: processes[i].id },
     })
     var therapists: any = []
-    var therapist;
+    var therapist
     for (let e = 0; e < therapist_process.length; e++) {
       therapist = await prisma.therapist.findFirst({
         where: { person_id: therapist_process[e].therapist_person_id },
@@ -777,7 +777,7 @@ export async function getAllActiveAppointments(
       where: { process_id: processes[i].id },
     })
     var patients: any = []
-    var patient;
+    var patient
     for (let e = 0; e < patient_process.length; e++) {
       patient = await prisma.patient.findFirst({
         where: { person_id: patient_process[e].patient_person_id },
