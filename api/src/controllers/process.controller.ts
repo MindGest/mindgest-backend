@@ -258,11 +258,18 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
         nextAppointmentString = "No next Appointment"
       }
 
+      var speciality = await prisma.speciality.findFirst({
+        where:{
+          speciality: process.speciality_speciality
+        }
+      })
+
       listing.push({
         therapistListing: therapistListing,
         patientName: utentName?.name,
         refCode: ref,
         nextAppointment: nextAppointmentString,
+        speciality: speciality?.speciality
       })
     }
     return res.status(StatusCodes.OK).json({
@@ -275,6 +282,101 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
     })
   }
 }
+
+export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, res: Response) {
+  try {
+    var decoded = res.locals.token
+
+    var processes = await prisma.therapist_process.findMany({
+      where:{
+        therapist_person_id:decoded.id
+      }
+    })
+
+    var listing: any = []
+
+    for (var processInfo of processes) {
+      var process = await prisma.process.findUnique({
+        where: {
+          id:processInfo.process_id
+        },
+      })
+
+      var ref = process?.ref
+
+      var utentProcess = await prisma.patient_process.findFirst({
+        where: {
+          process_id: process?.id,
+        },
+      })
+
+      var utentName = await prisma.person.findUnique({
+        where: {
+          id: utentProcess?.patient_person_id,
+        },
+      })
+
+      var appointments = await prisma.appointment_process.findMany({
+        where: {
+          process_id: process?.id,
+        },
+      })
+
+      var nextAppointment = Date.now()
+      var dateChanged = false
+
+      for (var appointmentProcess of appointments) {
+        var apointment = await prisma.appointment.findUnique({
+          where: {
+            slot_id: appointmentProcess.appointment_slot_id,
+          },
+        })
+
+        if (apointment!.slot_start_date.getTime() > nextAppointment) {
+          nextAppointment = apointment!.slot_start_date.getTime()
+          dateChanged = true
+        }
+      }
+
+      var nextAppointmentString: string = ""
+      if (dateChanged) {
+        nextAppointmentString = new Date(nextAppointment).toString()
+      } else {
+        nextAppointmentString = "No next Appointment"
+      }
+
+      var speciality = await prisma.speciality.findFirst({
+        where:{
+          speciality: process?.speciality_speciality
+        }
+      })
+
+      listing.push({
+        id: process?.id,
+        patientName: utentName?.name,
+        refCode: ref,
+        nextAppointment: nextAppointmentString,
+        speciality: speciality?.speciality
+      })
+    }
+
+    var tName = await prisma.person.findUnique({
+      where:{
+        id: decoded.id
+      }
+    })
+    return res.status(StatusCodes.OK).json({
+      list: listing,
+      therapist: tName?.name
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 
 export async function activate(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
@@ -675,4 +777,5 @@ export default {
   editPermissions,
   createNote,
   listNotes,
+  listTherapist
 }
