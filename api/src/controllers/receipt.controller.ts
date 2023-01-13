@@ -108,11 +108,43 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
           },
         })
 
+        var moreInfoPatient = await prisma.patient.findFirst({
+          where:{
+            person_id: patient?.id
+          }
+        })
+
+        console.log(appointment)
+        let dateParsed = new Date(appointment!.slot_end_date)
+        const currentTime = new Date();
+
+        let isDone = ''
+
+        
+        if (currentTime.getTime() > dateParsed.getTime()) {
+          isDone="Concluída"
+        } else {
+          isDone="Não Concluída"
+        }
+
+        let price = await prisma.pricetable.findFirst({
+          where:{
+            id: appointment?.pricetable_id
+          }
+        })
+
         listOfReceipts.push({
           patientName: patient?.name,
           mainTherapist: mainTherapistObject?.name,
-          ref: receipt.ref,
-          date: receipt.datetime,
+          ref: receipt?.ref,
+          date: receipt?.datetime,
+          nif: patient?.tax_number, 
+          sns:moreInfoPatient?.health_number,
+          morada:patient?.address, 
+          email: patient?.email, 
+          estado: isDone,
+          custo: price?.price,
+          pago: receipt.payed
         })
       }
     } else {
@@ -194,6 +226,27 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
           },
         })
 
+        var moreInfoPatient = await prisma.patient.findFirst({
+          where:{
+            person_id: patient?.id
+          }
+        })
+
+        let dateParsed = new Date(appointmentInfo!.slot_end_date)
+        const currentTime = new Date();
+
+        let isDone = ''
+        if (currentTime.getTime() > dateParsed.getTime()) {
+          isDone="Concluída"
+        } else {
+          isDone="Não Concluída"
+        }
+        let price = await prisma.pricetable.findFirst({
+          where:{
+            id: appointmentInfo?.pricetable_id
+          }
+        })
+
         if (
           (payed == notPayed) == true ||
           (payed == true && receipt?.payed) ||
@@ -204,6 +257,13 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
             mainTherapist: mainTherapistObject?.name,
             ref: receipt?.ref,
             date: receipt?.datetime,
+            nif: patient?.tax_number, 
+            sns:moreInfoPatient?.health_number,
+            morada:patient?.address, 
+            email: patient?.email, 
+            estado: isDone,
+            custo: price?.price,
+            pago: receipt?.payed
           })
         }
       }

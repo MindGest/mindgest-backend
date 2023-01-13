@@ -48,6 +48,7 @@ app.disable("x-powered-by")
 /// MindGest API Route
 app.use("/api", api)
 
+
 // Endpoints
 app.get("/", (_: Request, res: Response) =>
   res.redirect(StatusCodes.MOVED_PERMANENTLY, "/api/docs/")
