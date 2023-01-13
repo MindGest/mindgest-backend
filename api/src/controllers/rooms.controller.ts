@@ -77,13 +77,12 @@ export async function listAppointmentRooms(
               },
             })
 
-            therapistsInfo.push({'name':therapistName?.name, 'id':therapistName?.id})
+            therapistsInfo.push({ name: therapistName?.name, id: therapistName?.id })
 
             title += therapistName?.name + " e "
           }
 
           title = title.substring(0, title.length - 2)
-
 
           var process = await prisma.process.findUnique({
             where: {
@@ -94,15 +93,15 @@ export async function listAppointmentRooms(
           title += "Esp-" + process?.speciality_speciality
 
           var patientProcessId = await prisma.patient_process.findFirst({
-            where:{
-              process_id: process?.id
-            }
+            where: {
+              process_id: process?.id,
+            },
           })
 
           var patientInfo = await prisma.person.findUnique({
-            where:{
-              id:patientProcessId?.patient_person_id
-            }
+            where: {
+              id: patientProcessId?.patient_person_id,
+            },
           })
 
           roomAppointments.push({
@@ -112,7 +111,7 @@ export async function listAppointmentRooms(
             endDate: appointment.slot_end_date,
             therapists: therapistsInfo,
             userId: patientInfo?.id,
-            userName: patientInfo?.name, 
+            userName: patientInfo?.name,
           })
         }
 
