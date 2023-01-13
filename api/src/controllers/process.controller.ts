@@ -259,9 +259,9 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
       }
 
       var speciality = await prisma.speciality.findFirst({
-        where:{
-          speciality: process.speciality_speciality
-        }
+        where: {
+          speciality: process.speciality_speciality,
+        },
       })
 
       listing.push({
@@ -269,7 +269,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
         patientName: utentName?.name,
         refCode: ref,
         nextAppointment: nextAppointmentString,
-        speciality: speciality?.speciality
+        speciality: speciality?.speciality,
       })
     }
     return res.status(StatusCodes.OK).json({
@@ -288,9 +288,9 @@ export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, 
     var decoded = res.locals.token
 
     var processes = await prisma.therapist_process.findMany({
-      where:{
-        therapist_person_id:decoded.id
-      }
+      where: {
+        therapist_person_id: decoded.id,
+      },
     })
 
     var listing: any = []
@@ -298,7 +298,7 @@ export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, 
     for (var processInfo of processes) {
       var process = await prisma.process.findUnique({
         where: {
-          id:processInfo.process_id
+          id: processInfo.process_id,
         },
       })
 
@@ -346,9 +346,9 @@ export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, 
       }
 
       var speciality = await prisma.speciality.findFirst({
-        where:{
-          speciality: process?.speciality_speciality
-        }
+        where: {
+          speciality: process?.speciality_speciality,
+        },
       })
 
       listing.push({
@@ -356,18 +356,18 @@ export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, 
         patientName: utentName?.name,
         refCode: ref,
         nextAppointment: nextAppointmentString,
-        speciality: speciality?.speciality
+        speciality: speciality?.speciality,
       })
     }
 
     var tName = await prisma.person.findUnique({
-      where:{
-        id: decoded.id
-      }
+      where: {
+        id: decoded.id,
+      },
     })
     return res.status(StatusCodes.OK).json({
       list: listing,
-      therapist: tName?.name
+      therapist: tName?.name,
     })
   } catch (error) {
     console.log(error)
@@ -376,7 +376,6 @@ export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, 
     })
   }
 }
-
 
 export async function activate(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
@@ -777,5 +776,5 @@ export default {
   editPermissions,
   createNote,
   listNotes,
-  listTherapist
+  listTherapist,
 }
