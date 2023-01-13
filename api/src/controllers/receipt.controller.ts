@@ -109,28 +109,27 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
         })
 
         var moreInfoPatient = await prisma.patient.findFirst({
-          where:{
-            person_id: patient?.id
-          }
+          where: {
+            person_id: patient?.id,
+          },
         })
 
         console.log(appointment)
         let dateParsed = new Date(appointment!.slot_end_date)
-        const currentTime = new Date();
+        const currentTime = new Date()
 
-        let isDone = ''
+        let isDone = ""
 
-        
         if (currentTime.getTime() > dateParsed.getTime()) {
-          isDone="Concluída"
+          isDone = "Concluída"
         } else {
-          isDone="Não Concluída"
+          isDone = "Não Concluída"
         }
 
         let price = await prisma.pricetable.findFirst({
-          where:{
-            id: appointment?.pricetable_id
-          }
+          where: {
+            id: appointment?.pricetable_id,
+          },
         })
 
         listOfReceipts.push({
@@ -138,13 +137,13 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
           mainTherapist: mainTherapistObject?.name,
           ref: receipt?.ref,
           date: receipt?.datetime,
-          nif: patient?.tax_number, 
-          sns:moreInfoPatient?.health_number,
-          morada:patient?.address, 
-          email: patient?.email, 
+          nif: patient?.tax_number,
+          sns: moreInfoPatient?.health_number,
+          morada: patient?.address,
+          email: patient?.email,
           estado: isDone,
           custo: price?.price,
-          pago: receipt.payed
+          pago: receipt.payed,
         })
       }
     } else {
@@ -227,24 +226,24 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
         })
 
         var moreInfoPatient = await prisma.patient.findFirst({
-          where:{
-            person_id: patient?.id
-          }
+          where: {
+            person_id: patient?.id,
+          },
         })
 
         let dateParsed = new Date(appointmentInfo!.slot_end_date)
-        const currentTime = new Date();
+        const currentTime = new Date()
 
-        let isDone = ''
+        let isDone = ""
         if (currentTime.getTime() > dateParsed.getTime()) {
-          isDone="Concluída"
+          isDone = "Concluída"
         } else {
-          isDone="Não Concluída"
+          isDone = "Não Concluída"
         }
         let price = await prisma.pricetable.findFirst({
-          where:{
-            id: appointmentInfo?.pricetable_id
-          }
+          where: {
+            id: appointmentInfo?.pricetable_id,
+          },
         })
 
         if (
@@ -257,13 +256,13 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
             mainTherapist: mainTherapistObject?.name,
             ref: receipt?.ref,
             date: receipt?.datetime,
-            nif: patient?.tax_number, 
-            sns:moreInfoPatient?.health_number,
-            morada:patient?.address, 
-            email: patient?.email, 
+            nif: patient?.tax_number,
+            sns: moreInfoPatient?.health_number,
+            morada: patient?.address,
+            email: patient?.email,
             estado: isDone,
             custo: price?.price,
-            pago: receipt?.payed
+            pago: receipt?.payed,
           })
         }
       }

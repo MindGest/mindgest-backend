@@ -29,13 +29,15 @@ const FRONTEND_URL = String(process.env.FRONTEND_URL)
 const api = Router()
 
 // Middleware
-api.use(helmet({
-  crossOriginResourcePolicy: false,
-}))
+api.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+)
 api.use(express.json())
 api.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: "http://localhost:5173",
     credentials: true,
   })
 )
