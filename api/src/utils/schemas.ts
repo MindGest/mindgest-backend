@@ -320,6 +320,42 @@ export const NotesCreate = z.object({
   }),
 })
 
+export const QueryListRooms = z.object({
+  query: z.object({
+    date: z.string(),
+    room: z.string(),
+  }),
+})
+
+export const RoomCreate = z.object({
+  body: z.object({
+    name: z.string(),
+  }),
+})
+
+export const QueryStatistics = z.object({
+  query: z.object({
+    startDate: z.string(),
+    endDate: z.string(),
+    therapistId: z.string(),
+    specialityId: z.string(),
+    processId: z.string(),
+  }),
+})
+
+export const SpecialityListSchema = z.object({
+  body: z.object({
+    token: z.string(),
+  }),
+})
+
+export const SpecialityCreateSchema = z.object({
+  body: z.object({
+    token: z.string(),
+    speciality: z.string(),
+  }),
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -355,4 +391,9 @@ export default {
   QueryListProcess,
   ReceiptListQuery,
   NotesCreate,
+  QueryListRooms,
+  RoomCreate,
+  QueryStatistics,
+  SpecialityListSchema,
+  SpecialityCreateSchema,
 }

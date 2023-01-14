@@ -11,6 +11,9 @@ import DocsRouter from "./docs.route"
 import ProcessRouter from "./process.route"
 import AppointmentRouter from "./appointment.route"
 import ReceiptRouter from "./receipt.route"
+import RoomsRouter from "./rooms.route"
+import StatisticsRouter from "./statistics.route"
+import SpecialityRouter from "./speciality.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
@@ -26,11 +29,15 @@ const FRONTEND_URL = String(process.env.FRONTEND_URL)
 const api = Router()
 
 // Middleware
-api.use(helmet())
+api.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+)
 api.use(express.json())
 api.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: "http://localhost:5173",
     credentials: true,
   })
 )
@@ -45,6 +52,9 @@ api.use("/docs", DocsRouter)
 api.use("/process", ProcessRouter)
 api.use("/appointment", AppointmentRouter)
 api.use("/receipts", ReceiptRouter)
+api.use("/rooms", RoomsRouter)
+api.use("/statistics", StatisticsRouter)
+api.use("/speciality", SpecialityRouter)
 
 // Healthcheck
 api.get("/healthcheck", controller.healthCheck)

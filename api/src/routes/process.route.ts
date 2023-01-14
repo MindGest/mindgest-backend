@@ -21,6 +21,8 @@ process.get("/info/:processId", controller.info)
 
 process.get("/list", controller.list)
 
+process.get("/listTherapist", controller.listTherapist)
+
 process.post("/activate/:processId", controller.activate)
 
 process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema), controller.create)

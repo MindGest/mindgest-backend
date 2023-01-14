@@ -41,7 +41,7 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
   console.log(req.body.filterId)
 
   if (callerRole == "accountant") {
-    return res.status(StatusCodes.FORBIDDEN).json({
+    return res.status(StatusCodes.UNAUTHORIZED).json({
       message: "You do not have permission to see this content.",
     })
   }
@@ -121,23 +121,23 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       where: { process_id: processes[i].id },
     })
     var interns: any = []
+    var intern
     for (let e = 0; e < intern_process.length; e++) {
-      interns.push(
-        await prisma.intern.findFirst({
-          where: { person_id: intern_process[e].intern_person_id },
-          include: {
-            person: {
-              select: {
-                name: true,
-                // email: true,
-                // address: true,
-                // birth_date: true,
-                // phone_number: true
-              },
+      intern = await prisma.intern.findFirst({
+        where: { person_id: intern_process[e].intern_person_id },
+        include: {
+          person: {
+            select: {
+              name: true,
+              // email: true,
+              // address: true,
+              // birth_date: true,
+              // phone_number: true
             },
           },
-        })
-      )
+        },
+      })
+      interns.push(intern?.person.name)
     }
 
     // get the therapists of the processes[i]
@@ -145,26 +145,26 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       where: { process_id: processes[i].id },
     })
     var therapists: any = []
+    var therapist
     for (let e = 0; e < therapist_process.length; e++) {
-      therapists.push(
-        await prisma.therapist.findFirst({
-          where: { person_id: therapist_process[e].therapist_person_id },
-          select: {
-            //extern: true,
-            //cedula: true,
-            //healthsystem: true,
-            person: {
-              select: {
-                name: true,
-                //email: true,
-                //address: true,
-                //birth_date: true,
-                //phone_number: true
-              },
+      therapist = await prisma.therapist.findFirst({
+        where: { person_id: therapist_process[e].therapist_person_id },
+        select: {
+          //extern: true,
+          //cedula: true,
+          //healthsystem: true,
+          person: {
+            select: {
+              name: true,
+              //email: true,
+              //address: true,
+              //birth_date: true,
+              //phone_number: true
             },
           },
-        })
-      )
+        },
+      })
+      therapists.push(therapist?.person.name)
     }
 
     // get the patients of the processes[i]
@@ -301,7 +301,7 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
       where: { process_id: process.id, therapist_person_id: callerId },
     })
     if (!therapist_process) {
-      return res.status(StatusCodes.FORBIDDEN).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message:
           "It appears that you do not have permission to create an appointment, due to the fact that you are not associated with the its process.",
       })
@@ -312,13 +312,13 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
       where: { process_id: process.id, intern_person_id: callerId },
     })
     if (!intern_process) {
-      return res.status(StatusCodes.FORBIDDEN).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message:
           "It appears that you do not have permission to create an appointment, due to the fact that you are not associated with the its process.",
       })
     }
   } else if (!(callerRole == "admin")) {
-    return res.status(StatusCodes.FORBIDDEN).json({
+    return res.status(StatusCodes.UNAUTHORIZED).json({
       message: "It seems that you do not have permission to create an appointment.",
     })
   }
@@ -403,6 +403,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
   }
   // get the terapists
   var therapists: any = []
+  var therapist
   var therapist_process = await prisma.therapist_process.findMany({
     where: { process_id: process.id },
   })
@@ -412,28 +413,27 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     })
   }
   for (let i = 0; i < therapist_process.length; i++) {
-    therapists.push(
-      await prisma.therapist.findFirst({
-        where: { person_id: therapist_process[i].therapist_person_id },
-        select: { person: { select: { name: true } } },
-      })
-    )
+    therapist = await prisma.therapist.findFirst({
+      where: { person_id: therapist_process[i].therapist_person_id },
+      select: { person: { select: { name: true } } },
+    })
+    therapists.push(therapist?.person.name)
     if (callerId == Number(therapist_process[i].therapist_person_id)) {
       isProcessTherapist = true
     }
   }
   //get the interns
   var interns: any = []
+  var intern
   var intern_process = await prisma.intern_process.findMany({
     where: { process_id: process.id },
   })
   for (let i = 0; i < intern_process.length; i++) {
-    interns.push(
-      await prisma.intern.findFirst({
-        where: { person_id: intern_process[i].intern_person_id },
-        select: { person: { select: { name: true } } },
-      })
-    )
+    intern = await prisma.intern.findFirst({
+      where: { person_id: intern_process[i].intern_person_id },
+      select: { person: { select: { name: true } } },
+    })
+    interns.push(intern?.person.name)
     if (callerId == Number(intern_process[i].intern_person_id)) {
       isProcessIntern = true
     }
@@ -441,13 +441,14 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
 
   // verify if the caller has the right permissions
   if (!(callerIsAdmin || isProcessTherapist || isProcessIntern)) {
-    return res.status(StatusCodes.FORBIDDEN).json({
+    return res.status(StatusCodes.UNAUTHORIZED).json({
       message: "It seems that you do not have permission access this information.",
     })
   }
 
   // get the patients
   var patients: any = []
+  var patient
   var patient_process = await prisma.patient_process.findMany({
     where: { process_id: process.id },
   })
@@ -457,12 +458,11 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     })
   }
   for (let i = 0; i < patient_process.length; i++) {
-    patients.push(
-      await prisma.patient.findFirst({
-        where: { person_id: patient_process[i].patient_person_id },
-        select: { person: { select: { name: true } } },
-      })
-    )
+    patient = await prisma.patient.findFirst({
+      where: { person_id: patient_process[i].patient_person_id },
+      select: { person: { select: { name: true } } },
+    })
+    patients.push(patient?.person.name)
   }
 
   res.status(StatusCodes.OK).json({
@@ -523,7 +523,7 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
       where: { process_id: process.id, therapist_person_id: callerId },
     })
     if (!therapist_process) {
-      return res.status(StatusCodes.FORBIDDEN).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message:
           "It appears that you do not have permission to edit this appointment, due to the fact that you are not associated with the its process.",
       })
@@ -534,14 +534,14 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
       where: { process_id: process.id, intern_person_id: callerId },
     })
     if (!intern_process) {
-      return res.status(StatusCodes.FORBIDDEN).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message:
           "It appears that you do not have permission to edit this appointment, due to the fact that you are not associated with the its process.",
       })
     }
   } else if (!(callerRole == "admin")) {
     // you shouldn't be here!!!
-    return res.status(StatusCodes.FORBIDDEN).json({
+    return res.status(StatusCodes.UNAUTHORIZED).json({
       message: "You do not have permission to edit this appointment.",
     })
   }
@@ -605,7 +605,7 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
       where: { process_id: process.id, therapist_person_id: callerId },
     })
     if (!therapist_process) {
-      return res.status(StatusCodes.FORBIDDEN).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message:
           "It appears that you do not have permission to edit this appointment, due to the fact that you are not associated with the its process.",
       })
@@ -616,14 +616,14 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
       where: { process_id: process.id, intern_person_id: callerId },
     })
     if (!intern_process) {
-      return res.status(StatusCodes.FORBIDDEN).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message:
           "It appears that you do not have permission to edit this appointment, due to the fact that you are not associated with the its process.",
       })
     }
   } else if (!(callerRole == "admin")) {
     // if not a therapist, nor an intern, nor an admin -> you're not supposed to be here
-    return res.status(StatusCodes.FORBIDDEN).json({
+    return res.status(StatusCodes.UNAUTHORIZED).json({
       message: "You do not have permission to edit this appointment.",
     })
   }
@@ -695,6 +695,10 @@ export async function getAllActiveAppointments(
   } else if (callerRole == "intern") {
     isIntern = true
     internId = req.body.filterId
+  } else {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      message: "You do not have permission to see this information.",
+    })
   }
 
   // all appointments
@@ -759,13 +763,13 @@ export async function getAllActiveAppointments(
       where: { process_id: processes[i].id },
     })
     var therapists: any = []
+    var therapist
     for (let e = 0; e < therapist_process.length; e++) {
-      therapists.push(
-        await prisma.therapist.findFirst({
-          where: { person_id: therapist_process[e].therapist_person_id },
-          select: { person: { select: { name: true } } },
-        })
-      )
+      therapist = await prisma.therapist.findFirst({
+        where: { person_id: therapist_process[e].therapist_person_id },
+        select: { person: { select: { name: true } } },
+      })
+      therapists.push(therapist?.person.name)
     }
 
     // get the patients of the processes[i]
@@ -773,13 +777,13 @@ export async function getAllActiveAppointments(
       where: { process_id: processes[i].id },
     })
     var patients: any = []
+    var patient
     for (let e = 0; e < patient_process.length; e++) {
-      patients.push(
-        await prisma.patient.findFirst({
-          where: { person_id: patient_process[e].patient_person_id },
-          select: { person: { select: { name: true } } },
-        })
-      )
+      patient = await prisma.patient.findFirst({
+        where: { person_id: patient_process[e].patient_person_id },
+        select: { person: { select: { name: true } } },
+      })
+      patients.push(patient?.person.name)
     }
 
     for (let e = 0; e < appointment_process.length; e++) {
