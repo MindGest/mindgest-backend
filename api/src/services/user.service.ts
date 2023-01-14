@@ -16,7 +16,7 @@ import {
 import prisma from "../utils/prisma"
 import { User } from "../utils/schemas"
 
-let UNDEFINED="OHMANINHOQUERESPORRADA??!!??!!??"
+let UNDEFINED = "OHMANINHOQUERESPORRADA??!!??!!??"
 
 export async function fetchPersonProperties(personId: bigint) {
   let therapist = await prisma.therapist.findUnique({
@@ -236,7 +236,7 @@ export async function updateInfoAccountant(id: number, body: AccountantUpdateBod
 
 export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantUpdateBody) {
   console.log(body.password)
-  if(body.password !== UNDEFINED){
+  if (body.password !== UNDEFINED) {
     await prisma.accountant.update({
       data: {
         person: {
@@ -253,8 +253,7 @@ export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantU
       },
       where: { person_id: id },
     })
-  }
-  else{
+  } else {
     await prisma.accountant.update({
       data: {
         person: {

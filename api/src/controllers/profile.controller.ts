@@ -56,7 +56,6 @@ export async function uploadProfilePicture(req: Request, res: Response) {
         message: "Profile picture uploaded successfully",
       })
     })
-
   } catch (error) {
     logger.error(error)
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
