@@ -3,20 +3,24 @@ import controller from "../controllers/appointment.controller"
 
 const appointment = Router()
 
-appointment.get("/list", (req: Request, res: Response) => {
+appointment.post("/list", (req: Request, res: Response) => {
   controller.getAllAppointments(req, res)
 })
 
-appointment.get("/list/active", (req: Request, res: Response) => {
+appointment.post("/list/active", (req: Request, res: Response) => {
   controller.getAllActiveAppointments(req, res)
 })
 
-appointment.get("/info", (req: Request, res: Response) => {
+appointment.post("/info", (req: Request, res: Response) => {
   controller.infoAppointment(req, res)
 })
 
 appointment.post("/create", (req: Request, res: Response) => {
   controller.createAppointment(req, res)
+})
+
+appointment.post("/listLastTerminated", (req: Request, res: Response) => {
+  controller.lastTerminatedAppointments(req, res)
 })
 
 appointment.put("/archive", (req: Request, res: Response) => {

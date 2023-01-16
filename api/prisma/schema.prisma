@@ -88,11 +88,13 @@ model school {
 
 model appointment {
   online              Boolean?
+  active              Boolean?
   room_id             BigInt
   pricetable_id       String                @db.VarChar(512)
   slot_id             BigInt                @id
   slot_start_date     DateTime              @db.Timestamp(6)
   slot_end_date       DateTime              @db.Timestamp(6)
+  archived_date       DateTime              @db.Timestamp(6)
   room                room                  @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk1")
   pricetable          pricetable            @relation(fields: [pricetable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk2")
   appointment_process appointment_process[]

@@ -262,6 +262,7 @@ export const AppointmentCreateSchema = z.object({
     priceTableId: z.string(),
     startDate: DateSchema,
     endDate: DateSchema,
+    archiveDate: DateSchema,
   }),
 })
 
@@ -269,6 +270,7 @@ export const AppointmentArchiveSchema = z.object({
   body: z.object({
     token: z.string(),
     appointmentId: z.number(),
+    archiveDate: DateSchema,
   }),
 })
 
@@ -294,6 +296,11 @@ export const AppointmentEditSchema = z.object({
     appointmentEnd: DateSchema,
     appointmentRoomId: z.number(),
   }),
+})
+
+export const AppointmentsListLastTerminatedSchema = z.object({
+  body: z.object({
+    token: z.string()})
 })
 
 export enum NotificationFilterType {
@@ -373,6 +380,7 @@ export default {
   AppointmentsListSchema,
   AppointmentInfoSchema,
   AppointmentEditSchema,
+  AppointmentsListLastTerminatedSchema,
   EditProfileSchema,
   TherapistUpdateSchema,
   InternUpdateSchema,
