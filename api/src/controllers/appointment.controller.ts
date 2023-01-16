@@ -90,8 +90,12 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
     })
     for (let i = 0; i < interns_process.length; i++) {
       // add a check to see if the intern has permissions
-      var permissions = await retrieveInternPermissions(internId, Number(interns_process[i].process_id));
-      if (permissions != null && permissions.see == true){ // if null it is not shown either
+      var permissions = await retrieveInternPermissions(
+        internId,
+        Number(interns_process[i].process_id)
+      )
+      if (permissions != null && permissions.see == true) {
+        // if null it is not shown either
         processIds.push(Number(interns_process[i].process_id))
       }
     }
@@ -321,16 +325,16 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
         message:
           "It appears that you do not have permission to create an appointment, due to the fact that you are not associated with the its process.",
       })
-    }
-    else{ // check if the intern has permissions to create an appointment for this process
-      var permissions = await retrieveInternPermissions(callerId, Number(process.id));
-      if (permissions == null || permissions.appoint == false){ // intern does not have permission to create an appointment
+    } else {
+      // check if the intern has permissions to create an appointment for this process
+      var permissions = await retrieveInternPermissions(callerId, Number(process.id))
+      if (permissions == null || permissions.appoint == false) {
+        // intern does not have permission to create an appointment
         return res.status(StatusCodes.UNAUTHORIZED).json({
           message:
             "It appears that you do not have permission to create an appointment, talk with one of the therapists in the process for more information.",
         })
       }
-
     }
   } else if (!(callerRole == "admin")) {
     return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -452,8 +456,8 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     interns.push(intern?.person.name)
     if (callerId == Number(intern_process[i].intern_person_id)) {
       // get the permissions of this intern for this process
-      var permissions = await retrieveInternPermissions(callerId, Number(process.id));
-      if (permissions != null && permissions.see){
+      var permissions = await retrieveInternPermissions(callerId, Number(process.id))
+      if (permissions != null && permissions.see) {
         isProcessIntern = true // this means that the caller is an intern that is associated with the process and the see permission has been granted
       }
     }
@@ -558,9 +562,10 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
         message:
           "It appears that you do not have permission to edit this appointment, due to the fact that you are not associated with the its process.",
       })
-    } else { // is an intern of the process, but needs to have the appoint permission
-      var permissions = await retrieveInternPermissions(callerId, Number(process.id));
-      if (permissions == null || permissions.appoint == false){
+    } else {
+      // is an intern of the process, but needs to have the appoint permission
+      var permissions = await retrieveInternPermissions(callerId, Number(process.id))
+      if (permissions == null || permissions.appoint == false) {
         return res.status(StatusCodes.UNAUTHORIZED).json({
           message:
             "It appears that you do not have permission to edit an appointment, talk with one of the therapists in the process for more information.",
@@ -648,9 +653,10 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
         message:
           "It appears that you do not have permission to edit this appointment, due to the fact that you are not associated with the its process.",
       })
-    } else { // is an intern of the process, but needs to have the archive permission
-      var permissions = await retrieveInternPermissions(callerId, Number(process.id));
-      if (permissions == null || permissions.archive == false){
+    } else {
+      // is an intern of the process, but needs to have the archive permission
+      var permissions = await retrieveInternPermissions(callerId, Number(process.id))
+      if (permissions == null || permissions.archive == false) {
         return res.status(StatusCodes.UNAUTHORIZED).json({
           message:
             "It appears that you do not have permission to archive an appointment, talk with one of the therapists in the process for more information.",
@@ -754,8 +760,12 @@ export async function getAllActiveAppointments(
     })
     for (let i = 0; i < interns_process.length; i++) {
       // check see permission if the caller is an intern
-      var permissions = await retrieveInternPermissions(internId, Number(interns_process[i].process_id));
-      if (permissions != null && permissions.see == true){ // if he can see, then add this process.
+      var permissions = await retrieveInternPermissions(
+        internId,
+        Number(interns_process[i].process_id)
+      )
+      if (permissions != null && permissions.see == true) {
+        // if he can see, then add this process.
         processIds.push(Number(interns_process[i].process_id))
       }
     }
@@ -874,7 +884,10 @@ export async function getAllActiveAppointments(
 }
 
 // TODO: adicionar metodo para retornar as ultimas consultas para os accountants
-export async function lastTerminatedAppointments(req: Request<{}, {}, AppointmentListLatsTerminated>, res: Response){
+export async function lastTerminatedAppointments(
+  req: Request<{}, {}, AppointmentListLatsTerminated>,
+  res: Response
+) {
   /**
    * Returns all the appointments that have been terminated in the last 24 hours if the caller is an accountant
    */
@@ -892,30 +905,40 @@ export async function lastTerminatedAppointments(req: Request<{}, {}, Appointmen
   var callerRole = decodedToken.role
   var callerIsAdmin = decodedToken.admin
 
-  if (callerRole != "accountant"){
+  if (callerRole != "accountant") {
     res.status(StatusCodes.UNAUTHORIZED).json({
       message: "You do not have permission to use this endpoint.",
-    });
+    })
   }
 
-  var dayInMilliseconds = 1000 * 60 * 60 * 24;
-  var now = Date.now();
+  var dayInMilliseconds = 1000 * 60 * 60 * 24
+  var now = Date.now()
 
   // obter a informação de cada appointment que foi arquivado nas ultimas 24 horas.
-  var appointments = await prisma.appointment.findMany({where: {active: false}})
-  var appointmentsLast24h = [];
-  for (let i = 0; i < appointments.length; i++){
-    var archivedDate = new Date(appointments[i].archived_date);
-    if (archivedDate.getTime() > (now - dayInMilliseconds)){ // if in the last 24 hours
+  var appointments = await prisma.appointment.findMany({ where: { active: false } })
+  var appointmentsLast24h = []
+  for (let i = 0; i < appointments.length; i++) {
+    var archivedDate = new Date(appointments[i].archived_date)
+    if (archivedDate.getTime() > now - dayInMilliseconds) {
+      // if in the last 24 hours
       // get the info from each appointment
-      var currentAppointment = appointments[i];
-      var appointmentProcess = await prisma.appointment_process.findFirst({where: {appointment_slot_id: currentAppointment.slot_id}});
+      var currentAppointment = appointments[i]
+      var appointmentProcess = await prisma.appointment_process.findFirst({
+        where: { appointment_slot_id: currentAppointment.slot_id },
+      })
 
       // get patients for this process
-      var patient_process = await prisma.patient_process.findMany({where: {process_id: appointmentProcess?.process_id}});
-      var patients = []; // list of the names of the patients associated with the current process
-      for (let e = 0; patient_process.length; e ++){
-        patients.push(await prisma.person.findFirst({where: {id: patient_process[e].patient_person_id}, select: {name: true}}));
+      var patient_process = await prisma.patient_process.findMany({
+        where: { process_id: appointmentProcess?.process_id },
+      })
+      var patients = [] // list of the names of the patients associated with the current process
+      for (let e = 0; patient_process.length; e++) {
+        patients.push(
+          await prisma.person.findFirst({
+            where: { id: patient_process[e].patient_person_id },
+            select: { name: true },
+          })
+        )
       }
       // assemble appointment information (name of the patient, start and end dates of the appointment)
       appointmentsLast24h.push({
@@ -927,8 +950,8 @@ export async function lastTerminatedAppointments(req: Request<{}, {}, Appointmen
   }
 
   return res.status(StatusCodes.OK).json({
-    data: appointmentsLast24h
-  });
+    data: appointmentsLast24h,
+  })
 }
 
 async function getUserType(id: number) {
@@ -943,20 +966,20 @@ async function getUserType(id: number) {
   return "error"
 }
 
-async function retrieveInternPermissions(internId: number, processId: number){
+async function retrieveInternPermissions(internId: number, processId: number) {
   /*
    * Returns the permissions of an intern for this scope.
    */
 
   var permissions = await prisma.permissions.findFirst({
-    where: {process_id: processId, person_id: internId},
-    select:{
+    where: { process_id: processId, person_id: internId },
+    select: {
       see: true,
       appoint: true,
       archive: true,
-    }
-  });
-  return permissions;
+    },
+  })
+  return permissions
 }
 
 export default {
