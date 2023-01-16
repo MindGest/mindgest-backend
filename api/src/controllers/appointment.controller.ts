@@ -342,7 +342,6 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
   var appointment = await prisma.appointment.create({
     data: {
       online: req.body.online,
-      slot_id: 3, // TODO: Isto tem de ser incrementado automaticamente!!
       slot_start_date: req.body.startDate,
       slot_end_date: req.body.endDate,
       archived_date: req.body.archiveDate,
@@ -873,7 +872,6 @@ export async function getAllActiveAppointments(
   })
 }
 
-// TODO: adicionar metodo para retornar as ultimas consultas para os accountants
 export async function lastTerminatedAppointments(req: Request<{}, {}, AppointmentListLatsTerminated>, res: Response){
   /**
    * Returns all the appointments that have been terminated in the last 24 hours if the caller is an accountant
