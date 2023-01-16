@@ -300,7 +300,8 @@ export const AppointmentEditSchema = z.object({
 
 export const AppointmentsListLastTerminatedSchema = z.object({
   body: z.object({
-    token: z.string()})
+    token: z.string(),
+  }),
 })
 
 export enum NotificationFilterType {
