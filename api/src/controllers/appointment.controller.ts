@@ -882,8 +882,10 @@ export async function getAllActiveAppointments(
   })
 }
 
-
-export async function lastTerminatedAppointments(req: Request<{}, {}, AppointmentListLatsTerminated>, res: Response){
+export async function lastTerminatedAppointments(
+  req: Request<{}, {}, AppointmentListLatsTerminated>,
+  res: Response
+) {
   /**
    * Returns all the appointments that have been terminated in the last 24 hours if the caller is an accountant
    */
@@ -911,7 +913,10 @@ export async function lastTerminatedAppointments(req: Request<{}, {}, Appointmen
   var now = Date.now()
 
   // obter a informação de cada appointment que foi arquivado nas ultimas 24 horas.
-  var appointments = await prisma.appointment.findMany({ where: { active: false }, orderBy: {archived_date: "desc"}})
+  var appointments = await prisma.appointment.findMany({
+    where: { active: false },
+    orderBy: { archived_date: "desc" },
+  })
   var appointmentsLast24h = []
   for (let i = 0; i < appointments.length; i++) {
     var archivedDate = new Date(appointments[i].archived_date)
