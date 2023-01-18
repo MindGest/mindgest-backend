@@ -11,7 +11,6 @@ import {
   AppointmentsList,
   AppointmentInfo,
   AppointmentEdit,
-  AppointmentListLatsTerminated,
   AccessToken,
 } from "../utils/types"
 
@@ -21,7 +20,7 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -281,7 +280,7 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -377,7 +376,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -509,7 +508,7 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -599,7 +598,7 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -692,7 +691,7 @@ export async function getAllActiveAppointments(
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -883,7 +882,7 @@ export async function getAllActiveAppointments(
 }
 
 export async function lastTerminatedAppointments(
-  req: Request<{}, {}, AppointmentListLatsTerminated>,
+  req: Request,
   res: Response
 ) {
   /**
@@ -891,7 +890,7 @@ export async function lastTerminatedAppointments(
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",

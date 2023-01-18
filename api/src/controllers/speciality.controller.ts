@@ -5,14 +5,14 @@ import { StatusCodes } from "http-status-codes"
 
 import { verifyAccessToken } from "../services/auth.service"
 
-import { SpecialityCreateBody, SpecialityListBody, AccessToken } from "../utils/types"
+import { SpecialityCreateBody, AccessToken } from "../utils/types"
 
 /**
  * listar especialidades
  */
-export async function getAllSpecialities(req: Request<{}, {}, SpecialityListBody>, res: Response) {
+export async function getAllSpecialities(req: Request, res: Response) {
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -48,7 +48,7 @@ export async function getAllSpecialities(req: Request<{}, {}, SpecialityListBody
  */
 export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody>, res: Response) {
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
