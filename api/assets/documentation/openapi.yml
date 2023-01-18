@@ -635,7 +635,7 @@ paths:
                 speciality:
                   type: string
                   description: name of the speciality.
-              example: Especialidade-A
+                  example: Especialidade-A
       responses:
         "200":
           $ref: "#/components/responses/SpecialitiesCreate"
