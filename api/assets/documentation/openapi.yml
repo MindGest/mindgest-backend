@@ -47,8 +47,8 @@ tags:
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
-  - name: Specialty
-    description: Specialty Managment Endpoints
+  - name: Speciality
+    description: Speciality Managment Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
@@ -773,7 +773,6 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-
   /appointment/archive:
     put:
       summary: Archives an appointment in the database.
@@ -1951,7 +1950,7 @@ components:
                           name:
                             type: string
                             description: name of the patient
-    AppoitmentInfo:
+    AppointmentInfo:
       description: Appointment's information
       content:
         application/json:

@@ -41,10 +41,6 @@ export type AppointmentsList = z.TypeOf<typeof schemas.AppointmentsListSchema>["
 
 export type AppointmentInfo = z.TypeOf<typeof schemas.AppointmentInfoSchema>["body"]
 
-export type AppointmentListLatsTerminated = z.TypeOf<
-  typeof schemas.AppointmentsListLastTerminatedSchema
->["body"]
-
 export type ProcessEditPermissionsBody = z.TypeOf<
   typeof schemas.ProcessEditPermissionsSchema
 >["body"]
@@ -80,5 +76,4 @@ export type QueryStatistics = z.TypeOf<typeof schemas.QueryStatistics>["query"]
 export type NotesCreateBody = z.TypeOf<typeof schemas.NotesCreate>["body"]
 export type RoomCreateBody = z.TypeOf<typeof schemas.RoomCreate>["body"]
 
-export type SpecialityListBody = z.TypeOf<typeof schemas.SpecialityListSchema>["body"]
 export type SpecialityCreateBody = z.TypeOf<typeof schemas.SpecialityCreateSchema>["body"]

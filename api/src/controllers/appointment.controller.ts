@@ -11,7 +11,6 @@ import {
   AppointmentsList,
   AppointmentInfo,
   AppointmentEdit,
-  AppointmentListLatsTerminated,
   AccessToken,
 } from "../utils/types"
 
@@ -276,7 +275,7 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -372,7 +371,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -504,7 +503,7 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -594,7 +593,7 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -687,7 +686,7 @@ export async function getAllActiveAppointments(
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
+  var decodedToken = res.locals.token
   if (!decodedToken) {
     return res.status(StatusCodes.FORBIDDEN).json({
       message: "The token provided is not valid.",
@@ -877,10 +876,7 @@ export async function getAllActiveAppointments(
   })
 }
 
-export async function lastTerminatedAppointments(
-  req: Request<{}, {}, AppointmentListLatsTerminated>,
-  res: Response
-) {
+export async function lastTerminatedAppointments(req: Request, res: Response) {
   /**
    * Returns all the appointments that have been terminated in the last 24 hours if the caller is an accountant
    */
@@ -923,7 +919,7 @@ export async function lastTerminatedAppointments(
         where: { process_id: appointmentProcess?.process_id },
       })
       var patients = [] // list of the names of the patients associated with the current process
-      for (let e = 0; patient_process.length; e++) {
+      for (let e = 0; e < patient_process.length; e++) {
         patients.push(
           await prisma.person.findFirst({
             where: { id: patient_process[e].patient_person_id },
