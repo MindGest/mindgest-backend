@@ -881,10 +881,7 @@ export async function getAllActiveAppointments(
   })
 }
 
-export async function lastTerminatedAppointments(
-  req: Request,
-  res: Response
-) {
+export async function lastTerminatedAppointments(req: Request, res: Response) {
   /**
    * Returns all the appointments that have been terminated in the last 24 hours if the caller is an accountant
    */
