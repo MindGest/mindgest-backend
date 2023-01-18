@@ -3,7 +3,6 @@ import prisma from "../utils/prisma"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
-import { verifyAccessToken } from "../services/auth.service"
 
 import {
   AppointmentArchive,
@@ -11,7 +10,6 @@ import {
   AppointmentsList,
   AppointmentInfo,
   AppointmentEdit,
-  AccessToken,
 } from "../utils/types"
 
 export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>, res: Response) {
@@ -19,13 +17,8 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
    * Returns all the appointments of a therapist if a valid id is given, or all if the id value is "-1"
    */
 
-  // verify the token
+
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -279,13 +272,7 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
    * Creates an appointment
    */
 
-  // verify the token
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -375,13 +362,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
    * returns the info of an appointment
    */
 
-  // verify the token
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -507,13 +488,7 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
    * edits the properties of an appointment
    */
 
-  // verify the token
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -597,13 +572,7 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
    * archives an appointment
    */
 
-  // verify the token
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -690,13 +659,7 @@ export async function getAllActiveAppointments(
    * Returns all the active appointments of a therapist if a valid id is given or all from all the therapists if id = -1
    */
 
-  // verify the token
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -886,13 +849,7 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
    * Returns all the appointments that have been terminated in the last 24 hours if the caller is an accountant
    */
 
-  // verify the token
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id

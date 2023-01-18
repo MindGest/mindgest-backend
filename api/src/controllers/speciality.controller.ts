@@ -3,21 +3,13 @@ import prisma from "../utils/prisma"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
-import { verifyAccessToken } from "../services/auth.service"
-
-import { SpecialityCreateBody, AccessToken } from "../utils/types"
+import { SpecialityCreateBody } from "../utils/types"
 
 /**
  * listar especialidades
  */
 export async function getAllSpecialities(req: Request, res: Response) {
-  // verify the token
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -47,13 +39,7 @@ export async function getAllSpecialities(req: Request, res: Response) {
  *  speciality
  */
 export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody>, res: Response) {
-  // verify the token
   var decodedToken = res.locals.token
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
 
   // otbain the caller properties
   var callerId = decodedToken.id
