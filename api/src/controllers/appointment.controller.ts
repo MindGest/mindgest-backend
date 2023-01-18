@@ -21,17 +21,12 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
+  var decoded = res.locals.token
 
   // otbain the caller properties
-  var callerId = decodedToken.id
-  var callerRole = decodedToken.role
-  var callerIsAdmin = decodedToken.admin
+  var callerId = decoded.id
+  var callerRole = decoded.role
+  var callerIsAdmin = decoded.admin
 
   // prepare vars
   var isTherapist = false
@@ -891,17 +886,12 @@ export async function lastTerminatedAppointments(
    */
 
   // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
+  var decoded = res.locals.token
 
   // otbain the caller properties
-  var callerId = decodedToken.id
-  var callerRole = decodedToken.role
-  var callerIsAdmin = decodedToken.admin
+  var callerId = decoded.id
+  var callerRole = decoded.role
+  var callerIsAdmin = decoded.admin
 
   if (callerRole != "accountant") {
     res.status(StatusCodes.UNAUTHORIZED).json({
