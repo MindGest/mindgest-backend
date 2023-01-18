@@ -886,7 +886,7 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
         where: { process_id: appointmentProcess?.process_id },
       })
       var patients = [] // list of the names of the patients associated with the current process
-      for (let e = 0; patient_process.length; e++) {
+      for (let e = 0; e < patient_process.length; e++) {
         patients.push(
           await prisma.person.findFirst({
             where: { id: patient_process[e].patient_person_id },

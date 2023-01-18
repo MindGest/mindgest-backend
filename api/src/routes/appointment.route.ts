@@ -1,7 +1,9 @@
 import { Router, Request, Response } from "express"
 import controller from "../controllers/appointment.controller"
+import authMiddleware from "../middleware/auth.middleware"
 
 const appointment = Router()
+appointment.use(authMiddleware.authorize())
 
 appointment.post("/list", (req: Request, res: Response) => {
   controller.getAllAppointments(req, res)
@@ -19,7 +21,7 @@ appointment.post("/create", (req: Request, res: Response) => {
   controller.createAppointment(req, res)
 })
 
-appointment.post("/listLastTerminated", (req: Request, res: Response) => {
+appointment.get("/listLastTerminated", (req: Request, res: Response) => {
   controller.lastTerminatedAppointments(req, res)
 })
 
