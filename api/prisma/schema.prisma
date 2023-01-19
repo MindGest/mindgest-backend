@@ -26,8 +26,8 @@ model person {
   guard         guard?
   intern        intern?
   notifications notifications[]
-  permissions   permissions[]
   patient       patient?
+  permissions   permissions[]
   therapist     therapist?
 }
 
@@ -90,9 +90,11 @@ model appointment {
   online              Boolean?
   room_id             BigInt
   pricetable_id       String                @db.VarChar(512)
-  slot_id             BigInt                @id
+  slot_id             BigInt                @id @default(autoincrement())
   slot_start_date     DateTime              @db.Timestamp(6)
   slot_end_date       DateTime              @db.Timestamp(6)
+  archived_date       DateTime              @db.Timestamp(6)
+  active              Boolean?
   room                room                  @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk1")
   pricetable          pricetable            @relation(fields: [pricetable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk2")
   appointment_process appointment_process[]
@@ -177,8 +179,8 @@ model permissions {
   isMain       Boolean @default(false)
   id           BigInt  @id @default(autoincrement())
   person_id    BigInt
-  person       person  @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
   process_id   BigInt
+  person       person  @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk1")
   process      process @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "permissions_fk2")
 }
 
@@ -195,23 +197,23 @@ model process {
   active                Boolean
   remarks               String?               @db.VarChar(512)
   speciality_speciality String                @db.VarChar(512)
-  speciality            speciality            @relation(fields: [speciality_speciality], references: [speciality], onDelete: NoAction, onUpdate: NoAction, map: "process_fk1")
   appointment_process   appointment_process[]
   intern_process        intern_process[]
+  notes                 notes[]
   patient_process       patient_process[]
   permissions           permissions[]
+  speciality            speciality            @relation(fields: [speciality_speciality], references: [speciality], onDelete: NoAction, onUpdate: NoAction, map: "process_fk1")
   process_liable        process_liable[]
   therapist_process     therapist_process[]
-  notes                 notes[]
 }
 
-model notes{
-  id                    BigInt                @id @default(autoincrement())
-  title                 String                @db.VarChar(512)
-  body                  String                @db.VarChar(512)
-  process_id            BigInt
-  datetime              DateTime              @db.Date
-  process               process               @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_notes_fk1")
+model notes {
+  id         BigInt   @id @default(autoincrement())
+  title      String   @db.VarChar(512)
+  body       String   @db.VarChar(512)
+  process_id BigInt
+  datetime   DateTime @db.Date
+  process    process  @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_notes_fk1")
 }
 
 model process_liable {

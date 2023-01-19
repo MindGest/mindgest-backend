@@ -47,8 +47,8 @@ tags:
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
-  - name: Specialty
-    description: Specialty Managment Endpoints
+  - name: Speciality
+    description: Speciality Managment Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
@@ -635,7 +635,7 @@ paths:
                 speciality:
                   type: string
                   description: name of the speciality.
-              example: Especialidade-A
+                  example: Especialidade-A
       responses:
         "200":
           $ref: "#/components/responses/SpecialitiesCreate"
@@ -646,7 +646,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
   /appointment/list:
-    get:
+    post:
       summary: Lists all of the appointments of the given user id, or all if the id = -1.
       tags:
         - Appointment
@@ -670,7 +670,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
   /appointment/list/active:
-    get:
+    post:
       summary: Lists all of the active appointments of the given user id, or all if the id = -1.
       tags:
         - Appointment
@@ -694,7 +694,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
   /appointment/info:
-    get:
+    post:
       summary: Returns the information of an appointment
       tags:
         - Appointment
@@ -711,6 +711,21 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AppointmentInfo"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/listLastTerminated:
+    post:
+      summary: Returns the list of finished appointments in the last 24h.
+      tags:
+        - Appointment
+      description: Returns the list of finished appointments in the last 24h.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentListLastTerminated"
         "403":
           $ref: "#/components/responses/VerificationTokenInvalid"
         "401":
@@ -758,7 +773,6 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-
   /appointment/archive:
     put:
       summary: Archives an appointment in the database.
@@ -1905,7 +1919,38 @@ components:
                     speciality:
                       type: string
                       description: name of the speciality
-    AppoitmentInfo:
+    AppointmentListLastTerminated:
+      description: List of the finished appointments in the last 24h.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    appointmentStartTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentEndTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    patients:
+                      type: array
+                      description: list of the patients of the process
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: name of the patient
+    AppointmentInfo:
       description: Appointment's information
       content:
         application/json:

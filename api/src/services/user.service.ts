@@ -16,6 +16,8 @@ import {
 import prisma from "../utils/prisma"
 import { User } from "../utils/schemas"
 
+let UNDEFINED = "OHMANINHOQUERESPORRADA??!!??!!??"
+
 export async function fetchPersonProperties(personId: bigint) {
   let therapist = await prisma.therapist.findUnique({
     where: { person_id: personId },
@@ -233,22 +235,41 @@ export async function updateInfoAccountant(id: number, body: AccountantUpdateBod
 }
 
 export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantUpdateBody) {
-  await prisma.accountant.update({
-    data: {
-      person: {
-        update: {
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
+  console.log(body.password)
+  if (body.password !== UNDEFINED) {
+    await prisma.accountant.update({
+      data: {
+        person: {
+          update: {
+            address: body.address,
+            name: body.name,
+            email: body.email,
+            birth_date: body.birthDate,
+            password: await argon2.hash(body.password),
+            phone_number: body.phoneNumber,
+            tax_number: body.taxNumber,
+          },
         },
       },
-    },
-    where: { person_id: id },
-  })
+      where: { person_id: id },
+    })
+  } else {
+    await prisma.accountant.update({
+      data: {
+        person: {
+          update: {
+            address: body.address,
+            name: body.name,
+            email: body.email,
+            birth_date: body.birthDate,
+            phone_number: body.phoneNumber,
+            tax_number: body.taxNumber,
+          },
+        },
+      },
+      where: { person_id: id },
+    })
+  }
 }
 
 export async function updateInfoPatient(id: number, body: any) {

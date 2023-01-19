@@ -3,15 +3,12 @@ import prisma from "../utils/prisma"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
-import { verifyAccessToken } from "../services/auth.service"
-
 import {
   AppointmentArchive,
   AppointmentCreate,
   AppointmentsList,
   AppointmentInfo,
   AppointmentEdit,
-  AccessToken,
 } from "../utils/types"
 
 export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>, res: Response) {
@@ -19,13 +16,7 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
    * Returns all the appointments of a therapist if a valid id is given, or all if the id value is "-1"
    */
 
-  // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
+  var decodedToken = res.locals.token
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -88,7 +79,15 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       where: { intern_person_id: internId },
     })
     for (let i = 0; i < interns_process.length; i++) {
-      processIds.push(Number(interns_process[i].process_id))
+      // add a check to see if the intern has permissions
+      var permissions = await retrieveInternPermissions(
+        internId,
+        Number(interns_process[i].process_id)
+      )
+      if (permissions != null && permissions.see == true) {
+        // if null it is not shown either
+        processIds.push(Number(interns_process[i].process_id))
+      }
     }
   }
 
@@ -271,13 +270,7 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
    * Creates an appointment
    */
 
-  // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
+  var decodedToken = res.locals.token
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -316,6 +309,16 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
         message:
           "It appears that you do not have permission to create an appointment, due to the fact that you are not associated with the its process.",
       })
+    } else {
+      // check if the intern has permissions to create an appointment for this process
+      var permissions = await retrieveInternPermissions(callerId, Number(process.id))
+      if (permissions == null || permissions.appoint == false) {
+        // intern does not have permission to create an appointment
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+          message:
+            "It appears that you do not have permission to create an appointment, talk with one of the therapists in the process for more information.",
+        })
+      }
     }
   } else if (!(callerRole == "admin")) {
     return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -327,9 +330,9 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
   var appointment = await prisma.appointment.create({
     data: {
       online: req.body.online,
-      slot_id: 3, // TODO: Isto tem de ser incrementado automaticamente!!
       slot_start_date: req.body.startDate,
       slot_end_date: req.body.endDate,
+      archived_date: req.body.archiveDate,
       pricetable: {
         connect: { id: req.body.priceTableId },
       },
@@ -357,13 +360,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
    * returns the info of an appointment
    */
 
-  // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
+  var decodedToken = res.locals.token
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -435,7 +432,11 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     })
     interns.push(intern?.person.name)
     if (callerId == Number(intern_process[i].intern_person_id)) {
-      isProcessIntern = true
+      // get the permissions of this intern for this process
+      var permissions = await retrieveInternPermissions(callerId, Number(process.id))
+      if (permissions != null && permissions.see) {
+        isProcessIntern = true // this means that the caller is an intern that is associated with the process and the see permission has been granted
+      }
     }
   }
 
@@ -485,13 +486,7 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
    * edits the properties of an appointment
    */
 
-  // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
+  var decodedToken = res.locals.token
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -538,6 +533,15 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
         message:
           "It appears that you do not have permission to edit this appointment, due to the fact that you are not associated with the its process.",
       })
+    } else {
+      // is an intern of the process, but needs to have the appoint permission
+      var permissions = await retrieveInternPermissions(callerId, Number(process.id))
+      if (permissions == null || permissions.appoint == false) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+          message:
+            "It appears that you do not have permission to edit an appointment, talk with one of the therapists in the process for more information.",
+        })
+      }
     }
   } else if (!(callerRole == "admin")) {
     // you shouldn't be here!!!
@@ -566,13 +570,7 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
    * archives an appointment
    */
 
-  // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
+  var decodedToken = res.locals.token
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -620,6 +618,15 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
         message:
           "It appears that you do not have permission to edit this appointment, due to the fact that you are not associated with the its process.",
       })
+    } else {
+      // is an intern of the process, but needs to have the archive permission
+      var permissions = await retrieveInternPermissions(callerId, Number(process.id))
+      if (permissions == null || permissions.archive == false) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+          message:
+            "It appears that you do not have permission to archive an appointment, talk with one of the therapists in the process for more information.",
+        })
+      }
     }
   } else if (!(callerRole == "admin")) {
     // if not a therapist, nor an intern, nor an admin -> you're not supposed to be here
@@ -631,7 +638,8 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
   // archive the appointment
   await prisma.appointment.update({
     data: {
-      // active: true, // TODO: descomentar depois de se ter criado este campo na tabela appointment
+      active: false, // no longer active
+      archived_date: req.body.archiveDate,
     },
     where: { slot_id: req.body.appointmentId },
   })
@@ -649,13 +657,7 @@ export async function getAllActiveAppointments(
    * Returns all the active appointments of a therapist if a valid id is given or all from all the therapists if id = -1
    */
 
-  // verify the token
-  var decodedToken = verifyAccessToken<AccessToken>(req.body.token)
-  if (!decodedToken) {
-    return res.status(StatusCodes.FORBIDDEN).json({
-      message: "The token provided is not valid.",
-    })
-  }
+  var decodedToken = res.locals.token
 
   // otbain the caller properties
   var callerId = decodedToken.id
@@ -716,7 +718,15 @@ export async function getAllActiveAppointments(
       where: { intern_person_id: internId },
     })
     for (let i = 0; i < interns_process.length; i++) {
-      processIds.push(Number(interns_process[i].process_id))
+      // check see permission if the caller is an intern
+      var permissions = await retrieveInternPermissions(
+        internId,
+        Number(interns_process[i].process_id)
+      )
+      if (permissions != null && permissions.see == true) {
+        // if he can see, then add this process.
+        processIds.push(Number(interns_process[i].process_id))
+      }
     }
   }
 
@@ -792,7 +802,7 @@ export async function getAllActiveAppointments(
       var appointmentInfo = await prisma.appointment.findFirst({
         where: {
           slot_id: appointmentIds[e],
-          //active: true, //TODO: adicionar este campo à tabela appointment
+          active: true,
         },
         select: {
           online: true,
@@ -826,9 +836,73 @@ export async function getAllActiveAppointments(
     }
   }
 
-  res.status(StatusCodes.OK).json({
+  return res.status(StatusCodes.OK).json({
     message: "[ ListActive ]It is working.",
     data: allAppointmentsInfo,
+  })
+}
+
+export async function lastTerminatedAppointments(req: Request, res: Response) {
+  /**
+   * Returns all the appointments that have been terminated in the last 24 hours if the caller is an accountant
+   */
+
+  var decodedToken = res.locals.token
+
+  // otbain the caller properties
+  var callerId = decodedToken.id
+  var callerRole = decodedToken.role
+  var callerIsAdmin = decodedToken.admin
+
+  if (callerRole != "accountant") {
+    res.status(StatusCodes.UNAUTHORIZED).json({
+      message: "You do not have permission to use this endpoint.",
+    })
+  }
+
+  var dayInMilliseconds = 1000 * 60 * 60 * 24
+  var now = Date.now()
+
+  // obter a informação de cada appointment que foi arquivado nas ultimas 24 horas.
+  var appointments = await prisma.appointment.findMany({
+    where: { active: false },
+    orderBy: { archived_date: "desc" },
+  })
+  var appointmentsLast24h = []
+  for (let i = 0; i < appointments.length; i++) {
+    var archivedDate = new Date(appointments[i].archived_date)
+    if (archivedDate.getTime() > now - dayInMilliseconds) {
+      // if in the last 24 hours
+      // get the info from each appointment
+      var currentAppointment = appointments[i]
+      var appointmentProcess = await prisma.appointment_process.findFirst({
+        where: { appointment_slot_id: currentAppointment.slot_id },
+      })
+
+      // get patients for this process
+      var patient_process = await prisma.patient_process.findMany({
+        where: { process_id: appointmentProcess?.process_id },
+      })
+      var patients = [] // list of the names of the patients associated with the current process
+      for (let e = 0; e < patient_process.length; e++) {
+        patients.push(
+          await prisma.person.findFirst({
+            where: { id: patient_process[e].patient_person_id },
+            select: { name: true },
+          })
+        )
+      }
+      // assemble appointment information (name of the patient, start and end dates of the appointment)
+      appointmentsLast24h.push({
+        patients: patients,
+        appointmentStartTime: currentAppointment.slot_start_date,
+        appointmentEndTime: currentAppointment.slot_end_date,
+      })
+    }
+  }
+
+  return res.status(StatusCodes.OK).json({
+    data: appointmentsLast24h,
   })
 }
 
@@ -844,6 +918,22 @@ async function getUserType(id: number) {
   return "error"
 }
 
+async function retrieveInternPermissions(internId: number, processId: number) {
+  /*
+   * Returns the permissions of an intern for this scope.
+   */
+
+  var permissions = await prisma.permissions.findFirst({
+    where: { process_id: processId, person_id: internId },
+    select: {
+      see: true,
+      appoint: true,
+      archive: true,
+    },
+  })
+  return permissions
+}
+
 export default {
   getAllAppointments,
   createAppointment,
@@ -851,4 +941,5 @@ export default {
   editAppointment,
   archiveAppointment,
   getAllActiveAppointments,
+  lastTerminatedAppointments,
 }

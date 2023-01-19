@@ -255,40 +255,37 @@ export const ProcessEditPermissionsSchema = z.object({
 
 export const AppointmentCreateSchema = z.object({
   body: z.object({
-    token: z.string(),
     processId: z.number(),
     online: z.boolean(),
     roomId: z.number(),
     priceTableId: z.string(),
     startDate: DateSchema,
     endDate: DateSchema,
+    archiveDate: DateSchema,
   }),
 })
 
 export const AppointmentArchiveSchema = z.object({
   body: z.object({
-    token: z.string(),
     appointmentId: z.number(),
+    archiveDate: DateSchema,
   }),
 })
 
 export const AppointmentsListSchema = z.object({
   body: z.object({
-    token: z.string(),
     filterId: z.number(), //can either be -1 for all, an id of a therapist for their appointments or of an intern
   }),
 })
 
 export const AppointmentInfoSchema = z.object({
   body: z.object({
-    token: z.string(),
     appointmentId: z.number(),
   }),
 })
 
 export const AppointmentEditSchema = z.object({
   body: z.object({
-    token: z.string(),
     appointmentId: z.number(),
     appointmentStart: DateSchema,
     appointmentEnd: DateSchema,
@@ -343,15 +340,8 @@ export const QueryStatistics = z.object({
   }),
 })
 
-export const SpecialityListSchema = z.object({
-  body: z.object({
-    token: z.string(),
-  }),
-})
-
 export const SpecialityCreateSchema = z.object({
   body: z.object({
-    token: z.string(),
     speciality: z.string(),
   }),
 })
@@ -394,6 +384,5 @@ export default {
   QueryListRooms,
   RoomCreate,
   QueryStatistics,
-  SpecialityListSchema,
   SpecialityCreateSchema,
 }
