@@ -9,17 +9,16 @@ dotenv.config()
 import app from "../../src/main"
 
 describe("0.4 if an account is already verified", () => {
-    // it("0.4.0 account verified", async () => {
+  // it("0.4.0 account verified", async () => {
 
   it("0.4.1 the account has already been verified", async () => {
     const payload = {
       email: "email@student.dei.uc.pt",
-      callback: "http://frontend.com/verification-page"
+      callback: "http://frontend.com/verification-page",
     }
-    
 
     const message = {
-      message: "The user does not exist!"
+      message: "The user does not exist!",
     }
 
     const result = await request(app)
@@ -31,4 +30,3 @@ describe("0.4 if an account is already verified", () => {
     expect(result.body).toEqual(message)
   })
 })
-

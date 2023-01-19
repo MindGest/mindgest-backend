@@ -12,7 +12,7 @@ describe("0.6 Test password reset", () => {
   it("0.6.0 existing user sends request to change password", async () => {
     const token = "" // need to get token here from email
     const payload = {
-      token : token
+      token: token,
     }
 
     const result = await request(app)
@@ -41,4 +41,3 @@ describe("0.6 Test password reset", () => {
     expect(result.body).toEqual(message)
   })
 })
-

@@ -46,7 +46,7 @@ describe("0.0 Test registration", () => {
 
     // in json format
     const message = {
-      message: "A user with this email already exists!"
+      message: "A user with this email already exists!",
     }
 
     const result = await request(app)

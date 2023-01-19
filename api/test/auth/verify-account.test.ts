@@ -10,7 +10,7 @@ import app from "../../src/main"
 
 describe("0.3 if an account is already verified", () => {
   it("0.3.0 the account has already been verified", async () => {
-    const token = ""; // é preciso gerar um token
+    const token = "" // é preciso gerar um token
     const payload = {
       token: token,
     }

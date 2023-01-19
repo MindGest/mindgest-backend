@@ -40,6 +40,4 @@ describe("0.5 forgot password and user exists", () => {
     expect(result.status).toEqual(StatusCodes.OK)
     // falta o código de sucesso na documentação então não sei o que esperar
   })
-
-  
 })
