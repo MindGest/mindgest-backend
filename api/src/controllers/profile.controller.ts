@@ -28,6 +28,10 @@ import uploadPicture from "../utils/upload"
 
 export async function uploadProfilePicture(req: Request, res: Response) {
   try {
+    // Authenticate / Authorize user
+    const { id } = res.locals.token
+    logger.info(`UPLOAD [user-id: ${id}] => Profile Picture upload authorized...`)
+
     // Upload Profile picture
     uploadPicture(req, res, (err) => {
       if (err) {
@@ -36,25 +40,21 @@ export async function uploadProfilePicture(req: Request, res: Response) {
           message: "Invalid picture format (must be jpg, png, jpeg)",
         })
       }
-    })
 
-    // Authenticate / Authorize user
-    const { id } = res.locals.token
-    logger.info(`UPLOAD [user-id: ${id}] => Profile Picture upload authorized...`)
+	    // Save File, Update Database
+			const picture = req.file;
+	    logger.debug(`UPLOAD [user-id: ${id}] => Saving user's profile picture & updating database`)
+	    if (picture === null || picture === undefined) {
+	      return res.status(StatusCodes.BAD_REQUEST).json({
+				message: "Picture is missing in the request",
+	      })
+	    }
+	    saveProfilePicture(id, picture)
 
-    // Save File, Update Database
-    logger.debug(`UPLOAD [user-id: ${id}] => Saving user's profile picture & updating database`)
-    const picture = req.file
-    if (picture === null || picture === undefined) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Picture is missing in the request",
-      })
-    }
-    saveProfilePicture(id, picture)
-
-    logger.info(`UPLOAD [user-id: ${id}] => Upload successful!`)
-    return res.status(StatusCodes.CREATED).json({
-      message: "Profile picture uploaded successfully",
+	    logger.info(`UPLOAD [user-id: ${id}] => Upload successful!`)
+	    return res.status(StatusCodes.CREATED).json({
+	      message: "Profile picture uploaded successfully",
+	    })
     })
   } catch (error) {
     logger.error(error)
