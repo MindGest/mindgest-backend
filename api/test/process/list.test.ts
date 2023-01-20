@@ -8,11 +8,9 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("(y+2).0 test getters for listing processes", () => {
-  it("(y+2).0.0 test user trying to list processes successfully", async () => {
-    const payload = {
-      token: "<token>",
-    }
+describe("3.2 test getters for listing processes", () => {
+  it("3.2.0 test user trying to list processes successfully", async () => {
+    const token = "" //set up a valid admin token
     const message = {
       list: {
         therapistListing: ["Marta Santos"],
@@ -22,48 +20,25 @@ describe("(y+2).0 test getters for listing processes", () => {
       },
     }
     const result = await request(app)
-      .get("/api/process/list")
-      .send(payload)
+      .get("/api/process/list?active=true&especiality=Esp-A")
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.OK)
     expect(result.body).toEqual(message)
   })
 
-  it("(y+2).1.0 test user trying to list processes unsuccessfully", async () => {
-    const payload = {
-      token: "<token>",
-    }
+  it("3.2.1 test user trying to get empty process list", async () => {
+    const token = "Invalid token" //this is the same as having an expired token
     const message = {
-      message: "An internal error has occurred while processing the request",
+      "message": "Verification token invalid or expired"
     }
     const result = await request(app)
-      .get("/api/process/list")
-      .send(payload)
+      .get("/api/process/list?active=true&speciality=Esp-A")
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
-    expect(result.body).toEqual(message)
-  })
-
-  it("(y+2).2.0 test user trying to get empty process list", async () => {
-    const payload = {
-      token: "<token>",
-    }
-    const message = {
-      list: {
-        therapistListing: [],
-        patientName: "",
-        refCode: "",
-        nextAppointment: "",
-      },
-    }
-    const result = await request(app)
-      .get("/api/process/list")
-      .send(payload)
-      .set("Content-Type", "application/json")
-      .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.status).toEqual(StatusCodes.FORBIDDEN)
     expect(result.body).toEqual(message)
   })
 })
