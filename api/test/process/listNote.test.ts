@@ -12,17 +12,18 @@ describe("3.8 test listing notes in process", () => {
   it("3.8.0 List process notes", async () => {
     const token = "" //set this is has valid admin token
     const processId = "0"
-    const message = { // define real values
+    const message = {
+      // define real values
       message: [
-          {
-            "title": "string",
-            "body": "string",
-            "date": "string"
-          }
-        ]
+        {
+          title: "string",
+          body: "string",
+          date: "string",
+        },
+      ],
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/process/" + processId + "/createNote")
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
@@ -37,7 +38,7 @@ describe("3.8 test listing notes in process", () => {
       message: "User doesn't have authorization",
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/process/" + processId + "/createNote")
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
@@ -52,7 +53,7 @@ describe("3.8 test listing notes in process", () => {
       message: "Verification token invalid or expired",
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/process/" + processId + "/createNote")
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")

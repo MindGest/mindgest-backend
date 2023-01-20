@@ -31,7 +31,7 @@ describe("3.2 test getters for listing processes", () => {
   it("3.2.1 test user trying to get empty process list", async () => {
     const token = "Invalid token" //this is the same as having an expired token
     const message = {
-      "message": "Verification token invalid or expired"
+      message: "Verification token invalid or expired",
     }
     const result = await request(app)
       .get("/api/process/list?active=true&speciality=Esp-A")

@@ -11,7 +11,7 @@ import app from "../../src/main"
 describe("3.3 activating a processes", () => {
   it("3.3.0 User doesn't have authorization", async () => {
     const token = "" //set up an intern token
-    const processId = "0";
+    const processId = "0"
     const message = {
       message: "User doesn't have authorization",
     }
@@ -26,7 +26,7 @@ describe("3.3 activating a processes", () => {
 
   it("3.3.1 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is the same as having an expired token
-    const processId = "0";
+    const processId = "0"
 
     const message = {
       message: "Verification token invalid or expired",
@@ -43,7 +43,7 @@ describe("3.3 activating a processes", () => {
 
   it("3.3.2 ativar um processo já existente", async () => {
     const token = "" //set up an admin token
-    const processId = "0";
+    const processId = "0"
 
     const message = {
       message: "Process Activated",

@@ -8,7 +8,6 @@ dotenv.config()
 
 import app from "../../src/main"
 
-
 describe("3.0 archive a process", () => {
   it("3.0.0 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is the same as having an expired token
@@ -18,7 +17,7 @@ describe("3.0 archive a process", () => {
     }
     const result = await request(app)
       .post("/api/process/archive?processId=" + processId)
-      .set("Authorization", token)    
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
@@ -33,7 +32,7 @@ describe("3.0 archive a process", () => {
     }
     const result = await request(app)
       .post("/api/process/archive?processId=" + processId)
-      .set("Authorization", token)    
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.OK)
