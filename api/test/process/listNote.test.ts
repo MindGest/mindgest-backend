@@ -8,8 +8,8 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("3.8 test listing notes in process", () => {
-  it("3.8.0 List process notes", async () => {
+describe("3.9 test listing notes in process", () => {
+  it("3.9.0 List process notes", async () => {
     const token = "" //set this is has valid admin token
     const processId = "0"
     const message = { // define real values
@@ -30,7 +30,7 @@ describe("3.8 test listing notes in process", () => {
     expect(result.body).toEqual(message)
   })
 
-  it("(3.8.1 User doesn't have authorization", async () => {
+  it("3.9.1 User doesn't have authorization", async () => {
     const token = "" //set this is has guard token
     const processId = "0"
     const message = {

@@ -8,19 +8,17 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("3.8 test creating notes in process", () => {
-  it("3.8.0 Note Created", async () => {
+describe("3.8 test creating rooms", () => {
+  it("3.8.0 Room Created", async () => {
     const token = "" //set this is has valid admin token
-    const processId = "0"
     const payload = {
-        title: "note0",
-        body: "some text"
+        name: "room0",
     }
     const message = {
-      message: "Note Created",
+      message: "Room Created",
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/rooms/create")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
@@ -33,14 +31,13 @@ describe("3.8 test creating notes in process", () => {
     const token = "" //set this is has guard token
     const processId = "0"
     const payload = {
-      title: "note1",
-      body: "some text"
-  }
+      name: "room1",
+    }
     const message = {
       message: "User doesn't have authorization",
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/rooms/create")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
@@ -53,14 +50,13 @@ describe("3.8 test creating notes in process", () => {
     const token = "invalid token" //this is equivalent to expired token
     const processId = "0"
     const payload = {
-      title: "note1",
-      body: "some text"
-  }
+      name: "room1",
+    }
     const message = {
       message: "Verification token invalid or expired",
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/rooms/create")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
