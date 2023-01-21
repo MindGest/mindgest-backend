@@ -12,7 +12,7 @@ describe("3.8 test creating rooms", () => {
   it("3.8.0 Room Created", async () => {
     const token = "" //set this is has valid admin token
     const payload = {
-        name: "room0",
+      name: "room0",
     }
     const message = {
       message: "Room Created",
