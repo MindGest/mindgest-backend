@@ -13,14 +13,14 @@ describe("3.8 test creating notes in process", () => {
     const token = "" //set this is has valid admin token
     const processId = "0"
     const payload = {
-        title: "note0",
-        body: "some text"
+      title: "note0",
+      body: "some text",
     }
     const message = {
       message: "Note Created",
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/process/" + processId + "/createNote")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
@@ -34,13 +34,13 @@ describe("3.8 test creating notes in process", () => {
     const processId = "0"
     const payload = {
       title: "note1",
-      body: "some text"
-  }
+      body: "some text",
+    }
     const message = {
       message: "User doesn't have authorization",
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/process/" + processId + "/createNote")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
@@ -54,13 +54,13 @@ describe("3.8 test creating notes in process", () => {
     const processId = "0"
     const payload = {
       title: "note1",
-      body: "some text"
-  }
+      body: "some text",
+    }
     const message = {
       message: "Verification token invalid or expired",
     }
     const result = await request(app)
-      .post("/api/process/"+processId+"/createNote")
+      .post("/api/process/" + processId + "/createNote")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")

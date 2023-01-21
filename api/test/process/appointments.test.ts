@@ -13,8 +13,9 @@ describe("3.6 test getting all appointments of a process", () => {
   it("3.6.0 All appointments from a process", async () => {
     const token = "" //set this is has valid admin token
     const processId = "0"
-    const message = { // set realistic values
-      online: "<online_boolean>", 
+    const message = {
+      // set realistic values
+      online: "<online_boolean>",
       start_date: "<string>",
       end_date: "<string/timestamp>",
       room: "<string>",
