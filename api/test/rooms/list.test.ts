@@ -15,9 +15,9 @@ describe("4.1 test listing rooms", () => {
       message: [
         {
           name: "room0",
-          id: 0
-        }
-      ]
+          id: 0,
+        },
+      ],
     }
     const result = await request(app)
       .get("/api/rooms/list")

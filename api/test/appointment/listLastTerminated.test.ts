@@ -11,19 +11,20 @@ import app from "../../src/main"
 describe("2.3 test listing appointment in the last 24h", () => {
   it("2.3.0 List every appointment in the last 24 hours", async () => {
     const token = "" //set this has valid admin token
-    
-    const message = { //define real values
+
+    const message = {
+      //define real values
       message: [
         {
           appointmentStartTime: "2022-12-24T15:03:00.000Z",
           appointmentEndTime: "2022-12-24T15:03:00.000Z",
           patients: [
             {
-              name: "string"
-            }
-          ]
-        }
-      ]    
+              name: "string",
+            },
+          ],
+        },
+      ],
     }
     const result = await request(app)
       .post("/api/appointments/listLastTerminated")

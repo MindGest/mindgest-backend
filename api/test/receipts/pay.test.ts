@@ -9,7 +9,6 @@ dotenv.config()
 import app from "../../src/main"
 
 describe("5.1 test paying receipts", () => {
-  
   it("5.1.0 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is equivalent to expired token
     const receiptId = "0"
@@ -44,7 +43,7 @@ describe("5.1 test paying receipts", () => {
     const token = "" //set this has valid admin token
     const receiptId = "0"
     const message = {
-      message: "Receipt Payed!"
+      message: "Receipt Payed!",
     }
     const result = await request(app)
       .put("/api/receipts/create?receiptId=" + receiptId)

@@ -12,7 +12,7 @@ describe("4.2 test listing appointments in a room", () => {
   it("4.2.0 List every appointment in a room", async () => {
     const token = "" //set this is has valid admin token
     const date = "2022/12/24"
-    const room ="0"
+    const room = "0"
     const message = {
       message: [
         {
@@ -23,14 +23,14 @@ describe("4.2 test listing appointments in a room", () => {
               title: "Dr João Pedro Esp-A",
               id: 0,
               startDate: "2022-12-24T15:03:00.000Z",
-              endDate: "2022-12-24T15:03:00.000Z"
-            }
-          ]
-        }
-      ]    
+              endDate: "2022-12-24T15:03:00.000Z",
+            },
+          ],
+        },
+      ],
     }
     const result = await request(app)
-      .get("/api/rooms/listAppointmentsRoom?date"+ date +"&room=" + room)
+      .get("/api/rooms/listAppointmentsRoom?date" + date + "&room=" + room)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
@@ -41,12 +41,12 @@ describe("4.2 test listing appointments in a room", () => {
   it("4.2.1 User doesn't have authorization", async () => {
     const token = "" //set this has guard token
     const date = "2022/12/24"
-    const room ="0"
+    const room = "0"
     const message = {
       message: "User doesn't have authorization",
     }
     const result = await request(app)
-      .get("/api/rooms/listAppointmentsRoom?date"+ date +"&room=" + room)
+      .get("/api/rooms/listAppointmentsRoom?date" + date + "&room=" + room)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
@@ -57,12 +57,12 @@ describe("4.2 test listing appointments in a room", () => {
   it("4.2.2 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is equivalent to expired token
     const date = "2022/12/24"
-    const room ="0"
+    const room = "0"
     const message = {
       message: "Verification token invalid or expired",
     }
     const result = await request(app)
-      .get("/api/rooms/listAppointmentsRoom?date"+ date +"&room=" + room)
+      .get("/api/rooms/listAppointmentsRoom?date" + date + "&room=" + room)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")

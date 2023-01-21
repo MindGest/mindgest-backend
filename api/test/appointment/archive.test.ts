@@ -12,11 +12,12 @@ describe("2.5 test appointments info", () => {
   it("2.5.0 show an appointments info", async () => {
     const token = "" //set this has valid admin token
     const payload = {
-      appointmentId: 0
+      appointmentId: 0,
     }
-    
-    const message = { //define real values
-      message:  "The appointment has been successfully archived."
+
+    const message = {
+      //define real values
+      message: "The appointment has been successfully archived.",
     }
     const result = await request(app)
       .put("/api/appointments/archive")
@@ -31,7 +32,7 @@ describe("2.5 test appointments info", () => {
   it("2.5.1 User doesn't have authorization", async () => {
     const token = "" //set this has guard token
     const payload = {
-      appointmentId: 0
+      appointmentId: 0,
     }
     const message = {
       message: "User doesn't have authorization",
@@ -49,7 +50,7 @@ describe("2.5 test appointments info", () => {
   it("2.5.2 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is equivalent to expired token
     const payload = {
-      appointmentId: 0
+      appointmentId: 0,
     }
     const message = {
       message: "Verification token invalid or expired",

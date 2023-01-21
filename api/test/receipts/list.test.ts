@@ -19,11 +19,11 @@ describe("5.2 test listing receipts", () => {
           patientName: "patient0",
           mainTherapist: "Dr João Pedro",
           ref: "string",
-          date: "string"
-        }
-      ]
+          date: "string",
+        },
+      ],
     }
-    
+
     const result = await request(app)
       .get("/api/receipts/create?paid=" + paid + "&unPaid=" + unPaid)
       .set("Authorization", token)
@@ -43,9 +43,9 @@ describe("5.2 test listing receipts", () => {
           patientName: "patient0",
           mainTherapist: "Dr João Pedro",
           ref: "string",
-          date: "string"
-        }
-      ]
+          date: "string",
+        },
+      ],
     }
     const result = await request(app)
       .get("/api/receipts/create?paid=" + paid + "&unPaid=" + unPaid)
@@ -61,7 +61,7 @@ describe("5.2 test listing receipts", () => {
     const paid = "false"
     const unPaid = "true"
     const message = {
-      message: []
+      message: [],
     }
     const result = await request(app)
       .get("/api/receipts/create?paid=" + paid + "&unPaid=" + unPaid)

@@ -15,10 +15,11 @@ describe("2.6 test appointments info", () => {
       appointmentId: 0,
       appointmentRoomId: 0,
       appointmentStart: "2022-12-24T15:03:00.000Z",
-      appointmentEnd: "2022-12-24T15:03:00.000Z"
-    }  
-    const message = { //define real values
-      message:  "The appointment has been successfully archived."
+      appointmentEnd: "2022-12-24T15:03:00.000Z",
+    }
+    const message = {
+      //define real values
+      message: "The appointment has been successfully archived.",
     }
     const result = await request(app)
       .put("/api/appointments/edit")
@@ -36,7 +37,7 @@ describe("2.6 test appointments info", () => {
       appointmentId: 0,
       appointmentRoomId: 0,
       appointmentStart: "2022-12-24T15:03:00.000Z",
-      appointmentEnd: "2022-12-24T15:03:00.000Z"
+      appointmentEnd: "2022-12-24T15:03:00.000Z",
     }
     const message = {
       message: "User doesn't have authorization",
@@ -57,10 +58,10 @@ describe("2.6 test appointments info", () => {
       appointmentId: 0,
       appointmentRoomId: 0,
       appointmentStart: "2022-12-24T15:03:00.000Z",
-      appointmentEnd: "2022-12-24T15:03:00.000Z"
+      appointmentEnd: "2022-12-24T15:03:00.000Z",
     }
     const message = {
-      message: "The appointment has been successfully updated."
+      message: "The appointment has been successfully updated.",
     }
 
     const result = await request(app)

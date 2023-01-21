@@ -13,7 +13,7 @@ describe("5.0 test creating receipts", () => {
     const token = "" //set this has valid admin token
     const appointmentId = "0"
     const message = {
-      message: "Receipt Created"
+      message: "Receipt Created",
     }
     const result = await request(app)
       .post("/api/receipts/create?appointmentId=" + appointmentId)

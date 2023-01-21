@@ -17,12 +17,12 @@ describe("2.4 test creating appointments", () => {
       roomId: 0,
       priceTableId: 0,
       startDate: "2022-12-24T15:03:00.000Z",
-      endDate: "2022-12-24T15:03:00.000Z"
+      endDate: "2022-12-24T15:03:00.000Z",
     }
-    
-    
-    const message = { //define real values
-      message:  "The appointment has been successfully created."
+
+    const message = {
+      //define real values
+      message: "The appointment has been successfully created.",
     }
     const result = await request(app)
       .post("/api/appointments/create")
@@ -42,7 +42,7 @@ describe("2.4 test creating appointments", () => {
       roomId: 0,
       priceTableId: 0,
       startDate: "2022-12-24T15:03:00.000Z",
-      endDate: "2022-12-24T15:03:00.000Z"
+      endDate: "2022-12-24T15:03:00.000Z",
     }
     const message = {
       message: "User doesn't have authorization",
@@ -65,7 +65,7 @@ describe("2.4 test creating appointments", () => {
       roomId: 0,
       priceTableId: 0,
       startDate: "2022-12-24T15:03:00.000Z",
-      endDate: "2022-12-24T15:03:00.000Z"
+      endDate: "2022-12-24T15:03:00.000Z",
     }
     const message = {
       message: "Verification token invalid or expired",
