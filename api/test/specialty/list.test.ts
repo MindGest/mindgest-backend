@@ -14,9 +14,9 @@ describe("7.1 test listing specialties", () => {
     const message = {
       message: [
         {
-          speciality: "Esp-A"
-        }
-      ]    
+          speciality: "Esp-A",
+        },
+      ],
     }
     const result = await request(app)
       .get("/api/specialty/list")

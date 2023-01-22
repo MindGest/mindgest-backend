@@ -11,28 +11,29 @@ import app from "../../src/main"
 describe("6.0 test statistics", () => {
   it("6.0.0  list statistics", async () => {
     const token = "" //set this has valid admin token
-    const message = { // set realistic data
+    const message = {
+      // set realistic data
       message: {
         totalAppointments: 0,
         specialitiesAppointments: [
           {
             speciality: "string",
-            total: 0
-          }
+            total: 0,
+          },
         ],
         processAppointments: [
           {
             processId: "string",
-            total: 0
-          }
+            total: 0,
+          },
         ],
         therapistsApointments: [
           {
             therapist: "string",
-            "total": 0
-          }
-        ]
-      }
+            total: 0,
+          },
+        ],
+      },
     }
 
     const result = await request(app)

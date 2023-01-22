@@ -12,9 +12,9 @@ describe("7.0 test creating specialties", () => {
   it("7.0.0 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is equivalent to expired token
     const payload = {
-      speciality: "Esp-A"
+      speciality: "Esp-A",
     }
-    
+
     const message = {
       message: "Verification token invalid or expired",
     }
@@ -31,7 +31,7 @@ describe("7.0 test creating specialties", () => {
   it("7.0.1 User doesn't have authorization", async () => {
     const token = "" //set this has guard token
     const payload = {
-      speciality: "Esp-A"
+      speciality: "Esp-A",
     }
     const message = {
       message: "User doesn't have authorization",
@@ -49,7 +49,7 @@ describe("7.0 test creating specialties", () => {
   it("7.0.2 Specialty Created", async () => {
     const token = "" //set this has valid admin token
     const payload = {
-      speciality: "Esp-A"
+      speciality: "Esp-A",
     }
     const message = {
       message: "The speciality has been successfully created.",

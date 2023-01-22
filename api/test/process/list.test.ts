@@ -12,17 +12,14 @@ describe("3.2 test getters for listing processes", () => {
   it("3.2.0 test user trying to list processes successfully", async () => {
     const token = "" //set up a valid admin token
     const message = {
-      list:  [
+      list: [
         {
-          therapistListing: [
-            "Marta Santos"
-          ],
+          therapistListing: ["Marta Santos"],
           patientName: "Ricardo Maria",
           refCode: "23fdfd4e3",
-          nextAppointment: "string"
-        }
-      ]
-    
+          nextAppointment: "string",
+        },
+      ],
     }
     const result = await request(app)
       .get("/api/process/list?active=true&especiality=Esp-A")

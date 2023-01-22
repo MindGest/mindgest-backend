@@ -12,18 +12,16 @@ describe("8.0 test listing specialties", () => {
   it("8.0.0 List every patient of the logged on therapist", async () => {
     const token = "" //set this has valid Marta Santos token
     const message = {
-      "list": [
+      list: [
         {
-          "therapistListing": [
-            "Marta Santos"
-          ],
-          "patientName": "Ricardo Maria",
-          "ref": "23fdfd4e3",
-          "speciality": "string"
-        }
-      ]
+          therapistListing: ["Marta Santos"],
+          patientName: "Ricardo Maria",
+          ref: "23fdfd4e3",
+          speciality: "string",
+        },
+      ],
     }
-    
+
     const result = await request(app)
       .get("/api/therapist/listPatients")
       .set("Authorization", token)
