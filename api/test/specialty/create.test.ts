@@ -8,36 +8,36 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("4.0 test creating rooms", () => {
-  it("4.0.0 Room Created", async () => {
-    const token = "" //set this has valid admin token
+describe("7.0 test creating specialties", () => {
+  it("7.0.0 The user's Verification Token is expired/invalid", async () => {
+    const token = "invalid token" //this is equivalent to expired token
     const payload = {
-      name: "room0",
+      speciality: "Esp-A"
     }
+    
     const message = {
-      message: "Room Created",
+      message: "Verification token invalid or expired",
     }
     const result = await request(app)
-      .post("/api/rooms/create")
+      .post("/api/specialty/create")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result.status).toEqual(StatusCodes.FORBIDDEN)
     expect(result.body).toEqual(message)
   })
 
-  it("4.0.1 User doesn't have authorization", async () => {
+  it("7.0.1 User doesn't have authorization", async () => {
     const token = "" //set this has guard token
-    const processId = "0"
     const payload = {
-      name: "room1",
+      speciality: "Esp-A"
     }
     const message = {
       message: "User doesn't have authorization",
     }
     const result = await request(app)
-      .post("/api/rooms/create")
+      .post("/api/specialty/create")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
@@ -46,22 +46,21 @@ describe("4.0 test creating rooms", () => {
     expect(result.body).toEqual(message)
   })
 
-  it("4.0.2 The user's Verification Token is expired/invalid", async () => {
-    const token = "invalid token" //this is equivalent to expired token
-    const processId = "0"
+  it("7.0.2 Specialty Created", async () => {
+    const token = "" //set this has valid admin token
     const payload = {
-      name: "room1",
+      speciality: "Esp-A"
     }
     const message = {
-      message: "Verification token invalid or expired",
+      message: "The speciality has been successfully created.",
     }
     const result = await request(app)
-      .post("/api/rooms/create")
+      .post("/api/specialty/create")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.FORBIDDEN)
+    expect(result.status).toEqual(StatusCodes.OK)
     expect(result.body).toEqual(message)
   })
 })
