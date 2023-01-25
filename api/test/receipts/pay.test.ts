@@ -8,32 +8,15 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("3.3 activating a processes", () => {
-  it("3.3.0 User doesn't have authorization", async () => {
-    const token = "" //set up an intern token
-    const processId = "0"
-    const message = {
-      message: "User doesn't have authorization",
-    }
-    const result = await request(app)
-      .post("/api/process/activate?processId=" + processId)
-      .set("Authorization", token)
-      .set("Content-Type", "application/json")
-      .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
-  })
-
-  it("3.3.1 The user's Verification Token is expired/invalid", async () => {
-    const token = "invalid token" //this is the same as having an expired token
-    const processId = "0"
-
+describe("5.1 test paying receipts", () => {
+  it("5.1.0 The user's Verification Token is expired/invalid", async () => {
+    const token = "invalid token" //this is equivalent to expired token
+    const receiptId = "0"
     const message = {
       message: "Verification token invalid or expired",
     }
-
     const result = await request(app)
-      .post("/api/process/activate?processId=" + processId)
+      .put("/api/receipts/create?receiptId=" + receiptId)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
@@ -41,16 +24,29 @@ describe("3.3 activating a processes", () => {
     expect(result.body).toEqual(message)
   })
 
-  it("3.3.2 ativar um processo já existente", async () => {
-    const token = "" //set up an admin token
-    const processId = "0"
-
+  it("5.1.1 User doesn't have authorization", async () => {
+    const token = "" //set this has guard token
+    const receiptId = "0"
     const message = {
-      message: "Process Activated",
+      message: "User doesn't have authorization",
     }
-
     const result = await request(app)
-      .post("/api/process/activate?processId=" + processId)
+      .put("/api/receipts/create?receiptId=" + receiptId)
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
+    expect(result.body).toEqual(message)
+  })
+
+  it("5.1.2  pay a receipt", async () => {
+    const token = "" //set this has valid admin token
+    const receiptId = "0"
+    const message = {
+      message: "Receipt Payed!",
+    }
+    const result = await request(app)
+      .put("/api/receipts/create?receiptId=" + receiptId)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")

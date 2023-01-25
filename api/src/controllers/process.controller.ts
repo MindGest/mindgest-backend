@@ -175,7 +175,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
     var queryParams = req.query
 
     if (queryParams.active == null) {
-      queryParams.active = "false"
+      queryParams.active = "true"
     }
     var active = queryParams.active === "true"
 

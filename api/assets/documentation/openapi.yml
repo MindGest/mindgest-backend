@@ -832,6 +832,21 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /therapist/listPatients:
+    get:
+      summary: Lists every patient from a therapist
+      tags:
+        - Therapist
+      description: Lists every patient from a therapist
+      responses:
+        "200":
+          $ref: "#/components/responses/PatientsListed"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 components:
   schemas:
     Admin:
@@ -1510,24 +1525,26 @@ components:
           schema:
             properties:
               list:
-                type: object
-                properties:
-                  therapistListing:
-                    type: array
-                    items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    therapistListing:
+                      type: array
+                      items:
+                        type: string
+                        example: Marta Santos
+                    patientName:
                       type: string
-                      example: Marta Santos
-                  patientName:
-                    type: string
-                    example: Ricardo Maria
-                  refCode:
-                    type: string
-                    example: 23fdfd4e3
-                  nextAppointment:
-                    type: string
-                    summary: |
-                      No next Appointment if no appointment has been made or the date, in string
-                      format, of next date
+                      example: Ricardo Maria
+                    refCode:
+                      type: string
+                      example: 23fdfd4e3
+                    nextAppointment:
+                      type: string
+                      summary: |
+                        No next Appointment if no appointment has been made or the date, in string
+                        format, of next date
     ProcessActivated:
       description: Process Activated
       content:
@@ -2047,6 +2064,34 @@ components:
                 type: string
                 description: A message describing the request result
                 example: The appointment has been successfully archived.
+    PatientsListed:
+      description: List of patients processes
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              list:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    therapistListing:
+                      type: array
+                      items:
+                        type: string
+                        example: Marta Santos
+                    patientName:
+                      type: string
+                      example: Ricardo Maria
+                    ref:
+                      type: string
+                      example: 23fdfd4e3
+                    speciality:
+                      type: string
+                      summary: "algo aqui"
   securitySchemes:
     AccessToken:
       type: apiKey

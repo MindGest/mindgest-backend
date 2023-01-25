@@ -8,40 +8,25 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("4.0 if an account is already verified", () => {
-  it("4.0.0 the account has already been verified", async () => {
+describe("0.4 if an account is already verified", () => {
+  // it("0.4.0 account verified", async () => {
+
+  it("0.4.1 the account has already been verified", async () => {
     const payload = {
-      token: "",
-    } // é ainda preciso gerar um token
+      email: "email@student.dei.uc.pt",
+      callback: "http://frontend.com/verification-page",
+    }
+
     const message = {
-      message: "Account [already] verified successfully!",
+      message: "The user does not exist!",
     }
 
     const result = await request(app)
-      .post("/api/auth/verify-account")
+      .post("/api/auth/account-verification")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
-  })
-})
-
-describe("4.1 if an account is already verified but invalid token", () => {
-  it("4.1.0 with invalid token", async () => {
-    const payload = {
-      token: "invalid token",
-    }
-    const message = {
-      message: "Verification token invalid or expired",
-    }
-
-    const result = await request(app)
-      .post("/api/auth/verify-account")
-      .send(payload)
-      .set("Content-Type", "application/json")
-      .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.FORBIDDEN)
+    expect(result.status).toEqual(StatusCodes.BAD_REQUEST)
     expect(result.body).toEqual(message)
   })
 })

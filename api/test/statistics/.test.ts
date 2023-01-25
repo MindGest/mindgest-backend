@@ -8,21 +8,36 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("3.5 test process edit", () => {
-  it("3.5.0 test process edit successfully", async () => {
-    const token = "" //set this is has valid admin token
-    const payload = {
-      therapistId: 0,
-      speciality: "",
-      remarks: "this is just a test",
-      colaborators: [0],
-    }
+describe("6.0 test statistics", () => {
+  it("6.0.0  list statistics", async () => {
+    const token = "" //set this has valid admin token
     const message = {
-      message: "Process Edited",
+      // set realistic data
+      message: {
+        totalAppointments: 0,
+        specialitiesAppointments: [
+          {
+            speciality: "string",
+            total: 0,
+          },
+        ],
+        processAppointments: [
+          {
+            processId: "string",
+            total: 0,
+          },
+        ],
+        therapistsApointments: [
+          {
+            therapist: "string",
+            total: 0,
+          },
+        ],
+      },
     }
+
     const result = await request(app)
-      .post("/api/process/edit")
-      .send(payload)
+      .get("/api/statistics")
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
@@ -30,20 +45,13 @@ describe("3.5 test process edit", () => {
     expect(result.body).toEqual(message)
   })
 
-  it("3.5.1 test process edit without permission", async () => {
-    const token = "" //set this is has valid intern token
-    const payload = {
-      therapistId: 0,
-      speciality: "",
-      remarks: "this is just a test",
-      colaborators: [0],
-    }
+  it("6.0.1 User doesn't have authorization", async () => {
+    const token = "" //set this has guard token
     const message = {
       message: "User doesn't have authorization",
     }
     const result = await request(app)
-      .post("/api/process/edit")
-      .send(payload)
+      .get("/api/statistics")
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
@@ -51,20 +59,13 @@ describe("3.5 test process edit", () => {
     expect(result.body).toEqual(message)
   })
 
-  it("3.5.2 test process edit with expired token", async () => {
-    const token = "invalid token" //this is the same as having an expired token
-    const payload = {
-      therapistId: 0,
-      speciality: "",
-      remarks: "Verification token invalid or expired",
-      colaborators: [0],
-    }
+  it("6.0.2 The user's Verification Token is expired/invalid", async () => {
+    const token = "invalid token" //this is equivalent to expired token
     const message = {
-      message: "User doesn't have authorization",
+      message: "Verification token invalid or expired",
     }
     const result = await request(app)
-      .post("/api/process/edit")
-      .send(payload)
+      .get("/api/statistics")
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")

@@ -5,8 +5,8 @@ import { describe, expect, it } from "@jest/globals"
 
 import app from "../../src/main"
 
-describe("1.1 the user does not exist", () => {
-  it("1.1.0 login with a user that does not exist", async () => {
+describe("0.1 the user does not exist", () => {
+  it("0.1.0 login with a user that does not exist", async () => {
     const payload = {
       email: "email@student.dei.uc.pt",
       password: "password1234",
@@ -18,10 +18,8 @@ describe("1.1 the user does not exist", () => {
       .set("Accept", "application/json")
       .expect(StatusCodes.NOT_FOUND)
   })
-})
 
-describe("1.2 wrong password", () => {
-  it("1.2.0 wrong password with an existing user", async () => {
+  it("0.1.1 wrong password with an existing user", async () => {
     const payload = {
       email: "johndoe@student.dei.uc.pt",
       password: "password1235",
@@ -33,10 +31,8 @@ describe("1.2 wrong password", () => {
       .set("Accept", "application/json")
       .expect(StatusCodes.UNAUTHORIZED)
   })
-})
 
-describe("1.3 Test if login is working", () => {
-  it("1.3.0 Should login", async () => {
+  it("0.1.2 Should login only if verified", async () => {
     const payload = {
       email: "johndoe@student.dei.uc.pt",
       password: "password1234",

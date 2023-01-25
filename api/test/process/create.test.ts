@@ -8,30 +8,10 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("(y+8).0 test process creation", () => {
-  it("(y+8).0.0 test process creation successfully", async () => {
+describe("3.4 test process creation", () => {
+  it("3.4.0 The user's Verification Token is expired/invalid", async () => {
+    const token = "invalid token" //this is the same as having an expired token
     const payload = {
-      token: "<auth_token>",
-      patientId: 0,
-      therapistId: 0,
-      speciality: "string",
-      remarks: "string",
-    }
-    const message = {
-      message: "Permission Created",
-    }
-    const result = await request(app)
-      .post("/api/process/create")
-      .send(payload)
-      .set("Content-Type", "application/json")
-      .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
-  })
-
-  it("(y+8).1.0 test process creation with expired token", async () => {
-    const payload = {
-      token: "<expired_token>",
       patientId: 0,
       therapistId: 0,
       speciality: "string",
@@ -43,29 +23,31 @@ describe("(y+8).0 test process creation", () => {
     const result = await request(app)
       .post("/api/process/create")
       .send(payload)
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
     expect(result.body).toEqual(message)
   })
 
-  it("(y+8).2.0 test process creation unsuccessfully", async () => {
+  it("3.4.1 process Created", async () => {
+    const token = "" //set this is has valid admin token
     const payload = {
-      token: "<auth_token>",
       patientId: 0,
       therapistId: 0,
       speciality: "string",
       remarks: "string",
     }
     const message = {
-      message: "An internal error has occurred while processing the request",
+      message: "Permission Created",
     }
     const result = await request(app)
       .post("/api/process/create")
       .send(payload)
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
+    expect(result.status).toEqual(StatusCodes.OK)
     expect(result.body).toEqual(message)
   })
 })

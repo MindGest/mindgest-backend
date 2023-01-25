@@ -8,11 +8,12 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("4.0 if an account is already verified", () => {
-  it("4.0.0 the account has already been verified", async () => {
+describe("0.3 if an account is already verified", () => {
+  it("0.3.0 the account has already been verified", async () => {
+    const token = "" // é preciso gerar um token
     const payload = {
-      token: "",
-    } // é ainda preciso gerar um token
+      token: token,
+    }
     const message = {
       message: "Account [already] verified successfully!",
     }
@@ -25,10 +26,8 @@ describe("4.0 if an account is already verified", () => {
     expect(result.status).toEqual(StatusCodes.OK)
     expect(result.body).toEqual(message)
   })
-})
 
-describe("4.1 if an account is already verified but invalid token", () => {
-  it("4.1.0 with invalid token", async () => {
+  it("0.3.1 with invalid token", async () => {
     const payload = {
       token: "invalid token",
     }
