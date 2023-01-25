@@ -109,7 +109,7 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/Register"
       responses:
-        "200":
+        "201":
           $ref: "#/components/responses/RegistrationSuccessful"
         "409":
           $ref: "#/components/responses/UserAlreadyExists"

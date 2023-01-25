@@ -33,7 +33,6 @@ export async function healthCheck(req: Request, res: Response) {
     logger.info(`HEALTHCHECK => Complete.`)
     logger.debug(`HEALTHCHECK -> Server: ${health.status.api}`)
     logger.debug(`HEALTHCHECK -> Database: ${health.status.database}`)
-
     res
       .status(dbStatus === Health.OK ? StatusCodes.OK : StatusCodes.INTERNAL_SERVER_ERROR)
       .send(health)

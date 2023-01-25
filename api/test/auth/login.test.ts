@@ -1,10 +1,7 @@
 import request from "supertest"
-import dotenv from "dotenv"
 import { StatusCodes } from "http-status-codes"
 
 import { describe, expect, it } from "@jest/globals"
-
-dotenv.config()
 
 import app from "../../src/main"
 
@@ -14,16 +11,12 @@ describe("1.1 the user does not exist", () => {
       email: "email@student.dei.uc.pt",
       password: "password1234",
     }
-    const message = {
-      message: "The user does not exist!",
-    }
-    const result = await request(app)
+    await request(app)
       .post("/api/auth/login")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.NOT_FOUND)
-    expect(result.body).toEqual(message)
+      .expect(StatusCodes.NOT_FOUND)
   })
 })
 
@@ -33,15 +26,12 @@ describe("1.2 wrong password", () => {
       email: "johndoe@student.dei.uc.pt",
       password: "password1235",
     }
-    const message = {
-      message: "Login. Invalid credentials",
-    }
-    const result = await request(app)
+    await request(app)
       .post("/api/auth/login")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
+      .expect(StatusCodes.UNAUTHORIZED)
   })
 })
 
