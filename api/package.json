@@ -13,7 +13,7 @@
     "format": "prettier --write . && npx prisma format",
     "test:db-up": "docker compose -f ../util/docker-compose.yml --profile dev up -d --wait --remove-orphans",
     "test:db-down": "docker compose -f ../util/docker-compose.yml --profile dev down --volumes",
-    "test:db-setup" :"dotenv -e prisma/.env.test -- npm run prisma:push && npm run prisma:seed",
+    "test:db-setup": "dotenv -e prisma/.env.test -- npm run prisma:push && npm run prisma:seed",
     "test:studio": "dotenv -e prisma/.env.test prisma studio",
     "test:jest": "dotenv -v NODE_ENV=test -e prisma/.env.test -- jest",
     "test:run": "npm run test:db-setup && npm run test:jest",
