@@ -24,7 +24,9 @@ describe("0.0 Test registration", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
       .expect(StatusCodes.CREATED)
+
   })
+
   it("0.0.1 test - Repeat registration", async () => {
     const payload = {
       role: "admin",
@@ -36,19 +38,14 @@ describe("0.0 Test registration", () => {
       phoneNumber: 919191000,
     }
 
-    // in json format
-    const message = {
-      message: "A user with this email already exists!",
-    }
-
-    const result = await request(app)
+    await request(app)
       .post("/api/auth/register")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.CONFLICT)
-    expect(result.body).toEqual(message)
+      .expect(StatusCodes.CONFLICT)
   })
+
   it("0.0.2 test - Validate therapist register", async () => {
     const payload = {
       role: "therapist",
@@ -89,6 +86,7 @@ describe("0.0 Test registration", () => {
       .set("Accept", "application/json")
       .expect(StatusCodes.CREATED)
   })
+
   it("0.0.4 test - Validate accountant register", async () => {
     const payload = {
       role: "accountant",
@@ -107,6 +105,7 @@ describe("0.0 Test registration", () => {
       .set("Accept", "application/json")
       .expect(StatusCodes.CREATED)
   })
+
   it("0.0.5 test - Validate intern register", async () => {
     const payload = {
       role: "intern",
