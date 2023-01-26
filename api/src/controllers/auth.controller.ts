@@ -7,7 +7,6 @@ import logger from "../utils/logger"
 import prisma from "../utils/prisma"
 
 import { fetchPersonProperties } from "../services/user.service"
-import { sendResetPasswordEmail, sendVerificationEmail } from "../utils/mailler"
 
 import {
   attachCookies,
@@ -15,7 +14,6 @@ import {
   createRefreshToken,
   verifyRefreshToken,
   verifyToken,
-  createToken,
 } from "../services/auth.service"
 
 import {
@@ -25,11 +23,10 @@ import {
   RefreshBody,
   VerifyAccountBody,
   VerificationToken,
-  ForgotPasswordBody,
   ResetPasswordBody,
   PasswordResetToken,
-  AccountVerificationSchema,
 } from "../utils/types"
+
 import { User } from "../utils/schemas"
 
 export async function register(req: Request<{}, {}, RegistrationBody>, res: Response) {
@@ -210,6 +207,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
     let refreshToken = createRefreshToken(refreshTokenPayload)
 
     logger.debug(`LOGIN [${req.body.email}] => Attaching cookies...`)
+
     // Attach tokens as cookies
     attachCookies(res, accessToken, refreshToken)
 
@@ -316,110 +314,10 @@ export async function verify(req: Request<{}, {}, VerifyAccountBody>, res: Respo
 
     logger.info(`VERIFY [${person?.email}] => User Verified Successfully!`)
     return res.status(StatusCodes.OK).json({
-      message: "User verified sucessfully!",
+      message: "User verified successfully!",
     })
   } catch (error) {
     logger.error(`VERIFY => Server Error: ${error}`)
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "Ups... Something went wrong",
-    })
-  }
-}
-
-export async function accountVerification(
-  req: Request<{}, {}, AccountVerificationSchema>,
-  res: Response
-) {
-  try {
-    const person = await prisma.person.findFirst({
-      where: { email: req.body.email },
-    })
-
-    // Check if the user exists
-    if (person === null) {
-      logger.info(
-        `VERIFY-ACCOUNT [${req.body.email}] => Forgot password failed. User does not exist!`
-      )
-      return res.status(StatusCodes.NOT_FOUND).json({
-        message: `The user with email "${req.body.email}" does not exist.`,
-      })
-    }
-
-    logger.info(`VERIFY-ACCOUNT  [${req.body.email}] => Verify account token request`)
-
-    logger.debug(`VERIFY-ACCOUNT  [${req.body.email}] => Generation account verification token...`)
-    // Create a simple token for user verification
-    let token = createToken({ person: Number(person.id) })
-
-    // Send email if callback is provided
-    if (req.body.callback) {
-      logger.debug(`VERIFY-ACCOUNT [${req.body.email}] => Sending account verification email...`)
-      await sendVerificationEmail(person.name, person.email, token, req.body.callback)
-    }
-
-    logger.debug(`VERIFY-ACCOUNT [${req.body.email}] => Verify account token generated...`)
-    res.status(StatusCodes.OK).json({
-      message: "Account verification token generated",
-      token: req.body.callback ? "The verification token was sent by email!" : token,
-    })
-  } catch (error) {
-    logger.error(`VERIFY-ACCOUNT => Server Error: ${error}`)
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "Ups... Something went wrong",
-    })
-  }
-}
-
-export async function forgotPassword(req: Request<{}, {}, ForgotPasswordBody>, res: Response) {
-  try {
-    const person = await prisma.person.findFirst({
-      where: { email: req.body.email },
-    })
-
-    // Check if the user exists
-    if (person === null) {
-      logger.info(`FORGOT-PASS [${req.body.email}] => Forgot password failed. User does not exist!`)
-      return res.status(StatusCodes.NOT_FOUND).json({
-        message: `The user with email "${req.body.email}" does not exist.`,
-      })
-    }
-
-    logger.info(`FORGOT-PASS [${req.body.email}] => Forgot reset token request`)
-
-    // Check if person account is verified
-    if (!person.verified) {
-      logger.info(`FORGOT-PASS [${req.body.email}] => Forgot password failed. User not verified!`)
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "The account is not verified!",
-      })
-    }
-
-    // Check if the user account is approved by an administrator
-    if (!person.approved) {
-      logger.info(`FORGOT-PASS [${req.body.email}] => Forgot password failed. User not approved!`)
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "The account is not approved. Contact an admin to solve this issue!",
-      })
-    }
-
-    logger.debug(`FORGOT-PASS [${req.body.email}] => Generating password reset token...`)
-    // Create a simple token for password reset
-    let token = createToken({ person: Number(person.id) })
-
-    // Send email if callback is provided
-
-    if (req.body.callback) {
-      logger.debug(`FORGOT-PASS [${req.body.email}] => Sending password reset email...`)
-      await sendResetPasswordEmail(person.name, person.email, token, req.body.callback)
-    }
-
-    logger.info(`FORGOT-PASS [${req.body.email}] => Password reset token generated...`)
-    res.status(StatusCodes.OK).json({
-      message: "Password reset token generated",
-      token: req.body.callback ? "The password reset token was sent by email" : token,
-    })
-  } catch (error) {
-    logger.error(`FORGOT-PASS => Server Error: ${error}`)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -430,9 +328,8 @@ export async function resetPassword(req: Request<{}, {}, ResetPasswordBody>, res
   try {
     // Fetch and decoded the verification token
     let decoded = verifyToken<PasswordResetToken>(req.body.token)
-
     if (!decoded) {
-      logger.info(`RESET-PASS => Pasword reset token invalid!`)
+      logger.info(`RESET-PASS => Password reset token invalid!`)
       return res.status(StatusCodes.FORBIDDEN).json({
         message: "Invalid Verification Token",
       })
@@ -441,15 +338,15 @@ export async function resetPassword(req: Request<{}, {}, ResetPasswordBody>, res
     const person = await prisma.person.findUnique({
       where: { id: decoded.person },
     })
-    logger.info(`RESET-PASS [${person?.email}] => Password reset request!`)
 
-    logger.debug(`RESET-PASS [${person?.email}] => Reseting password...!`)
+    logger.info(`RESET-PASS [${person?.email}] => Password reset request!`)
+    logger.debug(`RESET-PASS [${person?.email}] => Resetting password...!`)
     await prisma.person.update({
       where: { id: person?.id },
       data: { password: await argon2.hash(req.body.password) },
     })
 
-    logger.info(`RESET-PASS [${person?.email}] => Password reset sucessfull!`)
+    logger.info(`RESET-PASS [${person?.email}] => Password reset successful!`)
     return res.status(StatusCodes.OK).json({
       message: "Password reset successful!",
     })
@@ -465,8 +362,6 @@ export default {
   register,
   login,
   refresh,
-  forgotPassword,
   resetPassword,
   verify,
-  accountVerification,
 }

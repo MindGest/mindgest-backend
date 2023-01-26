@@ -1,6 +1,5 @@
 import { Router } from "express"
 
-import bodyParser from "body-parser"
 import cookieParser from "cookie-parser"
 
 import schemas from "../utils/schemas"
@@ -14,7 +13,7 @@ const auth = Router()
 // Middleware
 auth.use(cookieParser(COOKIE_SECRET))
 
-// Enpoints
+// Endpoints
 auth.post("/register", middleware.requestValidator(schemas.RegistrationSchema), controller.register)
 
 auth.post("/login", middleware.requestValidator(schemas.LoginSchema), controller.login)
@@ -25,18 +24,6 @@ auth.post(
   "/verify-account",
   middleware.requestValidator(schemas.VerifyAccountSchema),
   controller.verify
-)
-
-auth.post(
-  "/account-verification",
-  middleware.requestValidator(schemas.AccountVerificationSchema),
-  controller.accountVerification
-)
-
-auth.post(
-  "/forgot-password",
-  middleware.requestValidator(schemas.ForgotPasswordSchema),
-  controller.forgotPassword
 )
 
 auth.post(
