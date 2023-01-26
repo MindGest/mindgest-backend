@@ -24,7 +24,7 @@ describe("0.6 Test password reset", () => {
     const payload1 = {
       token: token,
       password: "password1234",
-      confirm: "password1234"
+      confirm: "password1234",
     }
 
     const result1 = await request(app)
@@ -39,9 +39,9 @@ describe("0.6 Test password reset", () => {
     const payload = {
       token: "invalid token",
       password: "password1234",
-      confirm: "password1234"
+      confirm: "password1234",
     }
-    
+
     const result = await request(app)
       .post("/api/auth/reset-password")
       .send(payload)

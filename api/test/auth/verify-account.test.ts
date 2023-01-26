@@ -11,7 +11,7 @@ import app from "../../src/main"
 describe("0.3 if an account is already verified", () => {
   it("0.3.0 the account has already been verified", async () => {
     const payload = {
-      "email": "sarab@student.dei.uc.pt", 
+      email: "sarab@student.dei.uc.pt",
     } // no callback so token comes in body and is not sent by email
     const verificationResult = await request(app)
       .post("/api/auth/account-verification")
@@ -19,8 +19,8 @@ describe("0.3 if an account is already verified", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
 
-    const token = verificationResult.body.token 
-    
+    const token = verificationResult.body.token
+
     const payload1 = {
       token: token,
     }
