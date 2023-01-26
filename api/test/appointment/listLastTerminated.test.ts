@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("2.3 test listing appointment in the last 24h", () => {
   it("2.3.0 List every appointment in the last 24 hours", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -46,7 +45,6 @@ describe("2.3 test listing appointment in the last 24h", () => {
   })
 
   it("2.3.1 User doesn't have authorization", async () => {
-    
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -57,7 +55,7 @@ describe("2.3 test listing appointment in the last 24h", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const result2 = await request(app)
       .post("/api/appointments/listLastTerminated")
       .set("Authorization", token)
@@ -68,7 +66,7 @@ describe("2.3 test listing appointment in the last 24h", () => {
 
   it("2.3.2 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is equivalent to expired token
-    
+
     const result = await request(app)
       .post("/api/appointments/listLastTerminated")
 

@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("4.2 test listing appointments in a room", () => {
   it("4.2.0 List every appointment in a room", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -21,10 +20,10 @@ describe("4.2 test listing appointments in a room", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this is has valid admin token
-    
+
     const date = "2022/12/24"
     const room = "0"
-    
+
     const message = {
       message: [
         {
@@ -52,7 +51,6 @@ describe("4.2 test listing appointments in a room", () => {
   })
 
   it("4.2.1 User doesn't have authorization", async () => {
-    
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -63,10 +61,10 @@ describe("4.2 test listing appointments in a room", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const date = "2022/12/24"
     const room = "0"
-    
+
     const result2 = await request(app)
       .get("/api/rooms/listAppointmentsRoom?date" + date + "&room=" + room)
       .set("Authorization", token)
@@ -79,7 +77,7 @@ describe("4.2 test listing appointments in a room", () => {
     const token = "invalid token" //this is equivalent to expired token
     const date = "2022/12/24"
     const room = "0"
-    
+
     const result = await request(app)
       .get("/api/rooms/listAppointmentsRoom?date" + date + "&room=" + room)
       .set("Authorization", token)

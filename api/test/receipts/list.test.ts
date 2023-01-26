@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("5.2 test listing receipts", () => {
   it("5.2.0  list every receipt", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -21,10 +20,10 @@ describe("5.2 test listing receipts", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const paid = "true"
     const unPaid = "true"
-    
+
     const message = {
       message: [
         {
@@ -46,7 +45,6 @@ describe("5.2 test listing receipts", () => {
   })
 
   it("5.2.1  list payed receipts", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -57,10 +55,10 @@ describe("5.2 test listing receipts", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const paid = "true"
     const unPaid = "false"
-    
+
     const message = {
       message: [
         {
@@ -82,7 +80,6 @@ describe("5.2 test listing receipts", () => {
   })
 
   it("5.2.2  list unpayed receipts", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -93,10 +90,10 @@ describe("5.2 test listing receipts", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const paid = "false"
     const unPaid = "true"
-    
+
     const message = {
       message: [],
     }
@@ -111,7 +108,6 @@ describe("5.2 test listing receipts", () => {
   })
 
   it("5.2.3 User doesn't have authorization", async () => {
-    
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -122,10 +118,10 @@ describe("5.2 test listing receipts", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const paid = "true"
     const unPaid = "true"
-    
+
     const result2 = await request(app)
       .get("/api/receipts/create?paid=" + paid + "&unPaid=" + unPaid)
       .set("Authorization", token)
@@ -138,7 +134,7 @@ describe("5.2 test listing receipts", () => {
     const token = "invalid token" //this is equivalent to expired token
     const paid = "true"
     const unPaid = "true"
-    
+
     const result = await request(app)
       .get("/api/receipts/create?paid=" + paid + "&unPaid=" + unPaid)
       .set("Authorization", token)

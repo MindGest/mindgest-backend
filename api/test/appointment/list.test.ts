@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("2.0 test listing appointments", () => {
   it("2.0.0 List every appointment", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -21,7 +20,7 @@ describe("2.0 test listing appointments", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const payload2 = {
       filterId: 0,
     }
@@ -53,7 +52,6 @@ describe("2.0 test listing appointments", () => {
   })
 
   it("2.0.1 User doesn't have authorization", async () => {
-    
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -64,11 +62,11 @@ describe("2.0 test listing appointments", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const payload2 = {
       filterId: 0,
     }
-    
+
     const result2 = await request(app)
       .post("/api/appointments/list")
       .send(payload2)
