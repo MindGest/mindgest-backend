@@ -144,12 +144,12 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
           therapistListing: mainTherapistObject?.name,
           appointmentCode: receipt?.ref,
           appointmentDate: formattedDate,
-          nif: patient?.tax_number,
-          sns: moreInfoPatient?.health_number,
-          address: patient?.address,
-          email: patient?.email,
-          state: isDone,
-          cost: price?.price,
+          //nif: patient?.tax_number,
+          //sns: moreInfoPatient?.health_number,
+          //address: patient?.address,
+          //email: patient?.email,
+          //state: isDone,
+          //cost: price?.price,
           paid: receipt.payed,
         })
       }
@@ -310,14 +310,138 @@ export async function create(req: Request, res: Response) {
 
 export async function pay(req: Request, res: Response) {
   try {
-    var receiptId = parseInt(req.params.receiptId)
+    var receiptId = req.params.receiptId
+
+    let receipt = await prisma.receipt.findFirst({
+      where:{
+        ref:receiptId
+      }
+    })
 
     await prisma.receipt.update({
-      data: { payed: true },
-      where: { id: receiptId },
+      data: { payed: !receipt?.payed },
+      where: { ref: receiptId },
     })
     return res.status(StatusCodes.OK).json({
       message: "Receipt Payed!",
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export async function info(req: Request, res: Response) {
+  try {
+    var receiptId = req.params.processId
+
+    var receipt = await prisma.receipt.findFirst({
+      where:{
+        ref:receiptId
+      }
+    })
+    var appointment = await prisma.appointment.findUnique({
+      where: {
+        slot_id: receipt?.appointment_slot_id,
+      },
+    })
+
+    var appointment_process = await prisma.appointment_process.findFirst({
+      where: {
+        appointment_slot_id: appointment?.slot_id,
+      },
+    })
+
+    var process = await prisma.process.findUnique({
+      where: {
+        id: appointment_process?.process_id,
+      },
+    })
+
+    var patientProcess = await prisma.patient_process.findFirst({
+      where: {
+        process_id: process?.id,
+      },
+    })
+
+    var patient = await prisma.person.findUnique({
+      where: {
+        id: patientProcess?.patient_person_id,
+      },
+    })
+
+    var therapists = await prisma.therapist_process.findMany({
+      where: {
+        process_id: process?.id,
+      },
+    })
+
+    var flag = false
+    var mainTherapist
+    for (let therapist of therapists) {
+      if (flag == false) {
+        var permissions = await prisma.permissions.findFirst({
+          where: {
+            person_id: therapist.therapist_person_id,
+            process_id: process?.id,
+          },
+        })
+
+        if (permissions?.isMain) {
+          mainTherapist = therapist.therapist_person_id
+        }
+      }
+    }
+
+    var mainTherapistObject = await prisma.person.findUnique({
+      where: {
+        id: mainTherapist,
+      },
+    })
+
+    var moreInfoPatient = await prisma.patient.findFirst({
+      where: {
+        person_id: patient?.id,
+      },
+    })
+
+    console.log(appointment)
+    let dateParsed = new Date(appointment!.slot_end_date)
+    const currentTime = new Date()
+
+    let isDone = ""
+
+    if (currentTime.getTime() > dateParsed.getTime()) {
+      isDone = "Concluída"
+    } else {
+      isDone = "Não Concluída"
+    }
+
+    let price = await prisma.pricetable.findFirst({
+      where: {
+        id: appointment?.pricetable_id,
+      },
+    })
+
+    let date = receipt?.datetime
+    const formattedDate = date?.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+
+
+    res.status(StatusCodes.OK).json({
+      name: patient?.name,
+      tax_number: patient?.tax_number,
+      sns: moreInfoPatient?.health_number,
+      address: patient?.address,
+      email: patient?.email,
+      custo: price?.price,
+      paid: receipt?.payed,
+      responsavel: mainTherapistObject?.name,
+      data: formattedDate
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -330,4 +454,5 @@ export default {
   list,
   create,
   pay,
+  info
 }
