@@ -283,7 +283,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
   }
 }
 
-export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, res: Response) {
+export async function listTherapist(req: Request, res: Response) {
   try {
     var decoded = res.locals.token
 
