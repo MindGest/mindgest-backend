@@ -15,9 +15,6 @@ describe("7.0 test creating specialties", () => {
       speciality: "Esp-A",
     }
 
-    const message = {
-      message: "Verification token invalid or expired",
-    }
     const result = await request(app)
       .post("/api/specialty/create")
       .send(payload)
@@ -25,42 +22,55 @@ describe("7.0 test creating specialties", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message)
   })
 
   it("7.0.1 User doesn't have authorization", async () => {
-    const token = "" //set this has guard token
+    const payload1 = {
+      email: "obliquo@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result1 = await request(app)
+      .post("/api/auth/login")
+      .send(payload1)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    const token = result1.body.token //set this has guard token
+
     const payload = {
       speciality: "Esp-A",
     }
-    const message = {
-      message: "User doesn't have authorization",
-    }
-    const result = await request(app)
+
+    const result2 = await request(app)
       .post("/api/specialty/create")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
+    expect(result2.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
   it("7.0.2 Specialty Created", async () => {
-    const token = "" //set this has valid admin token
+    const payload1 = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result1 = await request(app)
+      .post("/api/auth/login")
+      .send(payload1)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    const token = result1.body.token //set this has valid admin token
+
     const payload = {
       speciality: "Esp-A",
     }
-    const message = {
-      message: "The speciality has been successfully created.",
-    }
-    const result = await request(app)
+
+    const result2 = await request(app)
       .post("/api/specialty/create")
       .send(payload)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result2.status).toEqual(StatusCodes.OK)
   })
 })

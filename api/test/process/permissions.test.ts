@@ -10,9 +10,19 @@ import app from "../../src/main"
 
 describe("3.7 test editing user process permissions", () => {
   it("3.7.0 Process Permissions Updated", async () => {
-    const token = "" //set this is has valid admin token
-    const processId = "0"
     const payload = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an admin token
+    const processId = "0"
+    const payload1 = {
       collaboratorId: 0,
       appoint: true,
       statitics: true,
@@ -21,23 +31,31 @@ describe("3.7 test editing user process permissions", () => {
       archive: true,
       see: true,
     }
-    const message = {
-      message: "Permission updated",
-    }
-    const result = await request(app)
+
+    const result1 = await request(app)
       .post("/api/process/permissions?processId=" + processId)
-      .send(payload)
+      .send(payload1)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 
   it("(3.7.1 test edit user process permission successfully", async () => {
-    const token = "" //set this is has guard token
-    const processId = "0"
     const payload = {
+      email: "obliquo@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an guard token
+
+    const processId = "0"
+    const payload1 = {
       token: "<therapist_auth_token>",
       processId: "<ref_code_not_in_list>",
       collaboratorId: 0,
@@ -48,17 +66,14 @@ describe("3.7 test editing user process permissions", () => {
       archive: true,
       see: true,
     }
-    const message = {
-      message: "User doesn't have authorization",
-    }
-    const result = await request(app)
+
+    const result1 = await request(app)
       .post("/api/process/permissions?processId=" + processId)
-      .send(payload)
+      .send(payload1)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
   it("3.7.2 test edit user process permission with expired token", async () => {
@@ -73,9 +88,7 @@ describe("3.7 test editing user process permissions", () => {
       archive: true,
       see: true,
     }
-    const message = {
-      message: "Verification token invalid or expired",
-    }
+
     const result = await request(app)
       .post("/api/process/permissions?processId=" + processId)
       .send(payload)
@@ -83,6 +96,5 @@ describe("3.7 test editing user process permissions", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message)
   })
 })

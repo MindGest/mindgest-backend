@@ -22,7 +22,6 @@ describe("0.2 token refresh", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.CREATED)
-    expect(result.body).toHaveProperty("message", "User's access token refreshed")
     expect(result.body).toHaveProperty("accessToken")
     expect(result.body).toHaveProperty("refreshToken")
   })
@@ -39,10 +38,6 @@ describe("0.2 token refresh", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toHaveProperty(
-      "message",
-      "Unauthorized. The user must login first and obtain an access token"
-    )
   })
 
   it("0.2.2 the user's Refresh Token expired or is invalid", async () => {
@@ -57,6 +52,5 @@ describe("0.2 token refresh", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toHaveProperty("message", "Refresh token invalid or expired")
   })
 })

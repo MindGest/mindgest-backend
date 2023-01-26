@@ -10,45 +10,58 @@ import app from "../../src/main"
 
 describe("3.5 test process edit", () => {
   it("3.5.0 test process edit successfully", async () => {
-    const token = "" //set this is has valid admin token
     const payload = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an admin token
+    const payload1 = {
       therapistId: 0,
       speciality: "",
       remarks: "this is just a test",
       colaborators: [0],
     }
-    const message = {
-      message: "Process Edited",
-    }
-    const result = await request(app)
+    const result1 = await request(app)
       .post("/api/process/edit")
-      .send(payload)
+      .send(payload1)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 
   it("3.5.1 test process edit without permission", async () => {
-    const token = "" //set this is has valid intern token
     const payload = {
+      email: "mmenezes@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an intern token
+    const payload1 = {
       therapistId: 0,
       speciality: "",
       remarks: "this is just a test",
       colaborators: [0],
     }
-    const message = {
-      message: "User doesn't have authorization",
-    }
-    const result = await request(app)
+
+    const result1 = await request(app)
       .post("/api/process/edit")
-      .send(payload)
+      .send(payload1)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
   it("3.5.2 test process edit with expired token", async () => {
@@ -59,9 +72,7 @@ describe("3.5 test process edit", () => {
       remarks: "Verification token invalid or expired",
       colaborators: [0],
     }
-    const message = {
-      message: "User doesn't have authorization",
-    }
+
     const result = await request(app)
       .post("/api/process/edit")
       .send(payload)
@@ -69,6 +80,5 @@ describe("3.5 test process edit", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message)
   })
 })

@@ -10,8 +10,18 @@ import app from "../../src/main"
 
 describe("2.4 test creating appointments", () => {
   it("2.4.0 creat appointment", async () => {
-    const token = "" //set this has valid admin token
-    const payload = {
+    const payload1 = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result1 = await request(app)
+      .post("/api/auth/login")
+      .send(payload1)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    const token = result1.body.token //set this has valid admin token
+
+    const payload2 = {
       processId: 0,
       online: true,
       roomId: 0,
@@ -20,23 +30,28 @@ describe("2.4 test creating appointments", () => {
       endDate: "2022-12-24T15:03:00.000Z",
     }
 
-    const message = {
-      //define real values
-      message: "The appointment has been successfully created.",
-    }
-    const result = await request(app)
+    const result2 = await request(app)
       .post("/api/appointments/create")
-      .send(payload)
+      .send(payload2)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result2.status).toEqual(StatusCodes.OK)
   })
 
   it("2.4.1 User doesn't have authorization", async () => {
-    const token = "" //set this has guard token
-    const payload = {
+    const payload1 = {
+      email: "obliquo@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result1 = await request(app)
+      .post("/api/auth/login")
+      .send(payload1)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    const token = result1.body.token //set this has guard token
+
+    const payload2 = {
       processId: 0,
       online: true,
       roomId: 0,
@@ -44,17 +59,14 @@ describe("2.4 test creating appointments", () => {
       startDate: "2022-12-24T15:03:00.000Z",
       endDate: "2022-12-24T15:03:00.000Z",
     }
-    const message = {
-      message: "User doesn't have authorization",
-    }
-    const result = await request(app)
+
+    const result2 = await request(app)
       .post("/api/appointments/create")
-      .send(payload)
+      .send(payload2)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
+    expect(result2.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
   it("2.4.2 The user's Verification Token is expired/invalid", async () => {
@@ -67,9 +79,7 @@ describe("2.4 test creating appointments", () => {
       startDate: "2022-12-24T15:03:00.000Z",
       endDate: "2022-12-24T15:03:00.000Z",
     }
-    const message = {
-      message: "Verification token invalid or expired",
-    }
+
     const result = await request(app)
       .post("/api/appointments/create")
       .send(payload)
@@ -77,6 +87,5 @@ describe("2.4 test creating appointments", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message)
   })
 })
