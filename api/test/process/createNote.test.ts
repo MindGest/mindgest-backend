@@ -26,7 +26,7 @@ describe("3.8 test creating notes in process", () => {
       title: "note0",
       body: "some text",
     }
-   
+
     const result1 = await request(app)
       .post("/api/process/" + processId + "/createNote")
       .send(payload1)
@@ -34,7 +34,6 @@ describe("3.8 test creating notes in process", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result1.status).toEqual(StatusCodes.OK)
-
   })
 
   it("3.8.1 User doesn't have authorization", async () => {
@@ -54,7 +53,7 @@ describe("3.8 test creating notes in process", () => {
       title: "note1",
       body: "some text",
     }
-    
+
     const result1 = await request(app)
       .post("/api/process/" + processId + "/createNote")
       .send(payload1)

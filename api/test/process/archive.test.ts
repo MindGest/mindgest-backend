@@ -12,7 +12,7 @@ describe("3.0 archive a process", () => {
   it("3.0.0 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is the same as having an expired token
     const processId = "0"
-    
+
     const result = await request(app)
       .post("/api/process/archive?processId=" + processId)
       .set("Authorization", token)
@@ -55,7 +55,7 @@ describe("3.0 archive a process", () => {
 
     const token = result.body.token //set up an admin token
     const processId = "0"
-    
+
     const result1 = await request(app)
       .post("/api/process/archive?processId=" + processId)
       .set("Authorization", token)

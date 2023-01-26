@@ -55,9 +55,8 @@ describe("3.3 activating a processes", () => {
       .set("Accept", "application/json")
 
     const token = result.body.token //set up an admin token
-  
-    const processId = "0"
 
+    const processId = "0"
 
     const result1 = await request(app)
       .post("/api/process/activate?processId=" + processId)

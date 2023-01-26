@@ -53,7 +53,7 @@ describe("3.1 obtaining process info", () => {
       .set("Accept", "application/json")
 
     const token = result.body.token //set up an intern token
-    
+
     const result1 = await request(app)
       .get("/api/process/info?processId=" + processId)
       .set("Authorization", token)
@@ -65,7 +65,7 @@ describe("3.1 obtaining process info", () => {
   it("3.1.2 The user's Verification Token is expired/invalid", async () => {
     const processId = "0"
     const token = "invalid token" //this is the same as having an expired token
-    
+
     const result = await request(app)
       .get("/api/process/info?processId=" + processId)
       .set("Authorization", token)

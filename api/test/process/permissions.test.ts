@@ -31,7 +31,7 @@ describe("3.7 test editing user process permissions", () => {
       archive: true,
       see: true,
     }
-    
+
     const result1 = await request(app)
       .post("/api/process/permissions?processId=" + processId)
       .send(payload1)
@@ -54,7 +54,6 @@ describe("3.7 test editing user process permissions", () => {
 
     const token = result.body.token //set up an guard token
 
-
     const processId = "0"
     const payload1 = {
       token: "<therapist_auth_token>",
@@ -67,7 +66,7 @@ describe("3.7 test editing user process permissions", () => {
       archive: true,
       see: true,
     }
-   
+
     const result1 = await request(app)
       .post("/api/process/permissions?processId=" + processId)
       .send(payload1)
@@ -89,7 +88,7 @@ describe("3.7 test editing user process permissions", () => {
       archive: true,
       see: true,
     }
-    
+
     const result = await request(app)
       .post("/api/process/permissions?processId=" + processId)
       .send(payload)

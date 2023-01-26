@@ -54,7 +54,7 @@ describe("3.9 test listing notes in process", () => {
 
     const token = result.body.token //set up an guard token
     const processId = "0"
-    
+
     const result1 = await request(app)
       .post("/api/process/" + processId + "/createNote")
       .set("Authorization", token)

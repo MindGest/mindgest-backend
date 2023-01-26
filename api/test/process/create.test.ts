@@ -44,7 +44,7 @@ describe("3.4 test process creation", () => {
       speciality: "string",
       remarks: "string",
     }
-   
+
     const result1 = await request(app)
       .post("/api/process/create")
       .send(payload1)
@@ -72,7 +72,7 @@ describe("3.4 test process creation", () => {
       speciality: "string",
       remarks: "string",
     }
-   
+
     const result1 = await request(app)
       .post("/api/process/create")
       .send(payload1)

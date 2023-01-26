@@ -53,7 +53,7 @@ describe("3.6 test getting all appointments of a process", () => {
 
     const token = result.body.token //set up an intern token
     const processId = "0"
-    
+
     const result1 = await request(app)
       .get("/api/process/appointments?processId=" + processId)
       .set("Authorization", token)
