@@ -13,7 +13,7 @@ describe("0.5 test forgot password", () => {
     const payload = {
       email: "email@student.dei.uc.pt",
     } // no callback so token comes in body and is not sent by email
-    
+
     const result = await request(app)
       .post("/api/auth/forgot-password")
       .send(payload)

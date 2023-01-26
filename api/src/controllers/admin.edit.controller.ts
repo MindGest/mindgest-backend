@@ -141,7 +141,7 @@ export async function fetchUserProfileInfo(req: Request, res: Response) {
       `PROFILE-INFO [user-id: ${user.id}] => Locating and retrieving user info from the database...`
     )
     const userProps = await fetchPersonProperties(user.id)
-    const person = await prisma.person.findUnique({
+    let usr = await prisma.person.findUnique({
       where: { id: user.id },
       include: {
         therapist:
@@ -150,6 +150,7 @@ export async function fetchUserProfileInfo(req: Request, res: Response) {
             : false,
       },
     })
+    const person = { role: userProps.userRole, ...usr }
 
     // Return information
     assert(person != null)
