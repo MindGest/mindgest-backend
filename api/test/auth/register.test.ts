@@ -28,13 +28,14 @@ describe("0.0 Test registration", () => {
 
   it("0.0.1 test - Repeat registration", async () => {
     const payload = {
-      role: "admin",
       name: "Sara Brito",
-      email: "sarab@student.dei.uc",
+      email: "sarab@student.dei.uc.pt",
       password: "password1234",
-      address: "Ferreira Borges, n 10",
-      birthDate: "1988-11-21T0:00:00.000Z",
+      address: "Ferreira Borges, Nº10",
+      birthDate: "1988-11-21T00:00:00.000Z",
       phoneNumber: 919191000,
+      taxNumber: 238218312,
+      role: "admin",
     }
 
     await request(app)
