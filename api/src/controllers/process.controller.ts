@@ -628,7 +628,6 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
   }
 }
 
-//Nao sei bem oq este é suposto devolver tbh
 export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
     var decoded = res.locals.token
@@ -661,12 +660,24 @@ export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Re
         },
       })
 
+      let date = apointment?.slot_start_date
+      const formattedDate = date?.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+
+      let receipt = await prisma.receipt.findFirst({
+        where:{
+          appointment_slot_id: apointment?.slot_id
+        }
+      })
+
       infoAppointments.push({
-        online: apointment?.online,
-        start_date: apointment?.slot_start_date,
-        end_date: apointment?.slot_end_date,
-        room: room?.name,
-        type: type?.type,
+        data: formattedDate,
+        estado: receipt?.payed ? "Pago" : "Por Pagar",
+        referencia: receipt != null ? receipt.ref : "",
+        valor: type?.price
       })
     }
 
