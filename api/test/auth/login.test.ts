@@ -32,7 +32,7 @@ describe("0.1 the user does not exist", () => {
       .expect(StatusCodes.UNAUTHORIZED)
   })
 
-  it("0.1.2 Should login only if verified", async () => {
+  it("0.1.2 does not login cause user has not been verified", async () => {
     const payload = {
       email: "johndoe@student.dei.uc.pt",
       password: "password1234",
@@ -40,6 +40,41 @@ describe("0.1 the user does not exist", () => {
     const result = await request(app)
       .post("/api/auth/login")
       .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
+  }) //user has to be verified and it has to be approved by a therapist or admin b4 this works
+
+  it("0.1.3 verify user first and then login", async () => {
+    const payload = {
+      "email": "johndoe@student.dei.uc.pt", 
+    } // no callback so token comes in body and is not sent by email
+    const verificationResult = await request(app)
+      .post("/api/auth/account-verification")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const verificationToken = verificationResult.body.token
+
+
+    const payload1 ={
+      token: verificationToken
+    }
+    const verifyResult = await request(app)
+      .post("/api/auth/account-verification")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+
+    const payload2 = {
+      email: "johndoe@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload2)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.OK)
