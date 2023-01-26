@@ -132,18 +132,25 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
           },
         })
 
+        let date = receipt?.datetime
+        const formattedDate = date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
+
         listOfReceipts.push({
           patientName: patient?.name,
-          mainTherapist: mainTherapistObject?.name,
-          ref: receipt?.ref,
-          date: receipt?.datetime,
+          therapistListing: mainTherapistObject?.name,
+          appointmentCode: receipt?.ref,
+          appointmentDate: formattedDate,
           nif: patient?.tax_number,
           sns: moreInfoPatient?.health_number,
-          morada: patient?.address,
+          address: patient?.address,
           email: patient?.email,
-          estado: isDone,
-          custo: price?.price,
-          pago: receipt.payed,
+          state: isDone,
+          cost: price?.price,
+          paid: receipt.payed,
         })
       }
     } else {

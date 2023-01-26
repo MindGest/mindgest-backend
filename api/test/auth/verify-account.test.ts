@@ -24,12 +24,12 @@ describe("0.3 if an account is already verified", () => {
     const payload1 = {
       token: token,
     }
-    const result = await request(app)
+    const result1 = await request(app)
       .post("/api/auth/verify-account")
       .send(payload1)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 
   it("0.3.1 the therapist account has already been verified", async () => {
@@ -47,12 +47,12 @@ describe("0.3 if an account is already verified", () => {
     const payload1 = {
       token: token,
     }
-    const result = await request(app)
+    const result1 = await request(app)
       .post("/api/auth/verify-account")
       .send(payload1)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 
   it("0.3.2 the security account has already been verified", async () => {
@@ -70,12 +70,12 @@ describe("0.3 if an account is already verified", () => {
     const payload1 = {
       token: token,
     }
-    const result = await request(app)
+    const result1 = await request(app)
       .post("/api/auth/verify-account")
       .send(payload1)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 
   it("0.3.3 the accountant account has already been verified", async () => {
@@ -93,12 +93,12 @@ describe("0.3 if an account is already verified", () => {
     const payload1 = {
       token: token,
     }
-    const result = await request(app)
+    const result1 = await request(app)
       .post("/api/auth/verify-account")
       .send(payload1)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 
   it("0.3.4 the intern account has already been verified", async () => {
@@ -116,12 +116,12 @@ describe("0.3 if an account is already verified", () => {
     const payload1 = {
       token: token,
     }
-    const result = await request(app)
+    const result1 = await request(app)
       .post("/api/auth/verify-account")
       .send(payload1)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 
   it("0.3.5 with invalid token", async () => {

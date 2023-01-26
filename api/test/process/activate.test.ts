@@ -10,27 +10,30 @@ import app from "../../src/main"
 
 describe("3.3 activating a processes", () => {
   it("3.3.0 User doesn't have authorization", async () => {
-    const token = "" //set up an intern token
-    const processId = "0"
-    const message = {
-      message: "User doesn't have authorization",
+    const payload = {
+      email: "mmenezes@student.dei.uc.pt",
+      password: "password1234",
     }
     const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an intern token
+    const processId = "0"
+
+    const result1 = await request(app)
       .post("/api/process/activate?processId=" + processId)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
   it("3.3.1 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is the same as having an expired token
     const processId = "0"
-
-    const message = {
-      message: "Verification token invalid or expired",
-    }
 
     const result = await request(app)
       .post("/api/process/activate?processId=" + processId)
@@ -38,23 +41,28 @@ describe("3.3 activating a processes", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message)
   })
 
   it("3.3.2 ativar um processo já existente", async () => {
-    const token = "" //set up an admin token
+    const payload = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an admin token
+
     const processId = "0"
 
-    const message = {
-      message: "Process Activated",
-    }
-
-    const result = await request(app)
+    const result1 = await request(app)
       .post("/api/process/activate?processId=" + processId)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 })

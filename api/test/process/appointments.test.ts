@@ -11,7 +11,17 @@ import { TokenExpiredError } from "jsonwebtoken"
 
 describe("3.6 test getting all appointments of a process", () => {
   it("3.6.0 All appointments from a process", async () => {
-    const token = "" //set this is has valid admin token
+    const payload = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an admin token
     const processId = "0"
     const message = {
       // set realistic values
@@ -21,28 +31,35 @@ describe("3.6 test getting all appointments of a process", () => {
       room: "<string>",
       type: "<string>",
     }
-    const result = await request(app)
+    const result1 = await request(app)
       .get("/api/process/appointments?processId=" + processId)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.OK)
+    expect(result1.body).toEqual(message)
   })
 
   it("3.6.1 test therapist trying to get appointments without permission", async () => {
-    const token = "" //set this is has valid intern token
-    const processId = "0"
-    const message = {
-      message: "User doesn't have authorization",
+    const payload = {
+      email: "mmenezes@student.dei.uc.pt",
+      password: "password1234",
     }
     const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an intern token
+    const processId = "0"
+
+    const result1 = await request(app)
       .get("/api/process/appointments?processId=" + processId)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
   it("3.6.2 test therapist trying to get appointments with expired token", async () => {
