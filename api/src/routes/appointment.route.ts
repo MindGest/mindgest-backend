@@ -25,6 +25,18 @@ appointment.get("/listLastTerminated", (req: Request, res: Response) => {
   controller.lastTerminatedAppointments(req, res)
 })
 
+appointment.get("/listAppointmentsOfTheDayGuard", (req: Request, res: Response) => {
+  controller.getAppointmentsOfTheDayGuard(req, res)
+})
+
+appointment.get("/listAppointmentsOfTheDayTherapist", (req: Request, res: Response) => {
+  controller.getAppointmentsOfTheDayTherapist(req, res)
+})
+
+appointment.get("/listAppointmentsOfTheDayIntern", (req: Request, res: Response) => {
+  controller.getAppointmentsOfTheDayIntern(req, res)
+})
+
 appointment.put("/archive", (req: Request, res: Response) => {
   controller.archiveAppointment(req, res)
 })
