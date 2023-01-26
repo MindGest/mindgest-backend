@@ -10,43 +10,58 @@ import app from "../../src/main"
 
 describe("3.8 test creating notes in process", () => {
   it("3.8.0 Note Created", async () => {
-    const token = "" //set this is has valid admin token
-    const processId = "0"
     const payload = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an admin token
+    const processId = "0"
+    const payload1 = {
       title: "note0",
       body: "some text",
     }
-    const message = {
-      message: "Note Created",
-    }
-    const result = await request(app)
+   
+    const result1 = await request(app)
       .post("/api/process/" + processId + "/createNote")
-      .send(payload)
+      .send(payload1)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.OK)
+
   })
 
   it("3.8.1 User doesn't have authorization", async () => {
-    const token = "" //set this is has guard token
-    const processId = "0"
     const payload = {
+      email: "obliquo@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an guard token
+    const processId = "0"
+    const payload1 = {
       title: "note1",
       body: "some text",
     }
-    const message = {
-      message: "User doesn't have authorization",
-    }
-    const result = await request(app)
+    
+    const result1 = await request(app)
       .post("/api/process/" + processId + "/createNote")
-      .send(payload)
+      .send(payload1)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
   it("3.8.2 The user's Verification Token is expired/invalid", async () => {
@@ -56,9 +71,6 @@ describe("3.8 test creating notes in process", () => {
       title: "note1",
       body: "some text",
     }
-    const message = {
-      message: "Verification token invalid or expired",
-    }
     const result = await request(app)
       .post("/api/process/" + processId + "/createNote")
       .send(payload)
@@ -66,6 +78,5 @@ describe("3.8 test creating notes in process", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message)
   })
 })

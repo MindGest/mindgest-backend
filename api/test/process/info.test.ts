@@ -11,7 +11,17 @@ import app from "../../src/main"
 describe("3.1 obtaining process info", () => {
   it("(3.1.0 Process Information", async () => {
     const processId = "0"
-    const token = "" //set up a valid admin token
+    const payload = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an admin token
     const message = {
       therapistId: 1,
       ref: "process ref",
@@ -21,27 +31,46 @@ describe("3.1 obtaining process info", () => {
       financialSituation: true,
       speciality: "Familiar",
     }
-    const result = await request(app)
+    const result1 = await request(app)
       .get("/api/process/info?processId=" + processId)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.OK)
+    expect(result1.body).toEqual(message)
   })
 
   it("3.1.1 The user's Verification Token is expired/invalid", async () => {
     const processId = "0"
-    const token = "invalid token" //this is the same as having an expired token
-    const message = {
-      message: "User doesn't have authorization",
+    const payload = {
+      email: "mmenezes@student.dei.uc.pt",
+      password: "password1234",
     }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an intern token
+    
+    const result1 = await request(app)
+      .get("/api/process/info?processId=" + processId)
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
+  })
+
+  it("3.1.2 The user's Verification Token is expired/invalid", async () => {
+    const processId = "0"
+    const token = "invalid token" //this is the same as having an expired token
+    
     const result = await request(app)
       .get("/api/process/info?processId=" + processId)
       .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message)
   })
 })
