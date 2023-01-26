@@ -1,4 +1,3 @@
-import { Request, Response } from "express"
 import { Router } from "express"
 
 import controller from "../controllers/profile.controller"

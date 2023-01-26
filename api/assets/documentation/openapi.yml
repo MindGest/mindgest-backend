@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  description: This is the Mindgest Rest API Documentation
-  title: Mindgest API Documentation
+  description: This is the MindGest Rest API Documentation
+  title: MindGest API Documentation
   contact:
     email: gp2223@gmail.com
   license:
@@ -27,28 +27,33 @@ tags:
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
+  - name: Email
+    description: Email Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
   - name: User
-    description: User Managment Endpoints
+    description: User Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
   - name: Appointment
-    description: Appointment Managment Endpoints
+    description: Appointment Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
   - name: Process
-    description: Process Managment Endpoints
+    description: Process Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
   - name: Room
-    description: Room Managment Endpoints
+    description: Room Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
-  - name: Speciality
-    description: Speciality Managment Endpoints
+  - name: Specialty
+    description: Specialty Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
@@ -62,7 +67,7 @@ paths:
     get:
       tags:
         - General
-      summary: Mindgest API Documentation Web Page
+      summary: MindGest API Documentation Web Page
       description: Fetch the Swagger UI version of the documentation (static website)
       operationId: docs
       responses:
@@ -76,7 +81,7 @@ paths:
     get:
       tags:
         - Documentation
-      summary: Mindgest API Documentation Web Page
+      summary: MindGest API Documentation Web Page
       description: Fetch the Swagger UI version of the documentation (static website)
       operationId: docs
       responses:
@@ -88,7 +93,7 @@ paths:
     get:
       tags:
         - Documentation
-      summary: Mindgest API Documentation in JSON Format
+      summary: MindGest API Documentation in JSON Format
       operationId: docs-json
       description: Fetch the Swagger UI JSON version of the documentation
       responses:
@@ -104,7 +109,7 @@ paths:
       summary: Register
       tags:
         - Authentication
-      description: User Eegistration Enpoint
+      description: User Registration Endpoint
       operationId: register
       requestBody:
         $ref: "#/components/requestBodies/Register"
@@ -120,7 +125,7 @@ paths:
       summary: Login
       tags:
         - Authentication
-      description: User Authentication Enpoint
+      description: User Authentication Endpoint
       operationId: login
       requestBody:
         $ref: "#/components/requestBodies/Login"
@@ -167,40 +172,6 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /auth/account-verification:
-    post:
-      summary: Send Account Verification Email
-      tags:
-        - Authentication
-      description: |
-        Send the user's account verification token by email together with a 
-        callback to the frontend of the application, to which the user
-        should be redirected when the verification is successful, if 
-        such callback is provided.
-      operationId: account-verification-email
-      requestBody:
-        $ref: "#/components/requestBodies/AccountVerification"
-      responses:
-        "400":
-          $ref: "#/components/responses/UserNotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-  /auth/forgot-password:
-    post:
-      summary: Send Password Reset Email
-      tags:
-        - Authentication
-      description: |
-        Send the user's account password reset token by email together with a 
-        callback to the frontend of the application, to which the user should
-        be redirected for password reset, if such callback is provided.
-      requestBody:
-        $ref: "#/components/requestBodies/ForgotPassword"
-      responses:
-        "400":
-          $ref: "#/components/responses/UserNotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
   /auth/reset-password:
     post:
       summary: Reset Password
@@ -216,6 +187,50 @@ paths:
           $ref: "#/components/responses/PasswordResetTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /email/account-verification:
+    post:
+      summary: Send Account Verification Email
+      tags:
+        - Email
+      description: |
+        Send the user's account verification token by email together with a 
+        callback to the frontend of the application, to which the user
+        should be redirected when the verification is successful, if 
+        such callback is provided.
+      operationId: account-verification-email
+      requestBody:
+        $ref: "#/components/requestBodies/AccountVerification"
+      responses:
+        "400":
+          $ref: "#/components/responses/UserNotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /email/forgot-password:
+    post:
+      summary: Send Password Reset Email
+      tags:
+        - Email
+      description: |
+        Send the user's account password reset token by email together with a 
+        callback to the frontend of the application, to which the user should
+        be redirected for password reset, if such callback is provided.
+      requestBody:
+        $ref: "#/components/requestBodies/ForgotPassword"
+      responses:
+        "400":
+          $ref: "#/components/responses/UserNotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /email/send-email:
+    post:
+      summary: Send Generic Email
+      tags:
+        - Email
+      description: Send a generic email to the user
+      responses:
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /process/archive:
     post:
       summary: Archives process
@@ -267,12 +282,13 @@ paths:
           name: active
           schema:
             type: string
-          description: \"true\" or \"false\", any other will cause erro, only lists active processes
+          description:
+            \"true\" or \"false\", any other will cause error, only lists active processes
         - in: query
-          name: speciality
+          name: specialty
           schema:
             type: string
-          description: name of speciality, if speciality doesn't exist an error will occur
+          description: name of specialty, if specialty doesn't exist an error will occur
       responses:
         "200":
           $ref: "#/components/responses/ProcessList"
@@ -307,7 +323,7 @@ paths:
       tags:
         - Process
       description: Creates new process
-      parameters:
+      # parameters:
       requestBody:
         $ref: "#/components/requestBodies/ProcessCreate"
       responses:
@@ -590,7 +606,7 @@ paths:
           name: specialityId
           schema:
             type: string
-          description: id of speciality to filter
+          description: id of specialty to filter
         - in: path
           name: processId
           schema:
@@ -607,10 +623,10 @@ paths:
           $ref: "#/components/responses/InternalServerError"
   /speciality/list:
     get:
-      summary: Returns a list with all the specialities in the database.
+      summary: Returns a list with all the specialties in the database.
       tags:
         - Speciality
-      description: Returns a list with all the specialities in the database.
+      description: Returns a list with all the specialties in the database.
       responses:
         "200":
           $ref: "#/components/responses/SpecialitiesListed"
@@ -622,10 +638,10 @@ paths:
           $ref: "#/components/responses/InternalServerError"
   /speciality/create:
     post:
-      summary: Creates a new speciality.
+      summary: Creates a new specialty.
       tags:
         - Speciality
-      description: Creates a new speciality.
+      description: Creates a new specialty.
       requestBody:
         content:
           application/json:
@@ -634,7 +650,7 @@ paths:
               properties:
                 speciality:
                   type: string
-                  description: name of the speciality.
+                  description: name of the specialty.
                   example: Especialidade-A
       responses:
         "200":
@@ -1380,7 +1396,7 @@ components:
                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiYWRtaW4iOmZhbHNlLCJyb2xlIjoiaW50ZXJuIiwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNjg5NjF9.xMacrxoiqpUg6frCEYCqNnSHedaI1QYiml6RgKmYeL4
               refreshToken:
                 type: string
-                description: The refresh token to be used for adquiring a new access token
+                description: The refresh token to be used for acquiring a new access token
                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwZXJzb24iOjIsInNlc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2NjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
     UserLoggedOut:
       description: Refresh request unauthorized.

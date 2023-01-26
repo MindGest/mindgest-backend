@@ -60,7 +60,7 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
       extern: body.extern,
       license: body.license,
       person: {
-        update: {
+        update: { 
           active: body.active,
           address: body.address,
           name: body.name,

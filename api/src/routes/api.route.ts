@@ -15,6 +15,7 @@ import RoomsRouter from "./rooms.route"
 import StatisticsRouter from "./statistics.route"
 import SpecialityRouter from "./speciality.route"
 import TherapistRouter from "./therapist.route"
+import EmailRouter from "./email.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
@@ -48,6 +49,7 @@ api.use(middleware.bodyParserErrorValidator())
 
 // Routes
 api.use("/auth", AuthRouter)
+api.use("/email", EmailRouter)
 api.use("/user", UserRouter)
 api.use("/docs", DocsRouter)
 api.use("/process", ProcessRouter)

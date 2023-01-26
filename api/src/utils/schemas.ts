@@ -344,6 +344,14 @@ export const SpecialityCreateSchema = z.object({
   }),
 })
 
+export const EmailSchema = z.object({
+  body: z.object({
+    email: z.string(),
+    subject: z.string(),
+    body: z.string(),
+  }),
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -383,4 +391,5 @@ export default {
   RoomCreate,
   QueryStatistics,
   SpecialityCreateSchema,
+  EmailSchema,
 }

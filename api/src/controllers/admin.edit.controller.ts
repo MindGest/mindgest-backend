@@ -59,7 +59,6 @@ export async function uploadUserProfilePicture(req: Request, res: Response) {
     logger.debug(
       `UPLOAD [user-id: ${id}] => Saving user's [user-id: ${user.id}] profile picture & updating database`
     )
-
     const picture = req.file
     if (picture === null || picture === undefined) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -151,6 +150,7 @@ export async function fetchUserProfileInfo(req: Request, res: Response) {
       },
     })
     const person = { role: userProps.userRole, ...usr }
+    console.log(person)
 
     // Return information
     assert(person != null)
