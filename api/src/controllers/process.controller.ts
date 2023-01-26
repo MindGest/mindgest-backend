@@ -668,16 +668,16 @@ export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Re
       })
 
       let receipt = await prisma.receipt.findFirst({
-        where:{
-          appointment_slot_id: apointment?.slot_id
-        }
+        where: {
+          appointment_slot_id: apointment?.slot_id,
+        },
       })
 
       infoAppointments.push({
         data: formattedDate,
         estado: receipt?.payed ? "Pago" : "Por Pagar",
         referencia: receipt != null ? receipt.ref : "",
-        valor: type?.price
+        valor: type?.price,
       })
     }
 

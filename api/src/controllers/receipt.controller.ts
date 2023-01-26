@@ -313,9 +313,9 @@ export async function pay(req: Request, res: Response) {
     var receiptId = req.params.receiptId
 
     let receipt = await prisma.receipt.findFirst({
-      where:{
-        ref:receiptId
-      }
+      where: {
+        ref: receiptId,
+      },
     })
 
     await prisma.receipt.update({
@@ -337,9 +337,9 @@ export async function info(req: Request, res: Response) {
     var receiptId = req.params.processId
 
     var receipt = await prisma.receipt.findFirst({
-      where:{
-        ref:receiptId
-      }
+      where: {
+        ref: receiptId,
+      },
     })
     var appointment = await prisma.appointment.findUnique({
       where: {
@@ -431,7 +431,6 @@ export async function info(req: Request, res: Response) {
       year: "numeric",
     })
 
-
     res.status(StatusCodes.OK).json({
       name: patient?.name,
       tax_number: patient?.tax_number,
@@ -441,7 +440,7 @@ export async function info(req: Request, res: Response) {
       custo: price?.price,
       paid: receipt?.payed,
       responsavel: mainTherapistObject?.name,
-      data: formattedDate
+      data: formattedDate,
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -450,11 +449,9 @@ export async function info(req: Request, res: Response) {
   }
 }
 
-
-
 export default {
   list,
   create,
   pay,
-  info
+  info,
 }

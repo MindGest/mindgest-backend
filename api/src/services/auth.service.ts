@@ -14,7 +14,7 @@ const NODE_ENV = String(process.env.NODE_ENV)
 
 export function createAccessToken(payload: AccessToken) {
   return signJWT(payload, JWT_ACCESS_SECRET, {
-    expiresIn: "15m", 
+    expiresIn: "15m",
   })
 }
 
