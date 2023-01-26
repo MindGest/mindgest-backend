@@ -334,7 +334,7 @@ export async function resetPassword(req: Request<{}, {}, ResetPasswordBody>, res
         message: "Invalid Verification Token",
       })
     }
-    
+
     const person = await prisma.person.findUnique({
       where: { id: decoded.person },
     })
