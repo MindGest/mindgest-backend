@@ -1,11 +1,12 @@
 FROM node:18
 
-RUN apt update -y
-RUN apt install curl -y
+LABEL MAINTAINER="Pedro Rodrigues <pedror@student.dei.uc.pt>"
+LABEL VERSION="0.1.0"
 
-WORKDIR /usr/src/mindgest
+RUN apt-get update -y
+RUN apt-get install curl -y
 
-COPY ./package*.json ./ 
+COPY package*.json ./
 
 RUN npm install -g npm --silent
 RUN npm install --silent
@@ -18,4 +19,5 @@ RUN npm run build
 EXPOSE 8080 
 
 ENTRYPOINT ["/bin/sh", "-c" , "npx prisma db push --skip-generate && npm start"]
+
 

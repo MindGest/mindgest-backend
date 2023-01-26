@@ -7,57 +7,70 @@ import { describe, expect, it } from "@jest/globals"
 dotenv.config()
 
 import app from "../../src/main"
+import { TokenExpiredError } from "jsonwebtoken"
 
-describe("(y+5).0 test getters for listing active processes", () => {
-  it("(y+5).0.0 test therapist trying to get appointments successfully", async () => {
+describe("3.6 test getting all appointments of a process", () => {
+  it("3.6.0 All appointments from a process", async () => {
     const payload = {
-      token: "<therapist_auth_token>",
-      processId: "<refCode>",
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
     }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an admin token
+    const processId = "0"
     const message = {
+      // set realistic values
       online: "<online_boolean>",
       start_date: "<string>",
       end_date: "<string/timestamp>",
       room: "<string>",
       type: "<string>",
     }
+    const result1 = await request(app)
+      .get("/api/process/appointments?processId=" + processId)
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result1.status).toEqual(StatusCodes.OK)
+    expect(result1.body).toEqual(message)
+  })
+
+  it("3.6.1 test therapist trying to get appointments without permission", async () => {
+    const payload = {
+      email: "mmenezes@student.dei.uc.pt",
+      password: "password1234",
+    }
     const result = await request(app)
-      .get("/api/process/appointments")
+      .post("/api/auth/login")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
-  })
 
-  it("(y+5).1.0 test therapist trying to get appointments without permission", async () => {
-    const payload = {
-      token: "<therapist_auth_token>",
-      processId: "<ref_code_not_in_list>",
-    }
-    const message = {
-      message: "User doesn't have authorization",
-    }
-    const result = await request(app)
-      .get("/api/process/appointments")
-      .send(payload)
+    const token = result.body.token //set up an intern token
+    const processId = "0"
+
+    const result1 = await request(app)
+      .get("/api/process/appointments?processId=" + processId)
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.UNAUTHORIZED)
-    expect(result.body).toEqual(message)
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
-  it("(y+5).2.0 test therapist trying to get appointments with expired token", async () => {
-    const payload = {
-      token: "<expired_token>",
-      processId: "<refCode>",
-    }
+  it("3.6.2 test therapist trying to get appointments with expired token", async () => {
+    const token = "invalid token" //this is equivalent to an expired token
+    const processId = "0"
     const message = {
       message: "Verification token invalid or expired",
     }
     const result = await request(app)
-      .get("/api/process/appointments")
-      .send(payload)
+      .get("/api/process/appointments?processId=" + processId)
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)

@@ -8,38 +8,59 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("y.0 check if process is archived correctly", () => {
-  it("y.0.0 archive a process correctly", async () => {
-    const payload = {
-      token: "<token>",
-      processId: 0,
-    }
-    const message = {
-      message: "Process Archived",
-    }
+describe("3.0 archive a process", () => {
+  it("3.0.0 The user's Verification Token is expired/invalid", async () => {
+    const token = "invalid token" //this is the same as having an expired token
+    const processId = "0"
+
     const result = await request(app)
-      .post("/api/process/archive")
-      .send(payload)
+      .post("/api/process/archive?processId=" + processId)
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result.status).toEqual(StatusCodes.FORBIDDEN)
   })
 
-  it("y.1.0 Try to archive unexisting process", async () => {
+  it("3.0.1 User is not authorized", async () => {
     const payload = {
-      token: "<token>",
-      processId: null,
-    }
-    const message = {
-      message: "An internal error has occurred while processing the request",
+      email: "mmenezes@student.dei.uc.pt",
+      password: "password1234",
     }
     const result = await request(app)
-      .post("/api/process/archive")
+      .post("/api/auth/login")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
-    expect(result.body).toEqual(message)
+
+    const token = result.body.token //set up an intern token
+    const processId = "0"
+    const result1 = await request(app)
+      .post("/api/process/archive?processId=" + processId)
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
+  })
+
+  it("3.0.2 Process Archived", async () => {
+    const payload = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an admin token
+    const processId = "0"
+
+    const result1 = await request(app)
+      .post("/api/process/archive?processId=" + processId)
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 })

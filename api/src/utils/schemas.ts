@@ -8,9 +8,7 @@ export enum User {
   GUARD = "guard",
 }
 
-export const DateSchema = z.preprocess((arg) => {
-  if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
-}, z.date())
+export const DateSchema = z.coerce.date()
 
 export const PersonSchema = z.object({
   name: z.string(),

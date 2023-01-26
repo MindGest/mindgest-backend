@@ -6,41 +6,85 @@ services:
     container_name: mindgest-db
     hostname: db
     restart: unless-stopped
-    ports:
-      - 5432:5432
     env_file:
       - .env
+    ports:
+      - ${POSTGRES_PORT}:5432
     volumes:
       - ./data/:/var/lib/postgresql/data/
     healthcheck:
-      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'" ]
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
+        ]
       interval: 10s
       timeout: 3s
       retries: 3
+    networks:
+      - mindgest-prod
+    profiles:
+      - prod
   api:
     image: mindgest-api:latest
     container_name: mindgest-api
     hostname: api
-    build: ../api/
+    build:
+      context: ../api/
+      dockerfile: Dockerfile
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
-    ports:
-      - 8080:8080
     env_file:
-      - .env
       - ../api/.env
+      - .env
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public"
       HOST: 0.0.0.0
       PORT: 8080
+    ports:
+      - 8080:8080
     links:
       - db
     volumes:
       - ../api:/usr/src/mindgest
     healthcheck:
-      test: [ "CMD-SHELL", "sh -c 'curl --fail http://localhost:8080/api/healthcheck || exit 1'" ]
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'curl --fail http://localhost:8080/api/healthcheck || exit 1'"
+        ]
       interval: 10s
       timeout: 3s
       retries: 3
+    networks:
+      - mindgest-prod
+    profiles:
+      - prod
+  db-test:
+    image: postgres:14.5-alpine
+    container_name: mindgest-db-test
+    hostname: test-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_TEST_PORT}:5432
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles:
+      - dev
+    networks:
+      - mindgest-dev
+
+networks:
+  mindgest-dev:
+  mindgest-prod:

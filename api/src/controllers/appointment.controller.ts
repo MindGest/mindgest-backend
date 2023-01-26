@@ -3,7 +3,6 @@ import prisma from "../utils/prisma"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
-
 import {
   AppointmentArchive,
   AppointmentCreate,
@@ -17,7 +16,6 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
   /**
    * Returns all the appointments of a therapist if a valid id is given, or all if the id value is "-1"
    */
-
 
   var decodedToken = res.locals.token
 

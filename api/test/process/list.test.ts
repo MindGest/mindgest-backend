@@ -8,62 +8,69 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("(y+2).0 test getters for listing processes", () => {
-  it("(y+2).0.0 test user trying to list processes successfully", async () => {
+describe("3.2 test getters for listing processes", () => {
+  it("3.2.0 test user trying to list processes successfully", async () => {
+    const processId = "0"
     const payload = {
-      token: "<token>",
-    }
-    const message = {
-      list: {
-        therapistListing: ["Marta Santos"],
-        patientName: "Ricardo Maria",
-        refCode: "23fdfd4e3",
-        nextAppointment: "string",
-      },
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
     }
     const result = await request(app)
-      .get("/api/process/list")
+      .post("/api/auth/login")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+
+    const token = result.body.token //set up an admin token
+    const message = {
+      list: [
+        {
+          therapistListing: ["Marta Santos"],
+          patientName: "Ricardo Maria",
+          refCode: "23fdfd4e3",
+          nextAppointment: "string",
+        },
+      ],
+    }
+    const result1 = await request(app)
+      .get("/api/process/list?active=true&especiality=Esp-A")
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result1.status).toEqual(StatusCodes.OK)
+    expect(result1.body).toEqual(message)
   })
 
-  it("(y+2).1.0 test user trying to list processes unsuccessfully", async () => {
+  it("3.2.2 test user trying to get empty process list", async () => {
+    const processId = "0"
     const payload = {
-      token: "<token>",
-    }
-    const message = {
-      message: "An internal error has occurred while processing the request",
+      email: "obliquo@student.dei.uc.pt",
+      password: "password1234",
     }
     const result = await request(app)
-      .get("/api/process/list")
+      .post("/api/auth/login")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
-    expect(result.body).toEqual(message)
+
+    const token = result.body.token //set up an guard token
+
+    const result1 = await request(app)
+      .get("/api/process/list?active=true&speciality=Esp-A")
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result1.status).toEqual(StatusCodes.UNAUTHORIZED)
   })
 
-  it("(y+2).2.0 test user trying to get empty process list", async () => {
-    const payload = {
-      token: "<token>",
-    }
-    const message = {
-      list: {
-        therapistListing: [],
-        patientName: "",
-        refCode: "",
-        nextAppointment: "",
-      },
-    }
+  it("3.2.2 test user trying to get empty process list", async () => {
+    const token = "Invalid token" //this is the same as having an expired token
+
     const result = await request(app)
-      .get("/api/process/list")
-      .send(payload)
+      .get("/api/process/list?active=true&speciality=Esp-A")
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
+    expect(result.status).toEqual(StatusCodes.FORBIDDEN)
   })
 })

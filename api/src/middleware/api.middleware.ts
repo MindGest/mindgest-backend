@@ -13,6 +13,7 @@ export function requestValidator(schema: AnyZodObject) {
         query: req.query,
       })
     } catch (error) {
+      console.log(error)
       if (error instanceof ZodError) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           message: "Malformed Request",

@@ -8,64 +8,77 @@ dotenv.config()
 
 import app from "../../src/main"
 
-describe("(y+8).0 test process creation", () => {
-  it("(y+8).0.0 test process creation successfully", async () => {
+describe("3.4 test process creation", () => {
+  it("3.4.0 The user's Verification Token is expired/invalid", async () => {
+    const token = "invalid token" //this is the same as having an expired token
     const payload = {
-      token: "<auth_token>",
       patientId: 0,
       therapistId: 0,
       speciality: "string",
       remarks: "string",
     }
-    const message = {
-      message: "Permission Created",
-    }
     const result = await request(app)
       .post("/api/process/create")
       .send(payload)
-      .set("Content-Type", "application/json")
-      .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.OK)
-    expect(result.body).toEqual(message)
-  })
-
-  it("(y+8).1.0 test process creation with expired token", async () => {
-    const payload = {
-      token: "<expired_token>",
-      patientId: 0,
-      therapistId: 0,
-      speciality: "string",
-      remarks: "string",
-    }
-    const message = {
-      message: "Verification token invalid or expired",
-    }
-    const result = await request(app)
-      .post("/api/process/create")
-      .send(payload)
+      .set("Authorization", token)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
-    expect(result.body).toEqual(message)
   })
 
-  it("(y+8).2.0 test process creation unsuccessfully", async () => {
+  it("3.4.1 user unauthorized", async () => {
     const payload = {
-      token: "<auth_token>",
+      email: "mmenezes@student.dei.uc.pt",
+      password: "password1234",
+    }
+    const result = await request(app)
+      .post("/api/auth/login")
+      .send(payload)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+
+    const token = result.body.token //set up an intern token
+    const payload1 = {
       patientId: 0,
       therapistId: 0,
       speciality: "string",
       remarks: "string",
     }
-    const message = {
-      message: "An internal error has occurred while processing the request",
+
+    const result1 = await request(app)
+      .post("/api/process/create")
+      .send(payload1)
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result1.status).toEqual(StatusCodes.OK)
+  })
+
+  it("3.4.2 process Created", async () => {
+    const payload = {
+      email: "sarab@student.dei.uc.pt",
+      password: "password1234",
     }
     const result = await request(app)
-      .post("/api/process/create")
+      .post("/api/auth/login")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-    expect(result.status).toEqual(StatusCodes.INTERNAL_SERVER_ERROR)
-    expect(result.body).toEqual(message)
+
+    const token = result.body.token //set up an admin token
+    const payload1 = {
+      patientId: 0,
+      therapistId: 0,
+      speciality: "string",
+      remarks: "string",
+    }
+
+    const result1 = await request(app)
+      .post("/api/process/create")
+      .send(payload1)
+      .set("Authorization", token)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/json")
+    expect(result1.status).toEqual(StatusCodes.OK)
   })
 })
