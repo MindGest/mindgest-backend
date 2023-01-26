@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("6.0 test statistics", () => {
   it("6.0.0  list statistics", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -21,7 +20,7 @@ describe("6.0 test statistics", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const message = {
       // set realistic data
       message: {
@@ -57,7 +56,6 @@ describe("6.0 test statistics", () => {
   })
 
   it("6.0.1 User doesn't have authorization", async () => {
-    
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -68,7 +66,7 @@ describe("6.0 test statistics", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const result2 = await request(app)
       .get("/api/statistics")
       .set("Authorization", token)
@@ -79,7 +77,7 @@ describe("6.0 test statistics", () => {
 
   it("6.0.2 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is equivalent to expired token
-    
+
     const result = await request(app)
       .get("/api/statistics")
       .set("Authorization", token)

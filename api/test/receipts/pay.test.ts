@@ -12,7 +12,7 @@ describe("5.1 test paying receipts", () => {
   it("5.1.0 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is equivalent to expired token
     const receiptId = "0"
-    
+
     const result = await request(app)
       .put("/api/receipts/create?receiptId=" + receiptId)
       .set("Authorization", token)
@@ -22,7 +22,6 @@ describe("5.1 test paying receipts", () => {
   })
 
   it("5.1.1 User doesn't have authorization", async () => {
-    
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -33,9 +32,9 @@ describe("5.1 test paying receipts", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const receiptId = "0"
-    
+
     const result2 = await request(app)
       .put("/api/receipts/create?receiptId=" + receiptId)
       .set("Authorization", token)
@@ -45,7 +44,6 @@ describe("5.1 test paying receipts", () => {
   })
 
   it("5.1.2  pay a receipt", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -56,9 +54,9 @@ describe("5.1 test paying receipts", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const receiptId = "0"
-    
+
     const result2 = await request(app)
       .put("/api/receipts/create?receiptId=" + receiptId)
       .set("Authorization", token)

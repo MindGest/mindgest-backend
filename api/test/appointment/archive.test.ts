@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("2.5 test appointments info", () => {
   it("2.5.0 show an appointments info", async () => {
-
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -46,7 +45,7 @@ describe("2.5 test appointments info", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const payload2 = {
       appointmentId: 0,
     }
@@ -65,7 +64,7 @@ describe("2.5 test appointments info", () => {
     const payload = {
       appointmentId: 0,
     }
-    
+
     const result = await request(app)
       .put("/api/appointments/archive")
       .send(payload)

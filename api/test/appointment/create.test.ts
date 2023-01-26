@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("2.4 test creating appointments", () => {
   it("2.4.0 creat appointment", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -21,7 +20,7 @@ describe("2.4 test creating appointments", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const payload2 = {
       processId: 0,
       online: true,
@@ -41,7 +40,6 @@ describe("2.4 test creating appointments", () => {
   })
 
   it("2.4.1 User doesn't have authorization", async () => {
-    
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -52,7 +50,7 @@ describe("2.4 test creating appointments", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const payload2 = {
       processId: 0,
       online: true,
@@ -61,7 +59,7 @@ describe("2.4 test creating appointments", () => {
       startDate: "2022-12-24T15:03:00.000Z",
       endDate: "2022-12-24T15:03:00.000Z",
     }
-    
+
     const result2 = await request(app)
       .post("/api/appointments/create")
       .send(payload2)
@@ -81,7 +79,7 @@ describe("2.4 test creating appointments", () => {
       startDate: "2022-12-24T15:03:00.000Z",
       endDate: "2022-12-24T15:03:00.000Z",
     }
-    
+
     const result = await request(app)
       .post("/api/appointments/create")
       .send(payload)

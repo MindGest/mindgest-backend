@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("4.0 test creating rooms", () => {
   it("4.0.0 Room Created", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -21,15 +20,15 @@ describe("4.0 test creating rooms", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-   
+
     const payload = {
       name: "room0",
     }
-    
+
     const message = {
       message: "Room Created",
     }
-    
+
     const result2 = await request(app)
       .post("/api/rooms/create")
       .send(payload)
@@ -41,7 +40,6 @@ describe("4.0 test creating rooms", () => {
   })
 
   it("4.0.1 User doesn't have authorization", async () => {
-    
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -52,13 +50,13 @@ describe("4.0 test creating rooms", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const processId = "0"
-    
+
     const payload2 = {
       name: "room1",
     }
-    
+
     const result2 = await request(app)
       .post("/api/rooms/create")
       .send(payload2)
@@ -74,7 +72,7 @@ describe("4.0 test creating rooms", () => {
     const payload = {
       name: "room1",
     }
-    
+
     const result = await request(app)
       .post("/api/rooms/create")
       .send(payload)

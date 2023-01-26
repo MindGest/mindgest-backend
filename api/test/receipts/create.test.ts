@@ -10,7 +10,6 @@ import app from "../../src/main"
 
 describe("5.0 test creating receipts", () => {
   it("5.0.0  Create a receipt", async () => {
-    
     const payload1 = {
       email: "sarab@student.dei.uc.pt",
       password: "password1234",
@@ -21,9 +20,9 @@ describe("5.0 test creating receipts", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has valid admin token
-    
+
     const appointmentId = "0"
-    
+
     const result2 = await request(app)
       .post("/api/receipts/create?appointmentId=" + appointmentId)
       .set("Authorization", token)
@@ -33,7 +32,6 @@ describe("5.0 test creating receipts", () => {
   })
 
   it("5.0.1 User doesn't have authorization", async () => {
-
     const payload1 = {
       email: "obliquo@student.dei.uc.pt",
       password: "password1234",
@@ -44,9 +42,9 @@ describe("5.0 test creating receipts", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     const token = result1.body.token //set this has guard token
-    
+
     const appointmentId = "0"
-    
+
     const result2 = await request(app)
       .post("/api/receipts/create?appointmentId=" + appointmentId)
       .set("Authorization", token)
@@ -58,7 +56,7 @@ describe("5.0 test creating receipts", () => {
   it("5.0.2 The user's Verification Token is expired/invalid", async () => {
     const token = "invalid token" //this is equivalent to expired token
     const appointmentId = "0"
-    
+
     const result = await request(app)
       .post("/api/receipts/create?appointmentId=" + appointmentId)
       .set("Authorization", token)
