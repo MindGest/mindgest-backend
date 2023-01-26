@@ -352,17 +352,17 @@ export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, 
       })
 
       var therapists = await prisma.therapist_process.findMany({
-        where:{
-          process_id:process?.id
-        }
+        where: {
+          process_id: process?.id,
+        },
       })
 
       let therapistsNames = []
       for (var therapist of therapists) {
         let therapistInfo = await prisma.person.findUnique({
-          where:{
-            id:therapist.therapist_person_id
-          }
+          where: {
+            id: therapist.therapist_person_id,
+          },
         })
 
         therapistsNames.push(therapistInfo?.name)
@@ -376,7 +376,7 @@ export async function listTherapist(req: Request<{}, {}, {}, QueryListProcess>, 
         speciality: speciality?.speciality,
         therapistListing: therapistsNames,
         //active: process?.active ? "ativo" : "inativo"
-        active: process?.active
+        active: process?.active,
       })
     }
 
@@ -771,8 +771,12 @@ export async function listNotes(req: Request, res: Response) {
     var list = []
 
     for (let note of notes) {
-      let date = note.datetime;
-      let formattedDate = date.toLocaleDateString("en-GB", {day: '2-digit', month: '2-digit', year: 'numeric'});
+      let date = note.datetime
+      let formattedDate = date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
       list.push({ title: note.title, body: note.body, date: formattedDate })
     }
 

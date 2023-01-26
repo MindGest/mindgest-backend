@@ -133,7 +133,11 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
         })
 
         let date = receipt?.datetime
-        const formattedDate = date.toLocaleDateString("en-GB", {day: '2-digit', month: '2-digit', year: 'numeric'});
+        const formattedDate = date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
 
         listOfReceipts.push({
           patientName: patient?.name,
@@ -248,7 +252,6 @@ export async function list(req: Request<{}, {}, {}, QueryListReceipt>, res: Resp
             id: appointmentInfo?.pricetable_id,
           },
         })
-        
 
         if (
           (payed == notPayed) == true ||
