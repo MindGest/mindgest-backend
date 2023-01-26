@@ -24,7 +24,6 @@ describe("0.0 Test registration", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
       .expect(StatusCodes.CREATED)
-
   })
 
   it("0.0.1 test - Repeat registration", async () => {
