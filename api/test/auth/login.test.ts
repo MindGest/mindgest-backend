@@ -47,7 +47,7 @@ describe("0.1 the user does not exist", () => {
 
   it("0.1.3 verify user first and then login", async () => {
     const payload = {
-      "email": "johndoe@student.dei.uc.pt", 
+      email: "johndoe@student.dei.uc.pt",
     } // no callback so token comes in body and is not sent by email
     const verificationResult = await request(app)
       .post("/api/auth/account-verification")
@@ -57,16 +57,14 @@ describe("0.1 the user does not exist", () => {
 
     const verificationToken = verificationResult.body.token
 
-
-    const payload1 ={
-      token: verificationToken
+    const payload1 = {
+      token: verificationToken,
     }
     const verifyResult = await request(app)
       .post("/api/auth/account-verification")
       .send(payload)
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
-
 
     const payload2 = {
       email: "johndoe@student.dei.uc.pt",
