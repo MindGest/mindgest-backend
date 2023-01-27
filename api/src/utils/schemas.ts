@@ -377,14 +377,14 @@ export const EditPermissionsSchema = z.object({
 export const GetPatientTypeSchema = z.object({
   body: z.object({
     patientId: z.number(),
-  })
+  }),
 })
 
 export const GetPatientInfoSchema = z.object({
   body: z.object({
     patientId: z.number(),
     processId: z.number(),
-  })
+  }),
 })
 
 const CareTakerSchema = z.object({
@@ -393,7 +393,7 @@ const CareTakerSchema = z.object({
   phoneNumber: z.number(),
   type: z.string(),
   remarks: z.string(),
-});
+})
 
 export const CreateChildPatientSchema = z.object({
   body: z.object({
