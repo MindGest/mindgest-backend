@@ -802,24 +802,22 @@ export async function listNotes(req: Request, res: Response) {
   }
 }
 
-
 export async function getPermissions(req: Request, res: Response) {
   try {
     var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findMany({
-      where:{
-        process_id: processId
-      }
+      where: {
+        process_id: processId,
+      },
     })
 
     let permissionsInfo = []
-    for(let permission of permissions){
-
+    for (let permission of permissions) {
       var userInfo = await prisma.person.findUnique({
-        where:{
-          id: permission.person_id
-        }
+        where: {
+          id: permission.person_id,
+        },
       })
 
       permissionsInfo.push({
@@ -829,14 +827,14 @@ export async function getPermissions(req: Request, res: Response) {
         editProcess: permission.editprocess,
         editPatient: permission.editpatitent,
         archive: permission.archive,
-        see: permission.see ,
+        see: permission.see,
         processId: permission.process_id,
-        name: userInfo?.name
+        name: userInfo?.name,
       })
     }
 
     res.status(StatusCodes.OK).json({
-      message: permissionsInfo
+      message: permissionsInfo,
     })
   } catch (error) {
     console.log(error)
@@ -845,7 +843,6 @@ export async function getPermissions(req: Request, res: Response) {
     })
   }
 }
-
 
 export default {
   archive,
