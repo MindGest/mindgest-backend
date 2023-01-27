@@ -36,9 +36,11 @@ process.post(
 process.get("/appointments/:processId", controller.appointments)
 
 process.post(
-  "/edit/permissions/:processId",
+  "/permissions/:processId",
   middleware.requestValidator(schemas.ProcessEditPermissionsSchema),
   controller.editPermissions
 )
+
+process.get("/permissions/:processId", controller.getPermissions)
 
 export default process
