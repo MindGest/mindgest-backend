@@ -350,8 +350,8 @@ export async function createTeenPatient(req: Request<{}, {}, CreateTeenPatientBo
   }
 }
 
-// criar paciente (adulto e idoso)
-export async function createAdultOrElderPatient(req: Request<{}, {}, CreateAdultPatientBody>, res: Response){
+// criar paciente (adulto, idoso, casal, famiilia)
+export async function createAdultOrElderOrCoupleOrFamilyPatient(req: Request<{}, {}, CreateAdultPatientBody>, res: Response){
   try{
     var decodedToken = res.locals.token
 
@@ -413,11 +413,29 @@ export async function createAdultOrElderPatient(req: Request<{}, {}, CreateAdult
   }
 }
 
-// criar paciente (idoso)
+// update child
+export async function editChildPatient(req: Request, res: Response){
+  try{
+    var decodedToken = res.locals.token
 
-// criar paciente (casal)
+    // obtain the caller properties
+    var callerId = decodedToken.id
+    var callerRole = decodedToken.role
+    var callerIsAdmin = decodedToken.admin
 
-// criar paciente (familia)
+    
+  }
+  catch (error){
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+// update teen
+
+// update the others
+
 
 // retornar o tipo de um paciente (pode dar jeito)
 export async function getPatientType(req: Request<{}, {}, GetPatientTypeBody>, res: Response) {
