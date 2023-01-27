@@ -78,3 +78,6 @@ export type RoomCreateBody = z.TypeOf<typeof schemas.RoomCreate>["body"]
 
 export type SpecialityCreateBody = z.TypeOf<typeof schemas.SpecialityCreateSchema>["body"]
 export type EmailSchema = z.TypeOf<typeof schemas.EmailSchema>["body"]
+
+export type GetPermissionsBody = z.TypeOf<typeof schemas.GetPermissionsSchema>["body"]
+export type EditPermissionsBody = z.TypeOf<typeof schemas.EditPermissionsSchema>["body"]

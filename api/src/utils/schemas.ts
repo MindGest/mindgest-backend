@@ -352,6 +352,25 @@ export const EmailSchema = z.object({
   }),
 })
 
+export const GetPermissionsSchema = z.object({
+  body: z.object({
+    processId: z.number()
+  })
+})
+
+export const EditPermissionsSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    collaboratorId: z.number(),
+    appoint: z.boolean(),
+    statitics: z.boolean(),
+    editProcess: z.boolean(),
+    editPatient: z.boolean(),
+    archive: z.boolean(),
+    see: z.boolean(),
+  })
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -392,4 +411,6 @@ export default {
   QueryStatistics,
   SpecialityCreateSchema,
   EmailSchema,
+  GetPermissionsSchema,
+  EditPermissionsSchema,
 }
