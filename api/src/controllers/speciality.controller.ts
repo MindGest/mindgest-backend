@@ -27,6 +27,8 @@ export async function getAllSpecialities(req: Request, res: Response) {
     var specialities = await prisma.speciality.findMany({
       select: {
         speciality: true,
+        code: true,
+        description: true
       },
     })
 
@@ -59,9 +61,11 @@ export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody
       })
     }
 
-    prisma.speciality.create({
+    await prisma.speciality.create({
       data: {
         speciality: req.body.speciality,
+        code: req.body.code,
+        description: req.body.description
       },
     })
 

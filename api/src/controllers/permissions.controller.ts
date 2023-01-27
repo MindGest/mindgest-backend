@@ -140,7 +140,7 @@ export async function editInternPermissions(
     })
 
     // update the permissions of the intern
-    prisma.permissions.update({
+    await prisma.permissions.update({
       where: { id: permission?.id },
       data: {
         editprocess: req.body.editProcess,

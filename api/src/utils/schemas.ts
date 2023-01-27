@@ -341,6 +341,8 @@ export const QueryStatistics = z.object({
 export const SpecialityCreateSchema = z.object({
   body: z.object({
     speciality: z.string(),
+    code: z.string(),
+    description: z.string()
   }),
 })
 

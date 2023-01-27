@@ -249,6 +249,8 @@ model room {
 
 model speciality {
   speciality           String                 @id @db.VarChar(512)
+  code                 String                 @db.VarChar(512)
+  description          String                 @db.VarChar(512)
   process              process[]
   therapist_speciality therapist_speciality[]
 }
