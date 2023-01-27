@@ -333,7 +333,7 @@ export const QueryStatistics = z.object({
   query: z.object({
     startDate: z.string(),
     endDate: z.string(),
-    therapistId: z.string(),
+    therapistId: z.string().optional(),
     specialityId: z.string(),
     processId: z.string(),
   }),
