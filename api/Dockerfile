@@ -14,7 +14,7 @@ RUN npm install --silent
 COPY . .
 
 RUN npx prisma generate
-RUN npx prisma seed
+RUN npm run prisma:seed 
 RUN npm run build
 
 EXPOSE 8080 

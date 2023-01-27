@@ -37,7 +37,7 @@ export async function sendVerificationEmail(
 ) {
   return sendEmail({
     to: email,
-    subject: "MindGest - Confirmar Conta",
+    subject: "Confirmar Conta",
     html: `
     <h4> Bem vindo, ${name}</h4>
     <p>Por favor, confirme o seu e-mail clicando no seguinte link:
@@ -45,7 +45,7 @@ export async function sendVerificationEmail(
     <a href="${callback}?token=${token}">Verificar Email</a> </p>
     <p>Cumprimentos, </p>
     <br> 
-    <p>Equipa MindGest</p>`,
+    <p>MindGest</p>`,
   })
 }
 
@@ -57,14 +57,14 @@ export async function sendResetPasswordEmail(
 ) {
   return sendEmail({
     to: email,
-    subject: "MindGest - Recuperar Password",
+    subject: "Recuperar Password",
     html: `
     <h4> Olá, ${name}</h4>
     <p>Para recuperar a sua password clique no seguinte link: 
     <br><br>
     <a href="${callback}?token=${token}">Recuperar Password</a>
     <p>Cumprimentos, </p>
-    <p>Equipa MindGest</p>`,
+    <p>MindGest</p>`,
   })
 }
 

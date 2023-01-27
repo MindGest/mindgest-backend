@@ -96,6 +96,18 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
       case User.THERAPIST: {
         // Insert therapist in the therapist table
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (therapist)...`)
+
+        const speciality = await prisma.speciality.findUnique({
+          where: {
+            speciality: req.body.speciality,
+          },
+        })
+
+        if (speciality === null || speciality === undefined) {
+          console.log("RIP")
+          return
+        }
+
         await prisma.therapist.create({
           data: {
             license: req.body.license,
