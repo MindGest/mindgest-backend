@@ -9,7 +9,7 @@ import { SpecialityCreateBody } from "../utils/types"
  * listar especialidades
  */
 export async function getAllSpecialities(req: Request, res: Response) {
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -33,8 +33,7 @@ export async function getAllSpecialities(req: Request, res: Response) {
     res.status(StatusCodes.OK).json({
       data: specialities,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -46,7 +45,7 @@ export async function getAllSpecialities(req: Request, res: Response) {
  *  speciality
  */
 export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody>, res: Response) {
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -69,8 +68,7 @@ export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody
     res.status(StatusCodes.OK).json({
       message: "The speciality has been successfully created.",
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })

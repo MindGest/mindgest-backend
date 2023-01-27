@@ -15,7 +15,7 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
   /**
    * Returns all the appointments of a therapist if a valid id is given, or all if the id value is "-1"
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -263,8 +263,7 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       message: "It is working.",
       data: allAppointmentsInfo,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -275,7 +274,7 @@ export async function getAppointmentsOfTheDayGuard(req: Request, res: Response) 
   /**
    * Returns all the appointments of the current day for the guards
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -312,8 +311,7 @@ export async function getAppointmentsOfTheDayGuard(req: Request, res: Response) 
       message: "It is working.",
       data: appointmentsOfToday,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -324,7 +322,7 @@ export async function getAppointmentsOfTheDayTherapist(req: Request, res: Respon
   /**
    * Returns all the appointments of the current day for the calling therapist
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -377,8 +375,7 @@ export async function getAppointmentsOfTheDayTherapist(req: Request, res: Respon
       message: "It is working.",
       data: appointmentsOfToday,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -389,7 +386,7 @@ export async function getAppointmentsOfTheDayIntern(req: Request, res: Response)
   /**
    * Returns all the appointments of the current day for the calling intern
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -442,8 +439,7 @@ export async function getAppointmentsOfTheDayIntern(req: Request, res: Response)
       message: "It is working.",
       data: appointmentsOfToday,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -454,7 +450,7 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
   /**
    * Creates an appointment
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -538,8 +534,7 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
     res.status(StatusCodes.OK).json({
       message: "The appointment has been created.",
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -550,7 +545,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
   /**
    * returns the info of an appointment
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -670,8 +665,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
       speciality: process.speciality_speciality,
       processRef: process.ref,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -682,7 +676,7 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
   /**
    * edits the properties of an appointment
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -760,8 +754,7 @@ export async function editAppointment(req: Request<{}, {}, AppointmentEdit>, res
     res.status(StatusCodes.OK).json({
       message: "The appointment was successfully updated.",
     })
-  }
-  catch (error) {
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -772,7 +765,7 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
   /**
    * archives an appointment
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -850,8 +843,7 @@ export async function archiveAppointment(req: Request<{}, {}, AppointmentArchive
     return res.status(StatusCodes.OK).json({
       message: "The given appointment was successfuly archived.",
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -865,7 +857,7 @@ export async function getAllActiveAppointments(
   /**
    * Returns all the active appointments of a therapist if a valid id is given or all from all the therapists if id = -1
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -1049,8 +1041,7 @@ export async function getAllActiveAppointments(
       message: "[ ListActive ]It is working.",
       data: allAppointmentsInfo,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -1061,7 +1052,7 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
   /**
    * Returns all the appointments that have been terminated in the last 24 hours if the caller is an accountant
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // otbain the caller properties
@@ -1119,8 +1110,7 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
     return res.status(StatusCodes.OK).json({
       data: appointmentsLast24h,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
