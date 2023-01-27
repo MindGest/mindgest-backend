@@ -64,6 +64,7 @@ export async function getInternsPermissions(req: Request<{}, {}, GetPermissionsB
                 editpatient: intern_permissions[i].editpatitent,
                 archive: intern_permissions[i].archive,
                 name: intern?.name,
+                collaboratorId: intern_permissions[i].person_id
             })
         }
 
