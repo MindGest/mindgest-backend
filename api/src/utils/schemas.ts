@@ -413,7 +413,7 @@ export const CreateChildPatientSchema = z.object({
     grade: z.number(),
     school: z.string(),
     // careTakersId: z.array(CareTakerSchema),
-  })
+  }),
 })
 
 export const CreateTeenPatientSchema = z.object({
@@ -435,7 +435,7 @@ export const CreateTeenPatientSchema = z.object({
     school: z.string(),
     course: z.string(),
     // careTakersId: z.array(CareTakerSchema),
-  })
+  }),
 })
 
 export const CreateAdultPatientSchema = z.object({
@@ -455,7 +455,7 @@ export const CreateAdultPatientSchema = z.object({
 
     profession: z.string(),
     // careTakersId: z.array(CareTakerSchema),
-  })
+  }),
 })
 
 export default {
@@ -504,5 +504,5 @@ export default {
   GetPatientInfoSchema,
   CreateChildPatientSchema,
   CreateTeenPatientSchema,
-  CreateAdultPatientSchema
+  CreateAdultPatientSchema,
 }
