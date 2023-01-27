@@ -28,7 +28,7 @@ export async function getAllSpecialities(req: Request, res: Response) {
       select: {
         speciality: true,
         code: true,
-        description: true
+        description: true,
       },
     })
 
@@ -65,7 +65,7 @@ export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody
       data: {
         speciality: req.body.speciality,
         code: req.body.code,
-        description: req.body.description
+        description: req.body.description,
       },
     })
 
