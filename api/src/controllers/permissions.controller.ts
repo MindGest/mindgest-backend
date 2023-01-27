@@ -59,20 +59,23 @@ export async function getInternsPermissions(
 
     let infoToReturn = []
 
-        for (let i = 0; i < intern_permissions.length; i++){
-            // get the name of the intern
-            let intern = await prisma.person.findFirst({where: {id: intern_permissions[i].person_id}, select: {name: true}});
-            infoToReturn.push({
-                editprocess: intern_permissions[i].editprocess,
-                see: intern_permissions[i].see,
-                appoint: intern_permissions[i].appoint,
-                statistics: intern_permissions[i].statitics,
-                editpatient: intern_permissions[i].editpatitent,
-                archive: intern_permissions[i].archive,
-                name: intern?.name,
-                collaboratorId: intern_permissions[i].person_id
-            })
-        }
+    for (let i = 0; i < intern_permissions.length; i++) {
+      // get the name of the intern
+      let intern = await prisma.person.findFirst({
+        where: { id: intern_permissions[i].person_id },
+        select: { name: true },
+      })
+      infoToReturn.push({
+        editprocess: intern_permissions[i].editprocess,
+        see: intern_permissions[i].see,
+        appoint: intern_permissions[i].appoint,
+        statistics: intern_permissions[i].statitics,
+        editpatient: intern_permissions[i].editpatitent,
+        archive: intern_permissions[i].archive,
+        name: intern?.name,
+        collaboratorId: intern_permissions[i].person_id,
+      })
+    }
 
     res.status(StatusCodes.OK).json({
       data: infoToReturn,
