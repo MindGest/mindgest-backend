@@ -23,6 +23,7 @@ export const TherapistSchema = z
   .object({
     healthSystem: z.string().optional(),
     license: z.string(),
+    speciality: z.string(),
   })
   .merge(PersonSchema)
   .merge(z.object({ taxNumber: z.number() }))

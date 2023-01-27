@@ -1,11 +1,11 @@
 import { Router } from "express"
 
-import controller from "../controllers/notification.controller"
+import controller from "../controllers/patient.controller"
 
 const notification = Router()
 
 // Endpoints
-notification.put("/mark/:notification", controller.mark)
+notification.put("/create", controller.create)
 notification.get("/list", controller.list)
 
 export default notification

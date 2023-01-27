@@ -9,7 +9,7 @@ info:
     url: https://mit-license.org/
   version: 0.1.0
 servers:
-  - url: http://mindgest.dei.uc.pt/api
+  - url: https://mindgest.dei.uc.pt/api
     description: Production Server
   - url: http://localhost:8080/api
     description: Development Server
