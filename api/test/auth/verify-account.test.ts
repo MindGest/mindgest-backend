@@ -141,12 +141,14 @@ describe("0.3 verify an account", () => {
 
   it("approving every verified account cause (there is no endpoint for it)", async () => {
     prisma.person.updateMany({
-      where: {email:{
-        contains: "dei.uc.pt"
-      }},
+      where: {
+        email: {
+          contains: "dei.uc.pt",
+        },
+      },
       data: {
-        approved: true
-      }
+        approved: true,
+      },
     })
 
     expect(1).toEqual(1)
