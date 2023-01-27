@@ -15,10 +15,9 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
   let decode = res.locals.token
   let id = decode.id
 
-  if(query.therapistId != null){
+  if (query.therapistId != null) {
     id = query.therapistId
   }
-
 
   if (query.startDate == null || query.endDate == null) {
     appointments = await prisma.appointment.findMany()
