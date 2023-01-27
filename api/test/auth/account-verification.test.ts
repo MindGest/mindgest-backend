@@ -12,7 +12,7 @@ import exp from "constants"
 describe("0.4 test account verification token", () => {
   it("0.4.0 account verified", async () => {
     const payload = {
-      email: "johndoe@student.dei.uc.pt",
+      email: "sarab@student.dei.uc.pt",
     } // no call back means that a mail is not sent and the token is sent in the reponse body
 
     const result = await request(app)

@@ -3,13 +3,15 @@ import dotenv from "dotenv"
 import { StatusCodes } from "http-status-codes"
 
 import { describe, expect, it } from "@jest/globals"
+import prisma from "../../src/utils/prisma"
 
 dotenv.config()
 
 import app from "../../src/main"
+import { any } from "zod"
 
-describe("0.3 if an account is already verified", () => {
-  it("0.3.0 the admin account has already been verified", async () => {
+describe("0.3 verify an account", () => {
+  it("0.3.0 verify admin account", async () => {
     const payload = {
       email: "sarab@student.dei.uc.pt",
     } // no callback so token comes in body and is not sent by email
@@ -32,7 +34,7 @@ describe("0.3 if an account is already verified", () => {
     expect(result1.status).toEqual(StatusCodes.OK)
   })
 
-  it("0.3.1 the therapist account has already been verified", async () => {
+  it("0.3.1 verify therapist account", async () => {
     const payload = {
       email: "johndoe@student.dei.uc.pt",
     } // no callback so token comes in body and is not sent by email
@@ -55,7 +57,7 @@ describe("0.3 if an account is already verified", () => {
     expect(result1.status).toEqual(StatusCodes.OK)
   })
 
-  it("0.3.2 the security account has already been verified", async () => {
+  it("0.3.2 verify guard account", async () => {
     const payload = {
       email: "obliquo@student.dei.uc.pt",
     } // no callback so token comes in body and is not sent by email
@@ -78,7 +80,7 @@ describe("0.3 if an account is already verified", () => {
     expect(result1.status).toEqual(StatusCodes.OK)
   })
 
-  it("0.3.3 the accountant account has already been verified", async () => {
+  it("0.3.3 verify accountant account", async () => {
     const payload = {
       email: "caroldam@student.dei.uc.pt",
     } // no callback so token comes in body and is not sent by email
@@ -101,7 +103,7 @@ describe("0.3 if an account is already verified", () => {
     expect(result1.status).toEqual(StatusCodes.OK)
   })
 
-  it("0.3.4 the intern account has already been verified", async () => {
+  it("0.3.4 verify intern account", async () => {
     const payload = {
       email: "mmenezes@student.dei.uc.pt",
     } // no callback so token comes in body and is not sent by email
@@ -135,5 +137,18 @@ describe("0.3 if an account is already verified", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/json")
     expect(result.status).toEqual(StatusCodes.FORBIDDEN)
+  })
+
+  it("approving every verified account cause (there is no endpoint for it)", async () => {
+    prisma.person.updateMany({
+      where: {email:{
+        contains: "dei.uc.pt"
+      }},
+      data: {
+        approved: true
+      }
+    })
+
+    expect(1).toEqual(1)
   })
 })
