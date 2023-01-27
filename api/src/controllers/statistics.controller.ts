@@ -12,6 +12,13 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
   var query = req.query
   var appointments
 
+  let decode = res.locals.token
+  let id = decode.id
+
+  if (query.therapistId != null) {
+    id = query.therapistId
+  }
+
   if (query.startDate == null || query.endDate == null) {
     appointments = await prisma.appointment.findMany()
   } else {
@@ -75,7 +82,7 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
           },
         })
 
-        if (query.therapistId != null) {
+        if (id != null) {
           var flag = false
 
           for (let therapist of therapistsProcess) {
@@ -85,7 +92,7 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
               },
             })
 
-            if (query.therapistId! == therapistInfo?.id.toString()) {
+            if (id! == therapistInfo?.id.toString()) {
               flag = true
               if (therapistsApointments.has(therapistInfo!.name)) {
                 therapistsApointments.set(
