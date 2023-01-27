@@ -73,6 +73,7 @@ export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody
       message: "The speciality has been successfully created.",
     })
   } catch (error) {
+    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })

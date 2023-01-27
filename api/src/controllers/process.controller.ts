@@ -287,6 +287,7 @@ export async function listTherapist(req: Request, res: Response) {
   try {
     var decoded = res.locals.token
 
+
     var processes = await prisma.therapist_process.findMany({
       where: {
         therapist_person_id: decoded.id,
