@@ -354,8 +354,8 @@ export const EmailSchema = z.object({
 
 export const GetPermissionsSchema = z.object({
   body: z.object({
-    processId: z.number()
-  })
+    processId: z.number(),
+  }),
 })
 
 export const EditPermissionsSchema = z.object({
@@ -368,7 +368,7 @@ export const EditPermissionsSchema = z.object({
     editPatient: z.boolean(),
     archive: z.boolean(),
     see: z.boolean(),
-  })
+  }),
 })
 
 export default {

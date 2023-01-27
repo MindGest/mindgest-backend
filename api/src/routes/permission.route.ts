@@ -6,11 +6,11 @@ const permission = Router()
 permission.use(authMiddleware.authorize())
 
 permission.post("/get-interns-permissions", (req: Request, res: Response) => {
-    controller.getInternsPermissions(req, res)
+  controller.getInternsPermissions(req, res)
 })
 
 permission.put("/edit-intern-permissions", (req: Request, res: Response) => {
-    controller.editInternPermissions(req, res)
+  controller.editInternPermissions(req, res)
 })
 
 export default permission
