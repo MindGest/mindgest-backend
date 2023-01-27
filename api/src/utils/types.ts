@@ -85,3 +85,8 @@ export type EditPermissionsBody = z.TypeOf<typeof schemas.EditPermissionsSchema>
 export type GetPatientTypeBody = z.TypeOf<typeof schemas.GetPatientTypeSchema>["body"]
 export type GetPatientInfoBody = z.TypeOf<typeof schemas.GetPatientInfoSchema>["body"]
 export type CreateChildPatientBody = z.TypeOf<typeof schemas.CreateChildPatientSchema>["body"]
+<<<<<<< HEAD
+export type CreateTeenPatientBody = z.TypeOf<typeof schemas.CreateTeenPatientSchema>["body"]
+export type CreateAdultPatientBody = z.TypeOf<typeof schemas.CreateAdultPatientSchema>["body"]
+=======
+>>>>>>> 6db0732da063e03367d79754161906471e69aa29
