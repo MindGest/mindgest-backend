@@ -79,7 +79,7 @@ model patient {
 
 model school {
   id                BigInt  @id @default(autoincrement())
-  name              BigInt
+  name              String  @db.VarChar(512)
   course            String  @db.VarChar(512)
   grade             BigInt? @unique
   patient_person_id BigInt

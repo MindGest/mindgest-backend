@@ -374,6 +374,48 @@ export const EditPermissionsSchema = z.object({
   }),
 })
 
+export const GetPatientTypeSchema = z.object({
+  body: z.object({
+    patientId: z.number(),
+  })
+})
+
+export const GetPatientInfoSchema = z.object({
+  body: z.object({
+    patientId: z.number(),
+    processId: z.number(),
+  })
+})
+
+const CareTakerSchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  phoneNumber: z.number(),
+  type: z.string(),
+  remarks: z.string(),
+});
+
+export const CreateChildPatientSchema = z.object({
+  body: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    grade: z.number(),
+    school: z.string(),
+    careTakersId: z.array(CareTakerSchema),
+  })
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -416,4 +458,7 @@ export default {
   EmailSchema,
   GetPermissionsSchema,
   EditPermissionsSchema,
+  GetPatientTypeSchema,
+  GetPatientInfoSchema,
+  CreateChildPatientSchema,
 }
