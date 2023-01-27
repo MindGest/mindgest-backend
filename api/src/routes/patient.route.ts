@@ -1,11 +1,14 @@
 import { Router } from "express"
 
 import controller from "../controllers/patient.controller"
+import authMiddleware from "../middleware/auth.middleware"
 
-const notification = Router()
+const patient = Router()
+
+patient.use(authMiddleware.authorize())
 
 // Endpoints
-notification.put("/create", controller.create)
-notification.get("/list", controller.list)
+patient.put("/create", controller.create)
+patient.get("/list", controller.list)
 
-export default notification
+export default patient
