@@ -11,6 +11,8 @@ receipt.use(authMiddleware.authorize())
 
 receipt.get("/list", controller.list)
 
+receipt.get("/info/:receiptId", controller.info)
+
 receipt.post("/create/:appointmentId", controller.create)
 
 receipt.put("/pay/:receiptId", controller.pay)

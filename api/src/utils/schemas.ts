@@ -342,6 +342,8 @@ export const QueryStatistics = z.object({
 export const SpecialityCreateSchema = z.object({
   body: z.object({
     speciality: z.string(),
+    code: z.string(),
+    description: z.string(),
   }),
 })
 
@@ -350,6 +352,25 @@ export const EmailSchema = z.object({
     email: z.string(),
     subject: z.string(),
     body: z.string(),
+  }),
+})
+
+export const GetPermissionsSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+  }),
+})
+
+export const EditPermissionsSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    collaboratorId: z.number(),
+    appoint: z.boolean(),
+    statitics: z.boolean(),
+    editProcess: z.boolean(),
+    editPatient: z.boolean(),
+    archive: z.boolean(),
+    see: z.boolean(),
   }),
 })
 
@@ -393,4 +414,6 @@ export default {
   QueryStatistics,
   SpecialityCreateSchema,
   EmailSchema,
+  GetPermissionsSchema,
+  EditPermissionsSchema,
 }

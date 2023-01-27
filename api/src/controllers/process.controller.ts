@@ -628,7 +628,6 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
   }
 }
 
-//Nao sei bem oq este é suposto devolver tbh
 export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
     var decoded = res.locals.token
@@ -661,12 +660,24 @@ export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Re
         },
       })
 
+      let date = apointment?.slot_start_date
+      const formattedDate = date?.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+
+      let receipt = await prisma.receipt.findFirst({
+        where: {
+          appointment_slot_id: apointment?.slot_id,
+        },
+      })
+
       infoAppointments.push({
-        online: apointment?.online,
-        start_date: apointment?.slot_start_date,
-        end_date: apointment?.slot_end_date,
-        room: room?.name,
-        type: type?.type,
+        data: formattedDate,
+        estado: receipt?.payed ? "Pago" : "Por Pagar",
+        referencia: receipt != null ? receipt.ref : "",
+        valor: type?.price,
       })
     }
 
@@ -791,6 +802,48 @@ export async function listNotes(req: Request, res: Response) {
   }
 }
 
+export async function getPermissions(req: Request, res: Response) {
+  try {
+    var processId = parseInt(req.params.processId)
+
+    var permissions = await prisma.permissions.findMany({
+      where: {
+        process_id: processId,
+      },
+    })
+
+    let permissionsInfo = []
+    for (let permission of permissions) {
+      var userInfo = await prisma.person.findUnique({
+        where: {
+          id: permission.person_id,
+        },
+      })
+
+      permissionsInfo.push({
+        collaboratorId: permission.person_id,
+        appoint: permission.appoint,
+        statistics: permission.statitics,
+        editProcess: permission.editprocess,
+        editPatient: permission.editpatitent,
+        archive: permission.archive,
+        see: permission.see,
+        processId: permission.process_id,
+        name: userInfo?.name,
+      })
+    }
+
+    res.status(StatusCodes.OK).json({
+      message: permissionsInfo,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 export default {
   archive,
   info,
@@ -803,4 +856,5 @@ export default {
   createNote,
   listNotes,
   listTherapist,
+  getPermissions,
 }

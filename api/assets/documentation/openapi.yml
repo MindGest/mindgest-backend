@@ -652,6 +652,14 @@ paths:
                   type: string
                   description: name of the specialty.
                   example: Especialidade-A
+                code:
+                  type: string
+                  description: code of the speciality
+                  example: EspA
+                description:
+                  type: string
+                  description: description of the speciality
+                  example: Description of the Especialidade-A
       responses:
         "200":
           $ref: "#/components/responses/SpecialitiesCreate"
@@ -1865,6 +1873,12 @@ components:
                     speciality:
                       type: string
                       description: name of the speciality
+                    code:
+                      type: string
+                      description: code of the speciality
+                    description:
+                      type: string
+                      description: description of the speciality
     SpecialitiesCreate:
       description: Create a speciality.
       content:
