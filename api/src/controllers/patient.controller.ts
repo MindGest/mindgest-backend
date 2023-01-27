@@ -8,7 +8,6 @@ import { GetPatientTypeBody,
         CreateTeenPatientBody,
         CreateAdultPatientBody } from "../utils/types"
 
-<<<<<<< HEAD
 const CHILD_PATIENT = 'child';
 const TEEN_PATIENT = 'teen';
 const ADULT_PATIENT = 'adult';
@@ -16,16 +15,6 @@ const ELDER_PATIENT = 'elder';
 const FAMILY_PATIENT = 'family';
 const COUPLE_PATIENT = 'couple';
 const DUMMY_PASSWORD = "ImDummyDaBaDeeDaBaDi";
-
-=======
-var CHILD_PATIENT = "child"
-var TEEN_PATIENT = "teen"
-var ADULT_PATIENT = "adult"
-var ELDER_PATIENT = "elder"
-var FAMILY_PATIENT = "family"
-var COUPLE_PATIENT = "couple"
-var DUMMY_PASSWORD = "ImDummyDaBaDeeDaBaDi"
->>>>>>> 6db0732da063e03367d79754161906471e69aa29
 
 export async function create(req: Request, res: Response) {
   console.log("Coming Soon")
