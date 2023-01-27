@@ -9,40 +9,37 @@ export async function list(req: Request, res: Response) {
   let id = decode.id
 
   let therapistProcesses = await prisma.therapist_process.findMany({
-    where:{
-      therapist_person_id:id
-    }
+    where: {
+      therapist_person_id: id,
+    },
   })
 
   let usersInfo = []
-  for(let processInfo of therapistProcesses){
+  for (let processInfo of therapistProcesses) {
     let usersProcess = await prisma.patient_process.findMany({
-      where:{
-        process_id: processInfo.process_id
-      }
+      where: {
+        process_id: processInfo.process_id,
+      },
     })
 
-    for(let user of usersProcess){
+    for (let user of usersProcess) {
       let userInfo = await prisma.person.findUnique({
-        where:{
-          id:user.patient_person_id
-        }
+        where: {
+          id: user.patient_person_id,
+        },
       })
 
       let userMoreInfo = await prisma.patient.findUnique({
-        where:{
-          person_id: user.patient_person_id
-        }
+        where: {
+          person_id: user.patient_person_id,
+        },
       })
 
       let responsable = await prisma.liable.findFirst({
-        where:{
-          
-        }
+        where: {},
       })
     }
   }
-
 }
 
 export default { create, list }
