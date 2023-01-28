@@ -310,6 +310,27 @@ async function seed() {
       person_id: person1.id
     }
   })
+
+  await prisma.intern_process.create({
+    data:{
+      process_id:process.id,
+      intern_person_id: person5.id
+    }
+  })
+
+  await prisma.permissions.create({
+    data:{
+      editpatitent:false,
+      editprocess:false,
+      see:false,
+      appoint:false,
+      statitics:false,
+      archive:false,
+      isMain:false,
+      process_id:process.id,
+      person_id: person5.id
+    }
+  })
 }
 
 export default { seed }
