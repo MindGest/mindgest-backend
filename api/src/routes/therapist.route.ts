@@ -11,4 +11,6 @@ therapist.use(authMiddleware.authorize())
 
 therapist.get("/listPatients", controller.listPatients)
 
+therapist.get("/list", controller.list)
+
 export default therapist

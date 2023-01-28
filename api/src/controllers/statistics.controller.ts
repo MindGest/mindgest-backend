@@ -133,6 +133,7 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
     })
 
     data.push({
+      id: processInfo.process_id,
       speciality: info?.speciality_speciality,
       name: mainTherapist,
       patientName: patientName?.name,

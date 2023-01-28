@@ -17,13 +17,6 @@ export async function getAllSpecialities(req: Request, res: Response) {
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    // permissions
-    if (!callerIsAdmin) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You do not have permission to list all the specialities.",
-      })
-    }
-
     var specialities = await prisma.speciality.findMany({
       select: {
         speciality: true,

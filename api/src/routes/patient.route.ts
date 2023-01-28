@@ -9,6 +9,10 @@ patient.get("/list-patients", (req: Request, res: Response) => {
   controller.listPatients(req, res)
 })
 
+patient.get("/list", (req: Request, res: Response)=> {
+  controller.listNamePatients(req,res)
+})
+
 patient.post("/get-patient-info", (req: Request, res: Response) => {
   controller.getPatientInfo(req, res)
 })

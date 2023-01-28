@@ -68,11 +68,32 @@ export async function listPatients(req: Request, res: Response) {
       therapists: therapistsName,
     })
   }
-  return res.status(StatusCodes.OK).json({
+  res.status(StatusCodes.OK).json({
     message: info,
+  })
+}
+
+export async function list(req: Request, res: Response) {
+  let terapeutas = []
+  
+  let terapeutasId = await prisma.therapist.findMany({})
+
+  for(let id of terapeutasId){
+    let terapeutaName = await prisma.person.findUnique({
+      where:{
+        id: id.person_id
+      }
+    })
+
+    terapeutas.push({'name': terapeutaName?.name, 'id': terapeutaName?.id})
+  }
+
+  res.status(StatusCodes.OK).json({
+    message: terapeutas,
   })
 }
 
 export default {
   listPatients,
+  list
 }

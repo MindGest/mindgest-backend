@@ -114,6 +114,24 @@ export async function listPatients(req: Request, res: Response) {
   }
 }
 
+export async function listNamePatients(req:Request, res:Response){
+  let names = []
+
+  let allPatitentsIds = await prisma.patient.findMany({})
+  for(let id of allPatitentsIds){
+    let name = await prisma.person.findUnique({
+      where:{
+        id:id.person_id
+      }
+    })
+    names.push({"name":name?.name,"id":name?.id})
+  }
+
+  return res.status(StatusCodes.OK).json({
+    message:names
+  })
+}
+
 // retornar info de um paciente dado o seu id.
 export async function getPatientInfo(req: Request<{}, {}, GetPatientInfoBody>, res: Response) {
   /**
@@ -1072,4 +1090,5 @@ export default {
   editAdultOrElderPatient,
   editCoupleOrFamilyPatient,
   archivePatient,
+  listNamePatients
 }
