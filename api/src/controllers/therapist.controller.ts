@@ -75,17 +75,17 @@ export async function listPatients(req: Request, res: Response) {
 
 export async function list(req: Request, res: Response) {
   let terapeutas = []
-  
+
   let terapeutasId = await prisma.therapist.findMany({})
 
-  for(let id of terapeutasId){
+  for (let id of terapeutasId) {
     let terapeutaName = await prisma.person.findUnique({
-      where:{
-        id: id.person_id
-      }
+      where: {
+        id: id.person_id,
+      },
     })
 
-    terapeutas.push({'name': terapeutaName?.name, 'id': terapeutaName?.id})
+    terapeutas.push({ name: terapeutaName?.name, id: terapeutaName?.id })
   }
 
   res.status(StatusCodes.OK).json({
@@ -95,5 +95,5 @@ export async function list(req: Request, res: Response) {
 
 export default {
   listPatients,
-  list
+  list,
 }

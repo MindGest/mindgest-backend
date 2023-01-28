@@ -114,21 +114,21 @@ export async function listPatients(req: Request, res: Response) {
   }
 }
 
-export async function listNamePatients(req:Request, res:Response){
+export async function listNamePatients(req: Request, res: Response) {
   let names = []
 
   let allPatitentsIds = await prisma.patient.findMany({})
-  for(let id of allPatitentsIds){
+  for (let id of allPatitentsIds) {
     let name = await prisma.person.findUnique({
-      where:{
-        id:id.person_id
-      }
+      where: {
+        id: id.person_id,
+      },
     })
-    names.push({"name":name?.name,"id":name?.id})
+    names.push({ name: name?.name, id: name?.id })
   }
 
   return res.status(StatusCodes.OK).json({
-    message:names
+    message: names,
   })
 }
 
@@ -1090,5 +1090,5 @@ export default {
   editAdultOrElderPatient,
   editCoupleOrFamilyPatient,
   archivePatient,
-  listNamePatients
+  listNamePatients,
 }
