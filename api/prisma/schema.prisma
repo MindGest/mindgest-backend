@@ -164,7 +164,7 @@ model patient_process {
 }
 
 model patienttype {
-  id      BigInt    @id
+  id      BigInt    @id @default(autoincrement())
   type    String    @db.VarChar(512)
   patient patient[]
 }

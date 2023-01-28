@@ -14,13 +14,13 @@ import { GetPatientTypeBody,
         EditCoupleOrFamilyPatientBody,
         EditCareTaker } from "../utils/types"
 
-const CHILD_PATIENT = 'child';
-const TEEN_PATIENT = 'teen';
-const ADULT_PATIENT = 'adult';
-const ELDER_PATIENT = 'elder';
-const FAMILY_PATIENT = 'family';
-const COUPLE_PATIENT = 'couple';
-const DUMMY_PASSWORD = "ImDummyDaBaDeeDaBaDi";
+const CHILD_PATIENT = "child"
+const TEEN_PATIENT = "teen"
+const ADULT_PATIENT = "adult"
+const ELDER_PATIENT = "elder"
+const FAMILY_PATIENT = "family"
+const COUPLE_PATIENT = "couple"
+const DUMMY_PASSWORD = "ImDummyDaBaDeeDaBaDi"
 
 
 // listar todos os pacientes (nome e tipo talvez idk, preciso para a criação do processo)
@@ -198,9 +198,9 @@ export async function createChildPatient(
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (!callerIsAdmin){
+    if (!callerIsAdmin) {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You are not allowed to sail in these waters."
+        message: "You are not allowed to sail in these waters.",
       })
     }
 
@@ -252,8 +252,11 @@ export async function createChildPatient(
 }
 
 // criar paciente (jovem)
-export async function createTeenPatient(req: Request<{}, {}, CreateTeenPatientBody>, res: Response){
-  try{
+export async function createTeenPatient(
+  req: Request<{}, {}, CreateTeenPatientBody>,
+  res: Response
+) {
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -261,9 +264,9 @@ export async function createTeenPatient(req: Request<{}, {}, CreateTeenPatientBo
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (!callerIsAdmin){
+    if (!callerIsAdmin) {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "Your ship is not built for these seas."
+        message: "Your ship is not built for these seas.",
       })
     }
 
@@ -281,7 +284,7 @@ export async function createTeenPatient(req: Request<{}, {}, CreateTeenPatientBo
         active: true,
         approved: true, // não sei se há forma de aprovar TODO: mudar depois
         tax_number: req.body.taxNumber,
-      }
+      },
     })
     // create the patient
     let patient = await prisma.patient.create({
@@ -291,7 +294,7 @@ export async function createTeenPatient(req: Request<{}, {}, CreateTeenPatientBo
         request: req.body.request,
         remarks: req.body.remarks,
         patienttype_id: req.body.patientTypeId,
-      }
+      },
     })
 
     // create the school
@@ -301,15 +304,13 @@ export async function createTeenPatient(req: Request<{}, {}, CreateTeenPatientBo
         name: req.body.school,
         course: req.body.course,
         patient_person_id: patient.person_id,
-      }
+      },
     })
 
     res.status(StatusCodes.OK).json({
-      message: "Teen patient created successfully."
+      message: "Teen patient created successfully.",
     })
-
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -326,9 +327,9 @@ export async function createAdultOrElderOrCoupleOrFamilyPatient(req: Request<{},
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (!callerIsAdmin){
+    if (!callerIsAdmin) {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You shall not PASSS!"
+        message: "You shall not PASSS!",
       })
     }
 
@@ -346,7 +347,7 @@ export async function createAdultOrElderOrCoupleOrFamilyPatient(req: Request<{},
         active: true,
         approved: true, // não sei se há forma de aprovar TODO: mudar depois
         tax_number: req.body.taxNumber,
-      }
+      },
     })
     // create the patient
     let patient = await prisma.patient.create({
@@ -356,7 +357,7 @@ export async function createAdultOrElderOrCoupleOrFamilyPatient(req: Request<{},
         request: req.body.request,
         remarks: req.body.remarks,
         patienttype_id: req.body.patientTypeId,
-      }
+      },
     })
 
     // create the profession
@@ -364,15 +365,13 @@ export async function createAdultOrElderOrCoupleOrFamilyPatient(req: Request<{},
       data: {
         name: req.body.profession,
         patient_person_id: patient.person_id,
-      }
+      },
     })
 
     res.status(StatusCodes.OK).json({
-      message: "Teen patient created successfully."
+      message: "Teen patient created successfully.",
     })
-
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
