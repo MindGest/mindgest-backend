@@ -393,9 +393,9 @@ export async function getAppointmentsOfTheDayIntern(req: Request, res: Response)
     var callerRole = decodedToken.role
     var callerId = decodedToken.id
 
-    if (callerRole != "therapist") {
+    if (callerRole != "intern") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "This endpoint is just for therapists.",
+        message: "This endpoint is just for intern.",
       })
     }
 
