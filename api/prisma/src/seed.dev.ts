@@ -298,17 +298,17 @@ async function seed() {
   })
 
   await prisma.permissions.create({
-    data:{
-      editpatitent:true,
-      editprocess:true,
-      see:true,
-      appoint:true,
-      statitics:true,
-      archive:true,
-      isMain:true,
-      process_id:process.id,
-      person_id: person1.id
-    }
+    data: {
+      editpatitent: true,
+      editprocess: true,
+      see: true,
+      appoint: true,
+      statitics: true,
+      archive: true,
+      isMain: true,
+      process_id: process.id,
+      person_id: person1.id,
+    },
   })
 
   await prisma.intern_process.create({
