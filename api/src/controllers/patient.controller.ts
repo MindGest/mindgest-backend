@@ -2,17 +2,19 @@ import prisma from "../utils/prisma"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
-import { GetPatientTypeBody, 
-        GetPatientInfoBody, 
-        CreateChildPatientBody,
-        CreateTeenPatientBody,
-        CreateAdultPatientBody,
-        EditChildPatientBody,
-        EditTeenPatientBody,
-        EditAdultPatientBody,
-        ArchivePatientBody,
-        EditCoupleOrFamilyPatientBody,
-        EditCareTaker } from "../utils/types"
+import {
+  GetPatientTypeBody,
+  GetPatientInfoBody,
+  CreateChildPatientBody,
+  CreateTeenPatientBody,
+  CreateAdultPatientBody,
+  EditChildPatientBody,
+  EditTeenPatientBody,
+  EditAdultPatientBody,
+  ArchivePatientBody,
+  EditCoupleOrFamilyPatientBody,
+  EditCareTaker,
+} from "../utils/types"
 
 const CHILD_PATIENT = "child"
 const TEEN_PATIENT = "teen"
@@ -21,7 +23,6 @@ const ELDER_PATIENT = "elder"
 const FAMILY_PATIENT = "family"
 const COUPLE_PATIENT = "couple"
 const DUMMY_PASSWORD = "ImDummyDaBaDeeDaBaDi"
-
 
 // listar todos os pacientes (nome e tipo talvez idk, preciso para a criação do processo)
 export async function listPatients(req: Request, res: Response) {
@@ -318,8 +319,11 @@ export async function createTeenPatient(
 }
 
 // criar paciente (adulto, idoso, casal, familia)
-export async function createAdultOrElderOrCoupleOrFamilyPatient(req: Request<{}, {}, CreateAdultPatientBody>, res: Response){
-  try{
+export async function createAdultOrElderOrCoupleOrFamilyPatient(
+  req: Request<{}, {}, CreateAdultPatientBody>,
+  res: Response
+) {
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -379,8 +383,8 @@ export async function createAdultOrElderOrCoupleOrFamilyPatient(req: Request<{},
 }
 
 // update child patient
-export async function editChildPatient(req: Request<{}, {}, EditChildPatientBody>, res: Response){
-  try{
+export async function editChildPatient(req: Request<{}, {}, EditChildPatientBody>, res: Response) {
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -391,33 +395,37 @@ export async function editChildPatient(req: Request<{}, {}, EditChildPatientBody
     // check authorizations
     // allow admins, therapist and intern (that have edit permissions) associated in the given process.
 
-    let canEdit = false;
-    let processId = req.body.processId;
+    let canEdit = false
+    let processId = req.body.processId
 
     // check permission therapist
-    if (callerRole == 'therapist'){
-      let therapist_process = await prisma.therapist_process.findFirst({where: {therapist_person_id: callerId, process_id: processId}});
-      if (therapist_process != null){
-        canEdit = true;
+    if (callerRole == "therapist") {
+      let therapist_process = await prisma.therapist_process.findFirst({
+        where: { therapist_person_id: callerId, process_id: processId },
+      })
+      if (therapist_process != null) {
+        canEdit = true
       }
     }
     // check permission intern
-    else if (callerRole == 'intern'){
-      let permission = await prisma.permissions.findFirst({where: {person_id: callerId, process_id: processId}});
-      if (permission != null && permission.editpatitent){
-        canEdit = true;
+    else if (callerRole == "intern") {
+      let permission = await prisma.permissions.findFirst({
+        where: { person_id: callerId, process_id: processId },
+      })
+      if (permission != null && permission.editpatitent) {
+        canEdit = true
       }
     }
 
-    if (!callerIsAdmin && !canEdit){
+    if (!callerIsAdmin && !canEdit) {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You don't have what it takes to wield this power!"
+        message: "You don't have what it takes to wield this power!",
       })
     }
 
     // update person
     await prisma.person.update({
-      where: {id: req.body.patientId},
+      where: { id: req.body.patientId },
       data: {
         name: req.body.name,
         email: req.body.email,
@@ -426,43 +434,40 @@ export async function editChildPatient(req: Request<{}, {}, EditChildPatientBody
         photo: req.body.photo,
         phone_number: req.body.phoneNumber,
         tax_number: req.body.taxNumber,
-      }
+      },
     })
 
     // update the patient
     await prisma.patient.update({
-      where: {person_id: req.body.patientId},
+      where: { person_id: req.body.patientId },
       data: {
         health_number: req.body.healthNumber,
         request: req.body.request,
         remarks: req.body.remarks,
         patienttype_id: req.body.patientTypeId,
-      }
+      },
     })
 
     // update school
     let school = await prisma.school.findFirst({
-      where: {patient_person_id: req.body.patientId}
+      where: { patient_person_id: req.body.patientId },
     })
 
     await prisma.school.update({
-      where: {id: school?.id},
+      where: { id: school?.id },
       data: {
         grade: req.body.grade,
         name: req.body.school,
-      }
+      },
     })
 
     // update care takers
-    updateCareTakers(req.body.careTakers);
-
+    updateCareTakers(req.body.careTakers)
 
     res.status(StatusCodes.OK).json({
-      message: "Patient updated with success."
+      message: "Patient updated with success.",
     })
-
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -470,8 +475,8 @@ export async function editChildPatient(req: Request<{}, {}, EditChildPatientBody
 }
 
 // update teen patient
-export async function editTeenPatient(req: Request<{}, {}, EditTeenPatientBody>, res: Response){
-  try{
+export async function editTeenPatient(req: Request<{}, {}, EditTeenPatientBody>, res: Response) {
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -482,33 +487,37 @@ export async function editTeenPatient(req: Request<{}, {}, EditTeenPatientBody>,
     // check authorizations
     // allow admins, therapist and intern (that have edit permissions) associated in the given process.
 
-    let canEdit = false;
-    let processId = req.body.processId;
+    let canEdit = false
+    let processId = req.body.processId
 
     // check permission therapist
-    if (callerRole == 'therapist'){
-      let therapist_process = await prisma.therapist_process.findFirst({where: {therapist_person_id: callerId, process_id: processId}});
-      if (therapist_process != null){
-        canEdit = true;
+    if (callerRole == "therapist") {
+      let therapist_process = await prisma.therapist_process.findFirst({
+        where: { therapist_person_id: callerId, process_id: processId },
+      })
+      if (therapist_process != null) {
+        canEdit = true
       }
     }
     // check permission intern
-    else if (callerRole == 'intern'){
-      let permission = await prisma.permissions.findFirst({where: {person_id: callerId, process_id: processId}});
-      if (permission != null && permission.editpatitent){
-        canEdit = true;
+    else if (callerRole == "intern") {
+      let permission = await prisma.permissions.findFirst({
+        where: { person_id: callerId, process_id: processId },
+      })
+      if (permission != null && permission.editpatitent) {
+        canEdit = true
       }
     }
 
-    if (!callerIsAdmin && !canEdit){
+    if (!callerIsAdmin && !canEdit) {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You don't have what it takes to wield this power!"
+        message: "You don't have what it takes to wield this power!",
       })
     }
 
     // update person
     await prisma.person.update({
-      where: {id: req.body.patientId},
+      where: { id: req.body.patientId },
       data: {
         name: req.body.name,
         email: req.body.email,
@@ -517,43 +526,41 @@ export async function editTeenPatient(req: Request<{}, {}, EditTeenPatientBody>,
         photo: req.body.photo,
         phone_number: req.body.phoneNumber,
         tax_number: req.body.taxNumber,
-      }
+      },
     })
 
     // update the patient
     await prisma.patient.update({
-      where: {person_id: req.body.patientId},
+      where: { person_id: req.body.patientId },
       data: {
         health_number: req.body.healthNumber,
         request: req.body.request,
         remarks: req.body.remarks,
         patienttype_id: req.body.patientTypeId,
-      }
+      },
     })
 
     // update school
     let school = await prisma.school.findFirst({
-      where: {patient_person_id: req.body.patientId}
+      where: { patient_person_id: req.body.patientId },
     })
 
     await prisma.school.update({
-      where: {id: school?.id},
+      where: { id: school?.id },
       data: {
         grade: req.body.grade,
         name: req.body.school,
         course: req.body.course,
-      }
+      },
     })
 
     // update care takers
-    updateCareTakers(req.body.careTakers);
+    updateCareTakers(req.body.careTakers)
 
     res.status(StatusCodes.OK).json({
-      message: "Patient updated with success."
+      message: "Patient updated with success.",
     })
-
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -561,8 +568,11 @@ export async function editTeenPatient(req: Request<{}, {}, EditTeenPatientBody>,
 }
 
 // update Adutl and elder
-export async function editAdultOrElderPatient(req: Request<{}, {}, EditAdultPatientBody>, res: Response){
-  try{
+export async function editAdultOrElderPatient(
+  req: Request<{}, {}, EditAdultPatientBody>,
+  res: Response
+) {
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -573,33 +583,37 @@ export async function editAdultOrElderPatient(req: Request<{}, {}, EditAdultPati
     // check authorizations
     // allow admins, therapist and intern (that have edit permissions) associated in the given process.
 
-    let canEdit = false;
-    let processId = req.body.processId;
+    let canEdit = false
+    let processId = req.body.processId
 
     // check permission therapist
-    if (callerRole == 'therapist'){
-      let therapist_process = await prisma.therapist_process.findFirst({where: {therapist_person_id: callerId, process_id: processId}});
-      if (therapist_process != null){
-        canEdit = true;
+    if (callerRole == "therapist") {
+      let therapist_process = await prisma.therapist_process.findFirst({
+        where: { therapist_person_id: callerId, process_id: processId },
+      })
+      if (therapist_process != null) {
+        canEdit = true
       }
     }
     // check permission intern
-    else if (callerRole == 'intern'){
-      let permission = await prisma.permissions.findFirst({where: {person_id: callerId, process_id: processId}});
-      if (permission != null && permission.editpatitent){
-        canEdit = true;
+    else if (callerRole == "intern") {
+      let permission = await prisma.permissions.findFirst({
+        where: { person_id: callerId, process_id: processId },
+      })
+      if (permission != null && permission.editpatitent) {
+        canEdit = true
       }
     }
 
-    if (!callerIsAdmin && !canEdit){
+    if (!callerIsAdmin && !canEdit) {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You don't have what it takes to wield this power!"
+        message: "You don't have what it takes to wield this power!",
       })
     }
 
     // update person
     await prisma.person.update({
-      where: {id: req.body.patientId},
+      where: { id: req.body.patientId },
       data: {
         name: req.body.name,
         email: req.body.email,
@@ -608,41 +622,39 @@ export async function editAdultOrElderPatient(req: Request<{}, {}, EditAdultPati
         photo: req.body.photo,
         phone_number: req.body.phoneNumber,
         tax_number: req.body.taxNumber,
-      }
+      },
     })
 
     // update the patient
     await prisma.patient.update({
-      where: {person_id: req.body.patientId},
+      where: { person_id: req.body.patientId },
       data: {
         health_number: req.body.healthNumber,
         request: req.body.request,
         remarks: req.body.remarks,
         patienttype_id: req.body.patientTypeId,
-      }
+      },
     })
 
     // update profession
     let profession = await prisma.profession.findFirst({
-      where: {patient_person_id: req.body.patientId}
+      where: { patient_person_id: req.body.patientId },
     })
 
     await prisma.profession.update({
-      where: {id: profession?.id},
+      where: { id: profession?.id },
       data: {
         name: req.body.profession,
-      }
+      },
     })
 
     // update care takers
-    updateCareTakers(req.body.careTakers);
+    updateCareTakers(req.body.careTakers)
 
     res.status(StatusCodes.OK).json({
-      message: "Patient updated with success."
+      message: "Patient updated with success.",
     })
-
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -650,8 +662,11 @@ export async function editAdultOrElderPatient(req: Request<{}, {}, EditAdultPati
 }
 
 // update couple and family
-export async function editCoupleOrFamilyPatient(req: Request<{}, {}, EditCoupleOrFamilyPatientBody>, res: Response){
-  try{
+export async function editCoupleOrFamilyPatient(
+  req: Request<{}, {}, EditCoupleOrFamilyPatientBody>,
+  res: Response
+) {
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -662,33 +677,37 @@ export async function editCoupleOrFamilyPatient(req: Request<{}, {}, EditCoupleO
     // check authorizations
     // allow admins, therapist and intern (that have edit permissions) associated in the given process.
 
-    let canEdit = false;
-    let processId = req.body.processId;
+    let canEdit = false
+    let processId = req.body.processId
 
     // check permission therapist
-    if (callerRole == 'therapist'){
-      let therapist_process = await prisma.therapist_process.findFirst({where: {therapist_person_id: callerId, process_id: processId}});
-      if (therapist_process != null){
-        canEdit = true;
+    if (callerRole == "therapist") {
+      let therapist_process = await prisma.therapist_process.findFirst({
+        where: { therapist_person_id: callerId, process_id: processId },
+      })
+      if (therapist_process != null) {
+        canEdit = true
       }
     }
     // check permission intern
-    else if (callerRole == 'intern'){
-      let permission = await prisma.permissions.findFirst({where: {person_id: callerId, process_id: processId}});
-      if (permission != null && permission.editpatitent){
-        canEdit = true;
+    else if (callerRole == "intern") {
+      let permission = await prisma.permissions.findFirst({
+        where: { person_id: callerId, process_id: processId },
+      })
+      if (permission != null && permission.editpatitent) {
+        canEdit = true
       }
     }
 
-    if (!callerIsAdmin && !canEdit){
+    if (!callerIsAdmin && !canEdit) {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You don't have what it takes to wield this power!"
+        message: "You don't have what it takes to wield this power!",
       })
     }
 
     // update person
     await prisma.person.update({
-      where: {id: req.body.patientId},
+      where: { id: req.body.patientId },
       data: {
         name: req.body.name,
         email: req.body.email,
@@ -697,38 +716,36 @@ export async function editCoupleOrFamilyPatient(req: Request<{}, {}, EditCoupleO
         photo: req.body.photo,
         phone_number: req.body.phoneNumber,
         tax_number: req.body.taxNumber,
-      }
+      },
     })
 
     // update the patient
     await prisma.patient.update({
-      where: {person_id: req.body.patientId},
+      where: { person_id: req.body.patientId },
       data: {
         health_number: req.body.healthNumber,
         request: req.body.request,
         remarks: req.body.remarks,
         patienttype_id: req.body.patientTypeId,
-      }
+      },
     })
 
     // update profession
     let profession = await prisma.profession.findFirst({
-      where: {patient_person_id: req.body.patientId}
+      where: { patient_person_id: req.body.patientId },
     })
 
     await prisma.profession.update({
-      where: {id: profession?.id},
+      where: { id: profession?.id },
       data: {
         name: req.body.profession,
-      }
+      },
     })
 
     res.status(StatusCodes.OK).json({
-      message: "Patient updated with success."
+      message: "Patient updated with success.",
     })
-
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -737,8 +754,8 @@ export async function editCoupleOrFamilyPatient(req: Request<{}, {}, EditCoupleO
 
 // archive patient
 // lets archive and activate a patient
-export async function archivePatient(req: Request<{}, {}, ArchivePatientBody>, res: Response){
-  try{
+export async function archivePatient(req: Request<{}, {}, ArchivePatientBody>, res: Response) {
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -748,29 +765,27 @@ export async function archivePatient(req: Request<{}, {}, ArchivePatientBody>, r
 
     // check authorizations
     // only admins can archive a patient (why, because I say so.)
-    
-    if (!callerIsAdmin){
+
+    if (!callerIsAdmin) {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "U Can't Touch This"
+        message: "U Can't Touch This",
       })
     }
 
     // flip the state of the patient
-    let person = await prisma.person.findFirst({where: {id: req.body.patientId}});
+    let person = await prisma.person.findFirst({ where: { id: req.body.patientId } })
 
     await prisma.person.update({
-      where: {id: req.body.patientId},
+      where: { id: req.body.patientId },
       data: {
         active: !person?.active,
-      }
+      },
     })
 
     res.status(StatusCodes.OK).json({
-      message: "The status of the patient has changed."
+      message: "The status of the patient has changed.",
     })
-
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -1026,20 +1041,22 @@ async function buildInfoCoupleOrFamilyPatient(
   return membersInfo
 }
 
-async function updateCareTakers(careTakers: Array<EditCareTaker>){
+async function updateCareTakers(careTakers: Array<EditCareTaker>) {
   /**
    * Updates the care takers of a process.
    */
 
-  for (let i = 0; i < careTakers.length; i++){
-    await prisma.liable.update({where: {id: careTakers[i].id},
-    data: {
-      name: careTakers[i].name,
-      email: careTakers[i].email,
-      phonenumber: careTakers[i].phoneNumber,
-      type: careTakers[i].type,
-      remarks: careTakers[i].remarks,
-    }})
+  for (let i = 0; i < careTakers.length; i++) {
+    await prisma.liable.update({
+      where: { id: careTakers[i].id },
+      data: {
+        name: careTakers[i].name,
+        email: careTakers[i].email,
+        phonenumber: careTakers[i].phoneNumber,
+        type: careTakers[i].type,
+        remarks: careTakers[i].remarks,
+      },
+    })
   }
 }
 
