@@ -280,7 +280,7 @@ export async function getAppointmentsOfTheDayGuard(req: Request, res: Response) 
     // otbain the caller properties
     var callerRole = decodedToken.role
 
-    if (callerRole != "accountant") {
+    if (callerRole != "guard") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "This endpoint is just for guards.",
       })
