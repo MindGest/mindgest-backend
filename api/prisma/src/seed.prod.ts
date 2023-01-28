@@ -1,5 +1,3 @@
-async function seed() {
-  
-}
+async function seed() {}
 
 export default { seed }

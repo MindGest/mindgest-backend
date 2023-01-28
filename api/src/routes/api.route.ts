@@ -16,6 +16,7 @@ import StatisticsRouter from "./statistics.route"
 import SpecialityRouter from "./speciality.route"
 import TherapistRouter from "./therapist.route"
 import EmailRouter from "./email.route"
+import PatientRouter from "./patient.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
@@ -59,6 +60,7 @@ api.use("/rooms", RoomsRouter)
 api.use("/statistics", StatisticsRouter)
 api.use("/speciality", SpecialityRouter)
 api.use("/therapist", TherapistRouter)
+api.use("/patient", PatientRouter)
 
 // Healthcheck
 api.get("/healthcheck", controller.healthCheck)

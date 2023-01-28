@@ -88,3 +88,11 @@ export type CreateChildPatientBody = z.TypeOf<typeof schemas.CreateChildPatientS
 
 export type CreateTeenPatientBody = z.TypeOf<typeof schemas.CreateTeenPatientSchema>["body"]
 export type CreateAdultPatientBody = z.TypeOf<typeof schemas.CreateAdultPatientSchema>["body"]
+export type EditChildPatientBody = z.TypeOf<typeof schemas.EditChildPatientSchema>["body"]
+export type EditTeenPatientBody = z.TypeOf<typeof schemas.EditTeenPatientSchema>["body"]
+export type EditAdultPatientBody = z.TypeOf<typeof schemas.EditAdultPatientSchema>["body"]
+export type ArchivePatientBody = z.TypeOf<typeof schemas.ArchivePatientSchema>["body"]
+export type EditCoupleOrFamilyPatientBody = z.TypeOf<
+  typeof schemas.EditCoupleOrFamilyPatientSchema
+>["body"]
+export type EditCareTaker = z.TypeOf<typeof schemas.EditCareTakerSchema>
