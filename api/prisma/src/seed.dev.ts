@@ -13,11 +13,12 @@ async function seed() {
   await prisma.patient_process.deleteMany({})
   await prisma.patient.deleteMany({})
   await prisma.patienttype.deleteMany({})
-  await prisma.appointment.deleteMany({})
   await prisma.therapist_process.deleteMany({})
   await prisma.therapist.deleteMany({})
-  await prisma.pricetable.deleteMany({})
   await prisma.receipt.deleteMany({})
+  await prisma.appointment.deleteMany({})
+  await prisma.permissions.deleteMany({})
+  await prisma.pricetable.deleteMany({})
   await prisma.process.deleteMany({})
   await prisma.speciality.deleteMany({})
   await prisma.person.deleteMany({})
@@ -294,6 +295,20 @@ async function seed() {
       datetime: new Date("2023-01-22T22:50:28.538Z"),
       payed: true,
       appointment_slot_id: appointment2.slot_id
+    }
+  })
+
+  await prisma.permissions.create({
+    data:{
+      editpatitent:true,
+      editprocess:true,
+      see:true,
+      appoint:true,
+      statitics:true,
+      archive:true,
+      isMain:true,
+      process_id:process.id,
+      person_id: person1.id
     }
   })
 }
