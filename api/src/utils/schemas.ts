@@ -387,7 +387,8 @@ export const GetPatientInfoSchema = z.object({
   }),
 })
 
-const CareTakerSchema = z.object({
+export const EditCareTakerSchema = z.object({
+  id: z.number(),
   name: z.string(),
   email: z.string().email(),
   phoneNumber: z.number(),
@@ -412,7 +413,6 @@ export const CreateChildPatientSchema = z.object({
 
     grade: z.number(),
     school: z.string(),
-    // careTakersId: z.array(CareTakerSchema),
   })
 })
 
@@ -434,7 +434,6 @@ export const CreateTeenPatientSchema = z.object({
     grade: z.number(),
     school: z.string(),
     course: z.string(),
-    // careTakersId: z.array(CareTakerSchema),
   })
 })
 
@@ -454,7 +453,106 @@ export const CreateAdultPatientSchema = z.object({
     patientTypeId: z.number(),
 
     profession: z.string(),
-    // careTakersId: z.array(CareTakerSchema),
+  })
+})
+
+export const EditChildPatientSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    patientId: z.number(),
+
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    grade: z.number(),
+    school: z.string(),
+    careTakers: z.array(EditCareTakerSchema),
+  })
+})
+
+export const EditTeenPatientSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    patientId: z.number(),
+    
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    grade: z.number(),
+    school: z.string(),
+    course: z.string(),
+    careTakers: z.array(EditCareTakerSchema),
+  })
+})
+
+export const EditAdultPatientSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    patientId: z.number(),
+
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    profession: z.string(),
+    careTakers: z.array(EditCareTakerSchema),
+  })
+})
+
+export const EditCoupleOrFamilyPatientSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    patientId: z.number(),
+
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    profession: z.string(),
+  })
+})
+
+export const ArchivePatientSchema = z.object({
+  body: z.object({
+    patientId: z.number()
   })
 })
 
@@ -504,5 +602,11 @@ export default {
   GetPatientInfoSchema,
   CreateChildPatientSchema,
   CreateTeenPatientSchema,
-  CreateAdultPatientSchema
+  CreateAdultPatientSchema,
+  EditChildPatientSchema,
+  EditTeenPatientSchema,
+  EditAdultPatientSchema,
+  ArchivePatientSchema,
+  EditCareTakerSchema,
+  EditCoupleOrFamilyPatientSchema
 }
