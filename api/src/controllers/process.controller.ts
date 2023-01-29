@@ -949,9 +949,9 @@ export async function getProcesses(req: Request, res: Response) {
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (callerRole == 'accountant' && callerRole == 'guard'){
+    if (callerRole == "accountant" && callerRole == "guard") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You do not have permission to access this information."
+        message: "You do not have permission to access this information.",
       })
     }
 
