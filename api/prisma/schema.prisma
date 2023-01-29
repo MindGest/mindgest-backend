@@ -32,13 +32,13 @@ model person {
 }
 
 model therapist {
-  extern                 Boolean
-  license                String?                  @db.VarChar(512)
-  health_system          String?                  @db.VarChar(512)
-  person_id              BigInt                   @id
-  person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
-  therapist_process      therapist_process[]
-  therapist_speciality   therapist_speciality[]
+  extern               Boolean
+  license              String?                @db.VarChar(512)
+  health_system        String?                @db.VarChar(512)
+  person_id            BigInt                 @id
+  person               person                 @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
+  therapist_process    therapist_process[]
+  therapist_speciality therapist_speciality[]
 }
 
 model guard {
@@ -52,9 +52,9 @@ model admin {
 }
 
 model intern {
-  person_id           BigInt                @id
-  person              person                @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
-  intern_process      intern_process[]
+  person_id      BigInt           @id
+  person         person           @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
+  intern_process intern_process[]
 }
 
 model accountant {
@@ -107,7 +107,6 @@ model appointment_process {
 
   @@id([appointment_slot_id, process_id])
 }
-
 
 model intern_process {
   intern_person_id BigInt
@@ -237,7 +236,6 @@ model speciality {
   process              process[]
   therapist_speciality therapist_speciality[]
 }
-
 
 model therapist_process {
   therapist_person_id BigInt

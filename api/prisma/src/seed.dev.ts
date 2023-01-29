@@ -345,38 +345,38 @@ async function seed() {
   })
 
   let liable = await prisma.liable.create({
-    data:{
-      name:"Pai do burro",
-      email:"paidoburro@gmail.com",
+    data: {
+      name: "Pai do burro",
+      email: "paidoburro@gmail.com",
       phonenumber: 91312312,
       type: "Pai",
       remarks: "Ele é mesmo burro pah",
-    }
+    },
   })
 
   await prisma.process_liable.create({
-    data:{
-      process_id:process.id,
-      liable_id:liable.id
-    }
+    data: {
+      process_id: process.id,
+      liable_id: liable.id,
+    },
   })
 
   await prisma.notifications.create({
-    data:{
-      title:"Teste123",
-      body:"Teste123",
-      seen:false,
+    data: {
+      title: "Teste123",
+      body: "Teste123",
+      seen: false,
       person_id: person6.id,
-    }
+    },
   })
 
   await prisma.notes.create({
-    data:{
+    data: {
       title: "ele é burro",
       body: "IMANINHOCABURRO",
       datetime: new Date("2023-01-22T22:50:28.538Z"),
-      process_id: process.id
-    }
+      process_id: process.id,
+    },
   })
 }
 
