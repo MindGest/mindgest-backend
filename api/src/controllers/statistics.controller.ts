@@ -24,23 +24,47 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
   let parsedDateEnd = new Date(query.endDate)
   let timestampEnd = parsedDateEnd.getTime()
 
-  let processes
+  let processes = []
 
-  if (query.processId != null) {
-    processes = await prisma.therapist_process.findMany({
-      where: {
-        therapist_person_id: id,
-        process_id: parseInt(query.processId),
-      },
-    })
-  } else {
-    processes = await prisma.therapist_process.findMany({
-      where: {
-        therapist_person_id: id,
-      },
-    })
+  // obter os ids dos processos
+  // criar um array de {process_id: <id>}
+  // given the process, ignore other filters
+  if (req.query.processId != null){
+    processes.push({process_id: req.query.processId});
+  }
+  // given therapist and speciality
+  else if (req.query.therapistId != null && req.query.speciality != null){
+    // all the therapists processess
+    let therapist_process = await prisma.therapist_process.findMany({where: {therapist_person_id: req.query.therapistId}});
+    // filter by speciality
+    for (let i = 0; i < therapist_process.length; i++){
+      let process = await prisma.process.findFirst({where: {id: therapist_process[i].process_id, speciality_speciality: req.query.speciality}});
+      if (process != null){
+        processes.push({process_id: process.id});
+      }
+    }
+  }
+  // given only therapist
+  else if (req.query.therapistId != null){
+    processes = await prisma.therapist_process.findMany({where: {therapist_person_id: req.query.therapistId}});
+  }
+  // given only speciality
+  else if (req.query.speciality != null){
+    // used to get the id, so that a pre defined array can be assembled
+    let processesInfo = await prisma.process.findMany({where: {speciality_speciality: req.query.speciality}, select: {id: true}});
+    for (let i = 0; i < processes.length; i++){
+      processes.push({process_id: processesInfo[i].id});
+    }
+  }
+  // else, use all the processes
+  else{
+    let processesInfo = await prisma.process.findMany({select: {id: true}});
+    for (let i = 0; i < processes.length; i++){
+      processes.push({process_id: processesInfo[i].id});
+    }
   }
 
+  // calcular as cenas
   let data = []
 
   for (let processInfo of processes) {
