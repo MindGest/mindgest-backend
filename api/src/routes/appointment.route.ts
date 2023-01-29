@@ -37,7 +37,7 @@ appointment.post(
   controller.createAppointment
 )
 
-appointment.get("/listLastTerminated", (req: Request, res: Response) => {
+appointment.get("/last-terminated", (req: Request, res: Response) => {
   controller.lastTerminatedAppointments(req, res)
 })
 
