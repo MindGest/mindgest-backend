@@ -293,7 +293,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
     today.setHours(0, 0, 0, 0)
     var process_user = null
 
-    if (callerRole == "guard") {
+    if (callerRole == "guard" || callerRole == "admin") {
       // return all the appointments of the day
       var appointments = await prisma.appointment.findMany({
         select: {
