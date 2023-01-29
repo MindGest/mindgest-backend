@@ -49,4 +49,6 @@ process.post(
   controller.getCollaborators
 )
 
+process.get("/get-processes", controller.getProcesses)
+
 export default process

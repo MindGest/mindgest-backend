@@ -8,12 +8,7 @@ import controller from "../controllers/email.controller"
 import middleware from "../middleware/api.middleware"
 import authMiddleware from "../middleware/auth.middleware"
 
-const COOKIE_SECRET = String(process.env.COOKIE_SECRET)
-
 const email = Router()
-
-// Middleware
-email.use(cookieParser(COOKIE_SECRET))
 
 // Endpoints
 email.post(

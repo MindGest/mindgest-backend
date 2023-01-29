@@ -1,7 +1,5 @@
 import mailer from "nodemailer"
 import logger from "./logger"
-import Email from "email-templates"
-import path from "path"
 
 const SMTP_EMAIL = String(process.env.SMTP_EMAIL)
 const SMTP_PASS = String(process.env.SMTP_PASS)

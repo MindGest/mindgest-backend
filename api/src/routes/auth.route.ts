@@ -6,12 +6,7 @@ import schemas from "../utils/schemas"
 import controller from "../controllers/auth.controller"
 import middleware from "../middleware/api.middleware"
 
-const COOKIE_SECRET = String(process.env.COOKIE_SECRET)
-
 const auth = Router()
-
-// Middleware
-auth.use(cookieParser(COOKIE_SECRET))
 
 // Endpoints
 auth.post("/register", middleware.requestValidator(schemas.RegistrationSchema), controller.register)

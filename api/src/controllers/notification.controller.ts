@@ -3,12 +3,16 @@ import { StatusCodes } from "http-status-codes"
 
 import prisma from "../utils/prisma"
 import { NotificationFilterType } from "../utils/schemas"
-import { MarkNotificationQueryParams, NotificationListQueryParams } from "../utils/types"
+import {
+  MarkNotificationQueryParams,
+  NotificationBody,
+  NotificationListQueryParams,
+} from "../utils/types"
 
 export async function mark(req: Request<MarkNotificationQueryParams>, res: Response) {
   const { id, role, admin } = res.locals.token
   try {
-    const notification_id = Number(req.params.notification)
+    const notification_id = Number(req.params.id)
     const notification = await prisma.notifications.findFirst({
       where: { person_id: id, id: notification_id },
     })
@@ -58,4 +62,24 @@ export async function list(req: Request<{}, {}, {}, NotificationListQueryParams>
   }
 }
 
-export default { mark, list }
+export async function create(req: Request<{}, {}, NotificationBody>, res: Response) {
+  const { id, role, admin } = res.locals.token
+  try {
+    await prisma.notifications.create({
+      data: {
+        title: req.body.title,
+        body: req.body.body,
+        person_id: id,
+      },
+    })
+    res.send(StatusCodes.OK).json({
+      message: `Notification created successfully.`,
+    })
+  } catch (error) {
+    res.send(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export default { mark, list, create }

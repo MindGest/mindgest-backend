@@ -64,7 +64,7 @@ export type SelfGuardUpdateBody = z.TypeOf<typeof schemas.GuardSchema>
 export type SelfAccountantUpdateBody = z.TypeOf<typeof schemas.AccountantSchema>
 export type SelfAdminUpdateBody = z.TypeOf<typeof schemas.AdminSchema>
 
-export type MarkNotificationQueryParams = { notification: Number }
+export type MarkNotificationQueryParams = { id: Number }
 
 export type NotificationListQueryParams = z.TypeOf<typeof schemas.NotificationFilterSchema>
 
@@ -75,6 +75,8 @@ export type QueryStatistics = z.TypeOf<typeof schemas.QueryStatistics>["query"]
 
 export type NotesCreateBody = z.TypeOf<typeof schemas.NotesCreate>["body"]
 export type RoomCreateBody = z.TypeOf<typeof schemas.RoomCreate>["body"]
+
+export type NotificationBody = z.TypeOf<typeof schemas.NotificationSchema>["body"]
 
 export type SpecialityCreateBody = z.TypeOf<typeof schemas.SpecialityCreateSchema>["body"]
 export type EmailSchema = z.TypeOf<typeof schemas.EmailSchema>["body"]
@@ -95,6 +97,7 @@ export type ArchivePatientBody = z.TypeOf<typeof schemas.ArchivePatientSchema>["
 export type EditCoupleOrFamilyPatientBody = z.TypeOf<
   typeof schemas.EditCoupleOrFamilyPatientSchema
 >["body"]
+
 export type EditCareTaker = z.TypeOf<typeof schemas.EditCareTakerSchema>
 
 export type GetAvailableRoomsBody = z.TypeOf<typeof schemas.GetAvailableRoomsSchema>["body"]

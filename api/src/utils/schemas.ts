@@ -75,8 +75,7 @@ export const RefreshSchema = z.object({
     .object({
       refreshToken: z.string().optional(),
     })
-    .strict()
-    .required(),
+    .strict(),
 })
 
 export const AuthToken = z.object({
@@ -301,6 +300,15 @@ export const NotificationFilterSchema = z.object({
   filter: z.enum([NotificationFilterType.READ, NotificationFilterType.UNREAD]).optional(),
 })
 
+export const NotificationSchema = z.object({
+  body: z
+    .object({
+      title: z.string(),
+      body: z.string(),
+    })
+    .required(),
+})
+
 export const ReceiptListQuery = z.object({
   query: z.object({
     payed: z.string(),
@@ -334,7 +342,7 @@ export const QueryStatistics = z.object({
     startDate: z.string(),
     endDate: z.string(),
     therapistId: z.string().optional(),
-    specialityId: z.string(),
+    specialityId: z.string().optional(),
     processId: z.string().optional(),
   }),
 })
@@ -624,4 +632,5 @@ export default {
   EditCoupleOrFamilyPatientSchema,
   GetAvailableRoomsSchema,
   GetCollaboratorsSchema,
+  NotificationSchema,
 }

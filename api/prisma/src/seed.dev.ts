@@ -322,6 +322,14 @@ async function seed() {
     },
   })
 
+  await prisma.speciality.create({
+    data: {
+      code: "TX",
+      description: "Terapia X",
+      speciality: "TerapiaX",
+    },
+  })
+
   await prisma.permissions.create({
     data: {
       editpatitent: false,
@@ -355,7 +363,8 @@ async function seed() {
 
   await prisma.notifications.create({
     data:{
-      message:"Teste123",
+      title:"Teste123",
+      body:"Teste123",
       seen:false,
       person_id: person6.id,
     }
