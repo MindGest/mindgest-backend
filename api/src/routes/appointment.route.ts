@@ -1,25 +1,19 @@
 import { Router, Request, Response } from "express"
 import controller from "../controllers/appointment.controller"
 import authMiddleware from "../middleware/auth.middleware"
+import middleware from "../middleware/api.middleware"
+import schemas from "../utils/schemas"
 
 const appointment = Router()
 appointment.use(authMiddleware.authorize())
 
-appointment.post("/list", (req: Request, res: Response) => {
-  controller.getAllAppointments(req, res)
-})
+appointment.post("/list", middleware.requestValidator(schemas.AppointmentsListSchema), controller.getAllAppointments)
 
-appointment.post("/list/active", (req: Request, res: Response) => {
-  controller.getAllActiveAppointments(req, res)
-})
+appointment.post("/list/active", middleware.requestValidator(schemas.AppointmentsListSchema), controller.getAllActiveAppointments)
 
-appointment.post("/info", (req: Request, res: Response) => {
-  controller.infoAppointment(req, res)
-})
+appointment.post("/info", middleware.requestValidator(schemas.AppointmentInfoSchema), controller.infoAppointment)
 
-appointment.post("/create", (req: Request, res: Response) => {
-  controller.createAppointment(req, res)
-})
+appointment.post("/create", middleware.requestValidator(schemas.AppointmentCreateSchema), controller.createAppointment)
 
 appointment.get("/listLastTerminated", (req: Request, res: Response) => {
   controller.lastTerminatedAppointments(req, res)
@@ -37,12 +31,8 @@ appointment.get("/listAppointmentsOfTheDayIntern", (req: Request, res: Response)
   controller.getAppointmentsOfTheDayIntern(req, res)
 })
 
-appointment.put("/archive", (req: Request, res: Response) => {
-  controller.archiveAppointment(req, res)
-})
+appointment.put("/archive", middleware.requestValidator(schemas.AppointmentArchiveSchema), controller.archiveAppointment)
 
-appointment.put("/edit", (req: Request, res: Response) => {
-  controller.editAppointment(req, res)
-})
+appointment.put("/edit", middleware.requestValidator(schemas.AppointmentEditSchema), controller.editAppointment)
 
 export default appointment

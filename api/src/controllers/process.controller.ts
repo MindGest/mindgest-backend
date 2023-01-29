@@ -10,6 +10,7 @@ import {
   ProcessIDPrams,
   QueryListProcess,
   NotesCreateBody,
+  GetCollaboratorsBody,
 } from "../utils/types"
 import logger from "../utils/logger"
 
@@ -844,6 +845,86 @@ export async function getPermissions(req: Request, res: Response) {
   }
 }
 
+export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody>, res: Response){
+  /**
+   * Returns info of all the collaborators of the process;
+   */
+
+  try {
+    var decodedToken = res.locals.token
+
+    // obtain the caller properties
+    var callerId = decodedToken.id
+    var callerRole = decodedToken.role
+    var callerIsAdmin = decodedToken.admin
+
+    // get the info from the request body
+    let processId = req.body.processId
+
+    let canSee = false
+
+    // check permission therapist
+    if (callerRole == "therapist") {
+      let therapist_process = await prisma.therapist_process.findFirst({
+        where: { therapist_person_id: callerId, process_id: processId },
+      })
+      if (therapist_process != null) {
+        canSee = true
+      }
+    }
+    // check permission intern
+    else if (callerRole == "intern") {
+      let permission = await prisma.permissions.findFirst({
+        where: { person_id: callerId, process_id: processId },
+      })
+      if (permission != null && permission.see) {
+        canSee = true
+      }
+    }
+
+    if (!callerIsAdmin && !canSee) {
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "You don't have what it takes to wield this power!",
+      })
+    }
+
+    // get the therapists of the process
+    let therapist_process = await prisma.therapist_process.findMany({where: {process_id: processId}});
+    let therapistsInfo = [];
+    for (let i = 0; i < therapist_process.length; i++){
+      let person = await prisma.person.findFirst({where: {id: therapist_process[i].therapist_person_id}});
+      therapistsInfo.push({
+        id: person?.id,
+        name: person?.name,
+      })
+    }
+
+    // get the interns of the process
+    let intern_process = await prisma.intern_process.findMany({where: {process_id: processId}});
+    let internsInfo = [];
+    for (let i = 0; i < intern_process.length; i++){
+      let person = await prisma.person.findFirst({where: {id: intern_process[i].intern_person_id}});
+      internsInfo.push({
+        id: person?.id,
+        name: person?.name,
+      })
+    }
+
+    let infoToReturn = {
+      therapists: therapistsInfo,
+      interns: internsInfo
+    };
+
+    res.status(StatusCodes.OK).json({
+      data: infoToReturn,
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 export default {
   archive,
   info,
@@ -857,4 +938,5 @@ export default {
   listNotes,
   listTherapist,
   getPermissions,
+  getCollaborators,
 }

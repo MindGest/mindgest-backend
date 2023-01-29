@@ -43,4 +43,6 @@ process.post(
 
 process.get("/permissions/:processId", controller.getPermissions)
 
+process.post("/collaborators", middleware.requestValidator(schemas.GetCollaboratorsSchema), controller.getCollaborators);
+
 export default process

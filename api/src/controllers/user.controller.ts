@@ -39,4 +39,74 @@ export async function getUsers(req: Request, res: Response) {
   }
 }
 
-export default { getUsers }
+export async function getAllTherapists(req: Request, res: Response){
+  /**
+   * Returns the name and id of every therapist.
+   */
+  try{
+    // TODO: check authorization
+
+    let infoToReturn = [];
+
+    // obtain the ids of the therapists
+    let therapists = await prisma.therapist.findMany();
+
+    // obtain the name of the therapists
+    for (let i = 0; i < therapists.length; i++){
+      let person = await prisma.person.findFirst({where: {id: therapists[i].person_id}});
+      infoToReturn.push({
+        id: therapists[i].person_id,
+        name: person?.name,
+      })
+    }
+
+    res.status(StatusCodes.OK).json({
+      data: infoToReturn,
+    })
+
+  }
+  catch (error){
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export async function getAllInterns(req: Request, res: Response){
+  /**
+   * Returns the name and id of every intern.
+   */
+  try{
+    // TODO: check authorization
+
+    let infoToReturn = [];
+
+    // obtain the ids of the therapists
+    let interns = await prisma.intern.findMany();
+
+    // obtain the name of the therapists
+    for (let i = 0; i < interns.length; i++){
+      let person = await prisma.person.findFirst({where: {id: interns[i].person_id}});
+      infoToReturn.push({
+        id: interns[i].person_id,
+        name: person?.name,
+      })
+    }
+
+    res.status(StatusCodes.OK).json({
+      data: infoToReturn,
+    })
+
+  }
+  catch (error){
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export default { 
+  getUsers,
+  getAllInterns,
+  getAllTherapists,
+ }

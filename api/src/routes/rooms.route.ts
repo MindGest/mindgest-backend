@@ -13,4 +13,6 @@ rooms.get("/list", controller.list)
 rooms.get("/listAppointmentsRoom", controller.listAppointmentRooms)
 rooms.post("/create", middleware.requestValidator(schemas.RoomCreate), controller.create)
 
+rooms.post("/get-available-rooms", middleware.requestValidator(schemas.GetAvailableRoomsSchema), controller.getAvailableRooms)
+
 export default rooms

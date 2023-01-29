@@ -556,6 +556,19 @@ export const ArchivePatientSchema = z.object({
   }),
 })
 
+export const GetAvailableRoomsSchema = z.object({
+  body: z.object({
+    startDate: DateSchema,
+    endDate: DateSchema
+  })
+})
+
+export const GetCollaboratorsSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+  })
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -609,4 +622,6 @@ export default {
   ArchivePatientSchema,
   EditCareTakerSchema,
   EditCoupleOrFamilyPatientSchema,
+  GetAvailableRoomsSchema,
+  GetCollaboratorsSchema,
 }

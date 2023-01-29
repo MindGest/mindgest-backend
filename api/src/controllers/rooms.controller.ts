@@ -4,7 +4,7 @@ import { appointment } from "@prisma/client"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { verifyAccessToken, verifyToken } from "../services/auth.service"
-import { QueryListRooms, RoomCreateBody } from "../utils/types"
+import { QueryListRooms, RoomCreateBody, GetAvailableRoomsBody } from "../utils/types"
 import logger from "../utils/logger"
 import moment from "moment"
 
@@ -239,8 +239,51 @@ export async function create(req: Request<{}, {}, RoomCreateBody>, res: Response
   }
 }
 
+export async function getAvailableRooms(req: Request<{}, {}, GetAvailableRoomsBody>, res: Response){
+  /**
+   * Returns the available rooms for the given time interval (from starting date to ending date).
+   * Only available rooms for the full time interval.
+   */
+
+  // TODO: verificar permissões -> não me apetece, desculpem.
+
+  // create the dates
+  let startDate = new Date(req.body.startDate);
+  let endDate = new Date(req.body.endDate);
+
+  // obter os appointments que estão dentro (todo ou em parte) do intervalo.
+  let appointments = await prisma.appointment.findMany();
+  let roomIdsOfTheAppointmentsInTheTimeInterval = [];
+  for (let i = 0; i < appointments.length; i++){
+    let appointmentStartDate = new Date(appointments[i].slot_start_date);
+    let appointmentEndDate = new Date(appointments[i].slot_end_date);
+    // check if the appointment overlaps the specified time interval
+    if(appointmentStartDate.getTime() < endDate.getTime() && appointmentEndDate.getTime() > startDate.getTime()){
+      roomIdsOfTheAppointmentsInTheTimeInterval.push(appointments[i].room_id)
+    }
+  }
+
+  // get the ids of all the rooms
+  let rooms = await prisma.room.findMany();
+
+  // compute free rooms
+  let freeRooms = [];
+  for (let i = 0; i < rooms.length; i++){
+    // if this room is not being used in the specified interval
+    if (!roomIdsOfTheAppointmentsInTheTimeInterval.includes(rooms[i].id)){
+      freeRooms.push(rooms[i]);
+    }
+  }
+
+  // return freeRooms
+  res.status(StatusCodes.OK).json({
+    data: freeRooms,
+  })
+}
+
 export default {
   listAppointmentRooms,
   list,
   create,
+  getAvailableRooms,
 }

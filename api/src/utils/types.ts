@@ -96,3 +96,8 @@ export type EditCoupleOrFamilyPatientBody = z.TypeOf<
   typeof schemas.EditCoupleOrFamilyPatientSchema
 >["body"]
 export type EditCareTaker = z.TypeOf<typeof schemas.EditCareTakerSchema>
+
+export type GetAvailableRoomsBody = z.TypeOf<typeof schemas.GetAvailableRoomsSchema>["body"]
+
+export type GetCollaboratorsBody = z.TypeOf<typeof schemas.GetCollaboratorsSchema>["body"]
+

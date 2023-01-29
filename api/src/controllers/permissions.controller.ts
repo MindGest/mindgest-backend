@@ -87,6 +87,71 @@ export async function getInternsPermissions(
   }
 }
 
+// retornar as permissões de um intern de um determinado processo
+export async function getInternPermissions(
+  req: Request<{}, {}, GetPermissionsBody>,
+  res: Response
+) {
+  /**
+   * Returns the permissions of the caller (if intern) in the process.
+   */
+
+  try {
+    var decodedToken = res.locals.token
+
+    // obtain the caller properties
+    var callerId = decodedToken.id
+    var callerRole = decodedToken.role
+    var callerIsAdmin = decodedToken.admin
+
+    // get the info from the request body
+    let processId = req.body.processId;
+    let internId = callerId;
+
+    // TODO: authorization
+    if (callerRole != 'intern'){
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "You should not be here."
+      })
+    }
+
+    // get the permissions of the intern in the proces
+    let intern_permissions = await prisma.permissions.findFirst({
+      where: { process_id: processId, person_id: internId},
+      select: {
+        editprocess: true,
+        see: true,
+        appoint: true,
+        statitics: true,
+        editpatitent: true,
+        archive: true,
+        person_id: true,
+      },
+    })
+
+    let intern = await prisma.person.findFirst({where: {id: internId}});
+
+    let infoToReturn = {
+      editprocess: intern_permissions?.editprocess,
+      see: intern_permissions?.see,
+      appoint: intern_permissions?.appoint,
+      statistics: intern_permissions?.statitics,
+      editpatient: intern_permissions?.editpatitent,
+      archive: intern_permissions?.archive,
+      name: intern?.name,
+      collaboratorId: intern_permissions?.person_id,
+    };
+
+    res.status(StatusCodes.OK).json({
+      data: infoToReturn,
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 // editar as permissões de um intern num dado processo.
 export async function editInternPermissions(
   req: Request<{}, {}, EditPermissionsBody>,
@@ -169,4 +234,5 @@ export async function editInternPermissions(
 export default {
   getInternsPermissions,
   editInternPermissions,
+  getInternPermissions,
 }
