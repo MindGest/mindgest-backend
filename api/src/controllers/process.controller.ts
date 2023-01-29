@@ -32,7 +32,7 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
       })
     }
 
-    let process = await prisma.process.findFirst({where: {id: processId}});
+    let process = await prisma.process.findFirst({ where: { id: processId } })
 
     await prisma.process.update({
       data: { active: !process?.active },
@@ -936,12 +936,12 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
   }
 }
 
-export async function getProcesses(req: Request, res: Response){
+export async function getProcesses(req: Request, res: Response) {
   /**
    * Returns all the processes that an intern or therapist that are calling are associated, however, if the caller is an admin, all the processess are returned.
    */
 
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -949,48 +949,58 @@ export async function getProcesses(req: Request, res: Response){
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (callerRole == 'accountant' && callerRole == 'guard'){
+    if (callerRole == "accountant" && callerRole == "guard") {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You do not have permission to access this information."
+        message: "You do not have permission to access this information.",
       })
     }
 
-    let processes = [];
-    if (callerIsAdmin){
+    let processes = []
+    if (callerIsAdmin) {
       // return all processes
       // get the id and ref of the processes
-      processes = await prisma.process.findMany({select: {
-        id: true,
-        ref: true,
-      }});
-    }
-    else if(callerRole == 'therapist'){
+      processes = await prisma.process.findMany({
+        select: {
+          id: true,
+          ref: true,
+        },
+      })
+    } else if (callerRole == "therapist") {
       // get only the processes in which the therapist is associated.
       let therapist_process = await prisma.therapist_process.findMany({
-        where: {therapist_person_id: callerId}
+        where: { therapist_person_id: callerId },
       })
 
-      for (let i = 0; i < therapist_process.length; i++){
-        processes.push(await prisma.process.findFirst({where: {id: therapist_process[i].process_id}, select: {id: true, ref: true}}));
+      for (let i = 0; i < therapist_process.length; i++) {
+        processes.push(
+          await prisma.process.findFirst({
+            where: { id: therapist_process[i].process_id },
+            select: { id: true, ref: true },
+          })
+        )
       }
-    }
-    else if(callerRole == 'intern'){
+    } else if (callerRole == "intern") {
       // get only the processes in which the intern is associated.
       let intern_process = await prisma.intern_process.findMany({
-        where: {intern_person_id: callerId}
+        where: { intern_person_id: callerId },
       })
 
-      for (let i = 0; i < intern_process.length; i++){
-        processes.push(await prisma.process.findFirst({where: {id: intern_process[i].process_id}, select: {id: true, ref: true}}));
+      for (let i = 0; i < intern_process.length; i++) {
+        processes.push(
+          await prisma.process.findFirst({
+            where: { id: intern_process[i].process_id },
+            select: { id: true, ref: true },
+          })
+        )
       }
     }
 
     // assemble the data to be returned
-    let infoToReturn = [];
-    
-    for (let i = 0; i < processes.length; i++){
+    let infoToReturn = []
+
+    for (let i = 0; i < processes.length; i++) {
       // for each process, get all the ids and names of the therapists associated
-      let therapists = await getProcessTherapists(processes[i]?.id);
+      let therapists = await getProcessTherapists(processes[i]?.id)
       infoToReturn.push({
         processId: processes[i]?.id,
         name: processes[i]?.ref,
@@ -1001,32 +1011,35 @@ export async function getProcesses(req: Request, res: Response){
     res.status(StatusCodes.OK).json({
       data: infoToReturn,
     })
-  }
-  catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
   }
 }
 
-async function getProcessTherapists(processId: bigint|undefined){
+async function getProcessTherapists(processId: bigint | undefined) {
   /**
    * Returns the ids and names of all the therapists associated with a process.
    */
-  if (processId == undefined){
-    return [];
+  if (processId == undefined) {
+    return []
   }
 
-  let therapist_process = await prisma.therapist_process.findMany({where: {process_id: processId}});
-  let therapists = [];
-  for (let i = 0; i < therapist_process.length; i++){
-    let person = await prisma.person.findFirst({where: {id: therapist_process[i].therapist_person_id}});
+  let therapist_process = await prisma.therapist_process.findMany({
+    where: { process_id: processId },
+  })
+  let therapists = []
+  for (let i = 0; i < therapist_process.length; i++) {
+    let person = await prisma.person.findFirst({
+      where: { id: therapist_process[i].therapist_person_id },
+    })
     therapists.push({
       id: person?.id,
       name: person?.name,
     })
   }
-  return therapists;
+  return therapists
 }
 
 export default {
