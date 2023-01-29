@@ -116,6 +116,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
             person: { connect: { id: person.id } },
           },
         })
+
         // Add therapist as an admin too
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (admin)...`)
         if ((await prisma.admin.count()) < 4) {

@@ -23,11 +23,13 @@ import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
 
 // Util
+import cookieParser from "cookie-parser"
 ;(BigInt.prototype as any).toJSON = function () {
   return Number(this.toString())
 }
 
 const FRONTEND_URL = String(process.env.FRONTEND_URL)
+const COOKIE_SECRET = String(process.env.COOKIE_SECRET)
 
 // MindGest API Router
 const api = Router()
@@ -41,13 +43,14 @@ api.use(
 api.use(express.json())
 api.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: FRONTEND_URL,
     credentials: true,
   })
 )
 api.use(compression({ filter: middleware.shouldCompress }))
 api.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
 api.use(middleware.bodyParserErrorValidator())
+api.use(cookieParser(COOKIE_SECRET))
 
 // Routes
 api.use("/auth", AuthRouter)
