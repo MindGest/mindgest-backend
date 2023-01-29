@@ -105,19 +105,19 @@ export async function getInternPermissions(
     var callerIsAdmin = decodedToken.admin
 
     // get the info from the request body
-    let processId = req.body.processId;
-    let internId = callerId;
+    let processId = req.body.processId
+    let internId = callerId
 
     // TODO: authorization
-    if (callerRole != 'intern'){
+    if (callerRole != "intern") {
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You should not be here."
+        message: "You should not be here.",
       })
     }
 
     // get the permissions of the intern in the proces
     let intern_permissions = await prisma.permissions.findFirst({
-      where: { process_id: processId, person_id: internId},
+      where: { process_id: processId, person_id: internId },
       select: {
         editprocess: true,
         see: true,
@@ -129,7 +129,7 @@ export async function getInternPermissions(
       },
     })
 
-    let intern = await prisma.person.findFirst({where: {id: internId}});
+    let intern = await prisma.person.findFirst({ where: { id: internId } })
 
     let infoToReturn = {
       editprocess: intern_permissions?.editprocess,
@@ -140,7 +140,7 @@ export async function getInternPermissions(
       archive: intern_permissions?.archive,
       name: intern?.name,
       collaboratorId: intern_permissions?.person_id,
-    };
+    }
 
     res.status(StatusCodes.OK).json({
       data: infoToReturn,

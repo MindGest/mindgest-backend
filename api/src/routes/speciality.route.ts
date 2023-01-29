@@ -12,6 +12,10 @@ speciality.get("/list", (req: Request, res: Response) => {
   controller.getAllSpecialities(req, res)
 })
 
-speciality.post("/create", middleware.requestValidator(schemas.SpecialityCreateSchema), controller.createSpeciality)
+speciality.post(
+  "/create",
+  middleware.requestValidator(schemas.SpecialityCreateSchema),
+  controller.createSpeciality
+)
 
 export default speciality

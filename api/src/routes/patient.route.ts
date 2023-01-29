@@ -13,34 +13,94 @@ patient.get("/list", (req: Request, res: Response) => {
   controller.listNamePatients(req, res)
 })
 
-patient.post("/get-patient-info", middleware.requestValidator(schemas.GetPatientInfoSchema), controller.getPatientInfo)
+patient.post(
+  "/get-patient-info",
+  middleware.requestValidator(schemas.GetPatientInfoSchema),
+  controller.getPatientInfo
+)
 
-patient.post("/get-patient-type", middleware.requestValidator(schemas.GetPatientTypeSchema), controller.getPatientType)
+patient.post(
+  "/get-patient-type",
+  middleware.requestValidator(schemas.GetPatientTypeSchema),
+  controller.getPatientType
+)
 
-patient.post("/create-child-patient", middleware.requestValidator(schemas.CreateChildPatientSchema), controller.createChildPatient)
+patient.post(
+  "/create-child-patient",
+  middleware.requestValidator(schemas.CreateChildPatientSchema),
+  controller.createChildPatient
+)
 
-patient.post("/create-teen-patient", middleware.requestValidator(schemas.CreateTeenPatientSchema), controller.createTeenPatient)
+patient.post(
+  "/create-teen-patient",
+  middleware.requestValidator(schemas.CreateTeenPatientSchema),
+  controller.createTeenPatient
+)
 
-patient.post("/create-adult-patient", middleware.requestValidator(schemas.CreateAdultPatientSchema), controller.createAdultOrElderOrCoupleOrFamilyPatient)
+patient.post(
+  "/create-adult-patient",
+  middleware.requestValidator(schemas.CreateAdultPatientSchema),
+  controller.createAdultOrElderOrCoupleOrFamilyPatient
+)
 
-patient.post("/create-elder-patient", middleware.requestValidator(schemas.CreateAdultPatientSchema), controller.createAdultOrElderOrCoupleOrFamilyPatient)
+patient.post(
+  "/create-elder-patient",
+  middleware.requestValidator(schemas.CreateAdultPatientSchema),
+  controller.createAdultOrElderOrCoupleOrFamilyPatient
+)
 
-patient.post("/create-couple-patient", middleware.requestValidator(schemas.CreateAdultPatientSchema), controller.createAdultOrElderOrCoupleOrFamilyPatient)
+patient.post(
+  "/create-couple-patient",
+  middleware.requestValidator(schemas.CreateAdultPatientSchema),
+  controller.createAdultOrElderOrCoupleOrFamilyPatient
+)
 
-patient.post("/create-family-patient", middleware.requestValidator(schemas.CreateAdultPatientSchema), controller.createAdultOrElderOrCoupleOrFamilyPatient)
+patient.post(
+  "/create-family-patient",
+  middleware.requestValidator(schemas.CreateAdultPatientSchema),
+  controller.createAdultOrElderOrCoupleOrFamilyPatient
+)
 
-patient.put("/edit-child-patient", middleware.requestValidator(schemas.EditChildPatientSchema), controller.editChildPatient)
+patient.put(
+  "/edit-child-patient",
+  middleware.requestValidator(schemas.EditChildPatientSchema),
+  controller.editChildPatient
+)
 
-patient.put("/edit-teen-patient", middleware.requestValidator(schemas.EditTeenPatientSchema), controller.editTeenPatient)
+patient.put(
+  "/edit-teen-patient",
+  middleware.requestValidator(schemas.EditTeenPatientSchema),
+  controller.editTeenPatient
+)
 
-patient.put("/edit-adult-patient", middleware.requestValidator(schemas.EditAdultPatientSchema), controller.editAdultOrElderPatient)
+patient.put(
+  "/edit-adult-patient",
+  middleware.requestValidator(schemas.EditAdultPatientSchema),
+  controller.editAdultOrElderPatient
+)
 
-patient.put("/edit-elder-patient", middleware.requestValidator(schemas.EditAdultPatientSchema), controller.editAdultOrElderPatient)
+patient.put(
+  "/edit-elder-patient",
+  middleware.requestValidator(schemas.EditAdultPatientSchema),
+  controller.editAdultOrElderPatient
+)
 
-patient.put("/edit-couple-patient", middleware.requestValidator(schemas.EditCoupleOrFamilyPatientSchema), controller.editCoupleOrFamilyPatient)
+patient.put(
+  "/edit-couple-patient",
+  middleware.requestValidator(schemas.EditCoupleOrFamilyPatientSchema),
+  controller.editCoupleOrFamilyPatient
+)
 
-patient.put("/edit-family-patient", middleware.requestValidator(schemas.EditCoupleOrFamilyPatientSchema), controller.editCoupleOrFamilyPatient)
+patient.put(
+  "/edit-family-patient",
+  middleware.requestValidator(schemas.EditCoupleOrFamilyPatientSchema),
+  controller.editCoupleOrFamilyPatient
+)
 
-patient.put("/archive-patient", middleware.requestValidator(schemas.ArchivePatientSchema), controller.archivePatient)
+patient.put(
+  "/archive-patient",
+  middleware.requestValidator(schemas.ArchivePatientSchema),
+  controller.archivePatient
+)
 
 export default patient
