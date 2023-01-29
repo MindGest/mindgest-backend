@@ -76,7 +76,7 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
     processes = [];
     for (let i = 0; i < tempProcesses.length; i++){
       let permissionsIntern = await prisma.permissions.findFirst({where: {person_id: callerId, process_id: tempProcesses[i].process_id}});
-      if (permissionsIntern != null){
+      if (permissionsIntern != null && permissionsIntern.statitics){
         processes.push(tempProcesses[i]);
       }
     }

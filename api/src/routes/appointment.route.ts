@@ -43,6 +43,8 @@ appointment.get("/listLastTerminated", (req: Request, res: Response) => {
 
 appointment.get("/list-appointments-of-the-day", controller.listAppointmentsOfTheDay)
 
+appointment.get("/ongoing", controller.onGoingAppointments)
+
 appointment.put(
   "/archive",
   middleware.requestValidator(schemas.AppointmentArchiveSchema),

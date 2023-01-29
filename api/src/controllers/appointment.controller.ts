@@ -1039,6 +1039,48 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
   }
 }
 
+export async function onGoingAppointments(req: Request, res: Response){
+  /**
+   * Returns all the on going appointments.
+   */
+  try{
+    var decodedToken = res.locals.token
+
+    // otbain the caller properties
+    var callerId = decodedToken.id
+    var callerRole = decodedToken.role
+    var callerIsAdmin = decodedToken.admin
+
+    // who can see this info???
+    // TODO: check authorization
+
+    // current time
+    let now = Date.now();
+
+    let onGoingAppointments = [];
+    // get all the appointments
+    let appointments = await prisma.appointment.findMany();
+    for (let i = 0; i < appointments.length; i++){
+      let startDate = new Date(appointments[i].slot_start_date);
+      let startTime = startDate.getTime();
+      let archivedDate = appointments[i].archived_date;
+      // filter the appointments
+      if (startTime < now && archivedDate == null){ // on going appointment (it started but is yet to be completed.)
+        onGoingAppointments.push(getAppointmentInformation(appointments[i], false));
+      }
+    }
+
+    res.status(StatusCodes.OK).json({
+      data: onGoingAppointments,
+    })
+  }
+  catch (error){
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 async function getUserType(id: number) {
   var therapist = await prisma.therapist.findFirst({
     where: { person_id: id },
@@ -1119,6 +1161,7 @@ async function getAppointmentInformation(appointment: any, needsSpeciality: bool
     return {
       appointmentStartTime: appointment.slot_start_date,
       appointmentEndTime: appointment.slot_end_date,
+      appointmentArchivedDate: appointment.archived_date,
       appointmentRoom: appointment.room.name,
       therapists: therapists,
       speciality: process?.speciality_speciality,
@@ -1129,6 +1172,7 @@ async function getAppointmentInformation(appointment: any, needsSpeciality: bool
   return {
     appointmentStartTime: appointment.slot_start_date,
     appointmentEndTime: appointment.slot_end_date,
+    appointmentArchivedDate: appointment.archived_date,
     appointmentRoom: appointment.room.name,
     therapists: therapists,
   }
@@ -1143,4 +1187,5 @@ export default {
   getAllActiveAppointments,
   lastTerminatedAppointments,
   listAppointmentsOfTheDay,
+  onGoingAppointments,
 }
