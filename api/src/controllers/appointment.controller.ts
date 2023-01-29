@@ -899,7 +899,7 @@ export async function getAllActiveAppointments(
       isIntern = true
       internId = req.body.filterId
     } else {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to see this information.",
       })
     }
@@ -1038,7 +1038,7 @@ export async function getAllActiveAppointments(
     }
 
     return res.status(StatusCodes.OK).json({
-      message: "[ ListActive ]It is working.",
+      message: "[ ListActive ] It is working.",
       data: allAppointmentsInfo,
     })
   } catch (error) {

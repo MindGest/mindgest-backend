@@ -319,6 +319,15 @@ async function seed() {
     },
   })
 
+
+  await prisma.speciality.create({
+    data: {
+      code: "TX",
+      description: "Terapia X",
+      speciality: "TerapiaX"
+    }
+  })
+
   await prisma.permissions.create({
     data: {
       editpatitent: false,
