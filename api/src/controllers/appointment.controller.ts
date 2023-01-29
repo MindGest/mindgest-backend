@@ -905,7 +905,7 @@ export async function getAllActiveAppointments(
     } else if (callerRole == "intern") {
       isIntern = true
       internId = req.body.filterId
-    } else if (callerRole == 'accountant') {
+    } else if (callerRole == "accountant") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to see this information.",
       })
