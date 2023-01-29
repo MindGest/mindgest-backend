@@ -878,6 +878,7 @@ export async function getAllActiveAppointments(
     var internId = -1
 
     console.log(req.body.filterId)
+    console.log(callerRole)
 
     if ((callerRole == "admin" || callerRole == "guard") && req.body.filterId != -1) {
       // the processes of the specified filterId
@@ -904,7 +905,7 @@ export async function getAllActiveAppointments(
     } else if (callerRole == "intern") {
       isIntern = true
       internId = req.body.filterId
-    } else {
+    } else if (callerRole == 'accountant') {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to see this information.",
       })
@@ -940,6 +941,7 @@ export async function getAllActiveAppointments(
     // get the processes
     var processes: any = []
     if ((callerRole == "admin" || callerRole == "guard") && req.body.filterId == -1) {
+      console.log("here")
       // all processes
       processes = await prisma.process.findMany()
     } else {
