@@ -281,7 +281,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
     var callerRole = decodedToken.role
     var callerId = decodedToken.id
 
-    if (callerRole != "therapist" && callerRole != "intern" && callerRole != "guard") {
+    if (callerRole == "accountant") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have access to this information.",
       })
@@ -292,7 +292,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
     today.setHours(0, 0, 0, 0)
     var process_user = null
 
-    if (callerRole == "guard") {
+    if (callerRole == "guard" || callerRole == "admin") {
       // return all the appointments of the day
       var appointments = await prisma.appointment.findMany({
         select: {
