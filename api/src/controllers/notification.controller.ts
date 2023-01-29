@@ -41,28 +41,27 @@ export async function list(req: Request<{}, {}, {}, NotificationListQueryParams>
   const { id, role, admin } = res.locals.token
   try {
     if (req.query.filter) {
-
       let info = await prisma.notifications.findMany({
         where: { person_id: id, seen: req.query.filter === NotificationFilterType.READ },
-        select:{
+        select: {
           title: true,
           body: true,
-          seen: true
-        }
+          seen: true,
+        },
       })
 
       return res.status(StatusCodes.OK).json({
         message: `Successfully retrieve all ${req.query.filter} notifications.`,
-        info: info
+        info: info,
       })
     } else {
       let info = await prisma.notifications.findMany({
         where: { person_id: id },
-        select:{
+        select: {
           title: true,
           body: true,
-          seen: true
-        }
+          seen: true,
+        },
       })
 
       console.log(info)
