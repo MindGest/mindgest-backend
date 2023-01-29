@@ -10,6 +10,9 @@ async function seed() {
   await prisma.guard.deleteMany({})
   await prisma.admin.deleteMany({})
   await prisma.intern_process.deleteMany({})
+  await prisma.process_liable.deleteMany({})
+  await prisma.notes.deleteMany({})
+  await prisma.notifications.deleteMany({})
   await prisma.intern.deleteMany({})
   await prisma.patient_process.deleteMany({})
   await prisma.patient.deleteMany({})
@@ -331,6 +334,40 @@ async function seed() {
       process_id: process.id,
       person_id: person5.id,
     },
+  })
+
+  let liable = await prisma.liable.create({
+    data:{
+      name:"Pai do burro",
+      email:"paidoburro@gmail.com",
+      phonenumber: 91312312,
+      type: "Pai",
+      remarks: "Ele é mesmo burro pah",
+    }
+  })
+
+  await prisma.process_liable.create({
+    data:{
+      process_id:process.id,
+      liable_id:liable.id
+    }
+  })
+
+  await prisma.notifications.create({
+    data:{
+      message:"Teste123",
+      seen:false,
+      person_id: person6.id,
+    }
+  })
+
+  await prisma.notes.create({
+    data:{
+      title: "ele é burro",
+      body: "IMANINHOCABURRO",
+      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      process_id: process.id
+    }
   })
 }
 

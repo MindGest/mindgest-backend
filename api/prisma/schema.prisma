@@ -37,7 +37,6 @@ model therapist {
   health_system          String?                  @db.VarChar(512)
   person_id              BigInt                   @id
   person                 person                   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
-  therapist_availability therapist_availability[]
   therapist_process      therapist_process[]
   therapist_speciality   therapist_speciality[]
 }
@@ -55,7 +54,6 @@ model admin {
 model intern {
   person_id           BigInt                @id
   person              person                @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "intern_fk1")
-  intern_availability intern_availability[]
   intern_process      intern_process[]
 }
 
@@ -110,22 +108,6 @@ model appointment_process {
   @@id([appointment_slot_id, process_id])
 }
 
-model availability {
-  slot_id                BigInt                   @id
-  slot_start_date        DateTime                 @db.Timestamp(6)
-  slot_end_date          DateTime                 @db.Timestamp(6)
-  intern_availability    intern_availability[]
-  therapist_availability therapist_availability[]
-}
-
-model intern_availability {
-  intern_person_id     BigInt
-  availability_slot_id BigInt
-  intern               intern       @relation(fields: [intern_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_availability_fk1")
-  availability         availability @relation(fields: [availability_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "intern_availability_fk2")
-
-  @@id([intern_person_id, availability_slot_id])
-}
 
 model intern_process {
   intern_person_id BigInt
@@ -147,7 +129,7 @@ model liable {
 }
 
 model notifications {
-  id        BigInt   @id
+  id        BigInt   @id @default(autoincrement())
   message   String?  @db.VarChar(512)
   seen      Boolean?
   person_id BigInt
@@ -255,14 +237,6 @@ model speciality {
   therapist_speciality therapist_speciality[]
 }
 
-model therapist_availability {
-  therapist_person_id  BigInt
-  availability_slot_id BigInt
-  therapist            therapist    @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_availability_fk1")
-  availability         availability @relation(fields: [availability_slot_id], references: [slot_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_availability_fk2")
-
-  @@id([therapist_person_id, availability_slot_id])
-}
 
 model therapist_process {
   therapist_person_id BigInt
