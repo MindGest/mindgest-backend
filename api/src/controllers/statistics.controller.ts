@@ -13,7 +13,7 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
 
   let decode = res.locals.token
   let callerId = decode.id
-  let callerRole = decode.role;
+  let callerRole = decode.role
 
   let parsedDateStart = new Date(query.startDate)
   let timestampStart = parsedDateStart.getTime()
@@ -71,13 +71,15 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
   }
 
   // if the caller is an intern, filter the processes by the ones that he has permissions to do the statistics
-  if (callerRole == "intern"){
-    let tempProcesses = processes;
-    processes = [];
-    for (let i = 0; i < tempProcesses.length; i++){
-      let permissionsIntern = await prisma.permissions.findFirst({where: {person_id: callerId, process_id: tempProcesses[i].process_id}});
-      if (permissionsIntern != null){
-        processes.push(tempProcesses[i]);
+  if (callerRole == "intern") {
+    let tempProcesses = processes
+    processes = []
+    for (let i = 0; i < tempProcesses.length; i++) {
+      let permissionsIntern = await prisma.permissions.findFirst({
+        where: { person_id: callerId, process_id: tempProcesses[i].process_id },
+      })
+      if (permissionsIntern != null) {
+        processes.push(tempProcesses[i])
       }
     }
   }
