@@ -73,7 +73,8 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
     })
 
     var colaborators: string[] = []
-    var mainTherapist
+    var mainTherapistId
+    var mainTherapistName
 
     var flag = false
     for (let therapist of therapists) {
@@ -92,7 +93,8 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
         })
 
         if (permissions?.isMain) {
-          mainTherapist = therapist.therapist_person_id
+          mainTherapistId = therapist.therapist_person_id;
+          mainTherapistName = person?.name;
         } else {
           colaborators.push(person!.name + " (terapeuta)")
         }
@@ -156,7 +158,8 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
     }
 
     return res.status(StatusCodes.OK).json({
-      therapistId: mainTherapist,
+      therapistId: mainTherapistId,
+      therapistName: mainTherapistName,
       ref: processRef,
       colaborators: colaborators,
       utent: utentName?.name,
