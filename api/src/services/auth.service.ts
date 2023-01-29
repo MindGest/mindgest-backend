@@ -49,7 +49,8 @@ export function attachCookies(res: Response, accessToken: string, refreshToken: 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     signed: true,
-    secure: NODE_ENV !== "development",
+    secure: true, // has to be true
+    // secure: NODE_ENV !== "development", 
     maxAge: 15 * 60 * 1000,
     sameSite: "none",
   })
@@ -58,7 +59,8 @@ export function attachCookies(res: Response, accessToken: string, refreshToken: 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     signed: true,
-    secure: NODE_ENV !== "development",
+    secure: true, // has to be true
+    // secure: NODE_ENV !== "development", 
     maxAge: 60 * 60 * 1000,
     sameSite: "none",
   })
