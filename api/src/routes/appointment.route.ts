@@ -20,7 +20,7 @@ appointment.post(
 )
 
 appointment.post(
-  "/list/active",
+  "/list-active",
   middleware.requestValidator(schemas.AppointmentsListSchema),
   controller.getAllActiveAppointments
 )

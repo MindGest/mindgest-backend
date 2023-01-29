@@ -11,10 +11,10 @@ receipt.use(authMiddleware.authorize())
 
 receipt.get("/list", controller.list)
 
-receipt.get("/info/:receiptId", controller.info)
+receipt.get("/:receiptId/info", controller.info)
 
-receipt.post("/create/:appointmentId", controller.create)
+receipt.post("/:appointmentId/create", controller.create)
 
-receipt.put("/pay/:receiptId", controller.pay)
+receipt.put("/:receiptId/pay", controller.pay)
 
 export default receipt

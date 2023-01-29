@@ -8,40 +8,40 @@ const process = Router()
 
 process.use(authMiddleware.authorize())
 
-process.use(
-  "/:processId/createNote",
+process.post(
+  "/:processId/notes",
   middleware.requestValidator(schemas.NotesCreate),
   controller.createNote
 )
-process.use("/:processId/listNotes", controller.listNotes)
+process.get("/:processId/notes", controller.listNotes)
 
-process.post("/archive/:processId", controller.archive)
+process.post("/:processId/archive", controller.archive)
 
-process.get("/info/:processId", controller.info)
+process.get("/:processId/info", controller.info)
 
 process.get("/list", controller.list)
 
-process.get("/listTherapist", controller.listTherapist)
+process.get("/therapists", controller.listTherapist)
 
-process.post("/activate/:processId", controller.activate)
+process.post("/:processId/activate", controller.activate)
 
 process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema), controller.create)
 
 process.post(
-  "/edit/:processId",
+  "/:processId/edit",
   middleware.requestValidator(schemas.ProcessEditSchema),
   controller.edit
 )
 
-process.get("/appointments/:processId", controller.appointments)
+process.get("/:processId/appointments", controller.appointments)
 
 process.post(
-  "/permissions/:processId",
+  "/:processId/permissions",
   middleware.requestValidator(schemas.ProcessEditPermissionsSchema),
   controller.editPermissions
 )
 
-process.get("/permissions/:processId", controller.getPermissions)
+process.get("/:processId/permissions", controller.getPermissions)
 
 process.post(
   "/collaborators",
@@ -49,6 +49,6 @@ process.post(
   controller.getCollaborators
 )
 
-process.get("/get-processes", controller.getProcesses)
+process.get("/processes", controller.getProcesses)
 
 export default process
