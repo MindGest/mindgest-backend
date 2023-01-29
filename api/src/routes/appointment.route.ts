@@ -20,7 +20,7 @@ appointment.post(
 )
 
 appointment.post(
-  "/list/active",
+  "/list-active",
   middleware.requestValidator(schemas.AppointmentsListSchema),
   controller.getAllActiveAppointments
 )
@@ -37,7 +37,7 @@ appointment.post(
   controller.createAppointment
 )
 
-appointment.get("/listLastTerminated", (req: Request, res: Response) => {
+appointment.get("/last-terminated", (req: Request, res: Response) => {
   controller.lastTerminatedAppointments(req, res)
 })
 

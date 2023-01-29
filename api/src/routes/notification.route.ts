@@ -13,7 +13,7 @@ const notification = Router()
 notification.use(authMiddleware.authorize())
 
 // Endpoints
-notification.put("/mark/:id", controller.mark)
+notification.put("/:id/mark", controller.mark)
 notification.get("/list", controller.list)
 notification.get(
   "/create",

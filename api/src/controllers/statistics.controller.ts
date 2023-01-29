@@ -13,7 +13,7 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
 
   let decode = res.locals.token
   let callerId = decode.id
-  let callerRole = decode.role;
+  let callerRole = decode.role
 
   let parsedDateStart = new Date(query.startDate)
   let timestampStart = parsedDateStart.getTime()
