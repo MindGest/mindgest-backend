@@ -41,7 +41,7 @@ export async function listPatients(req: Request, res: Response) {
 
     // check authorization for this endpoint
     if (callerRole == "accountant" || callerRole == "guard") {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You are not allowed to access this information.",
       })
     }
@@ -177,7 +177,7 @@ export async function getPatientInfo(req: Request<{}, {}, GetPatientInfoBody>, r
 
     // if admin, therapist, or an authorized intern, let them retrieve this information
     if (!callerIsAdmin && !isAnAuthorizedIntern && callerRole != "therapist") {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You are not allowed to access this information.",
       })
     }
@@ -218,7 +218,7 @@ export async function createChildPatient(
     var callerIsAdmin = decodedToken.admin
 
     if (!callerIsAdmin) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You are not allowed to sail in these waters.",
       })
     }
@@ -284,7 +284,7 @@ export async function createTeenPatient(
     var callerIsAdmin = decodedToken.admin
 
     if (!callerIsAdmin) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "Your ship is not built for these seas.",
       })
     }
@@ -350,7 +350,7 @@ export async function createAdultOrElderOrCoupleOrFamilyPatient(
     var callerIsAdmin = decodedToken.admin
 
     if (!callerIsAdmin) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You shall not PASSS!",
       })
     }
@@ -436,7 +436,7 @@ export async function editChildPatient(req: Request<{}, {}, EditChildPatientBody
     }
 
     if (!callerIsAdmin && !canEdit) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You don't have what it takes to wield this power!",
       })
     }
@@ -528,7 +528,7 @@ export async function editTeenPatient(req: Request<{}, {}, EditTeenPatientBody>,
     }
 
     if (!callerIsAdmin && !canEdit) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You don't have what it takes to wield this power!",
       })
     }
@@ -624,7 +624,7 @@ export async function editAdultOrElderPatient(
     }
 
     if (!callerIsAdmin && !canEdit) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You don't have what it takes to wield this power!",
       })
     }
@@ -718,7 +718,7 @@ export async function editCoupleOrFamilyPatient(
     }
 
     if (!callerIsAdmin && !canEdit) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You don't have what it takes to wield this power!",
       })
     }
@@ -785,7 +785,7 @@ export async function archivePatient(req: Request<{}, {}, ArchivePatientBody>, r
     // only admins can archive a patient (why, because I say so.)
 
     if (!callerIsAdmin) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "U Can't Touch This",
       })
     }
@@ -850,7 +850,7 @@ export async function getPatientType(req: Request<{}, {}, GetPatientTypeBody>, r
 
     // if admin, therapist, or an authorized intern, let them retrieve this information
     if (!callerIsAdmin && !isAnAuthorizedIntern && callerRole != "therapist") {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You are not allowed to access this information.",
       })
     }

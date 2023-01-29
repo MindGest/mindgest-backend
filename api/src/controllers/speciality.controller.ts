@@ -49,7 +49,7 @@ export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody
     var callerIsAdmin = decodedToken.admin
 
     if (callerRole == "guard" || callerRole == "accountant") {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to create a speciality.",
       })
     }
