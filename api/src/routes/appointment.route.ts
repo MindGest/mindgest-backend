@@ -3,8 +3,14 @@ import controller from "../controllers/appointment.controller"
 import authMiddleware from "../middleware/auth.middleware"
 import middleware from "../middleware/api.middleware"
 import schemas from "../utils/schemas"
+import cookieParser from "cookie-parser"
+
+const COOKIE_SECRET = String(process.env.COOKIE_SECRET)
 
 const appointment = Router()
+
+// Middleware
+appointment.use(cookieParser(COOKIE_SECRET))
 appointment.use(authMiddleware.authorize())
 
 appointment.post(

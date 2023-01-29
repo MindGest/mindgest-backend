@@ -5,6 +5,7 @@ import middleware from "../middleware/api.middleware"
 import schemas from "../utils/schemas"
 
 const patient = Router()
+
 patient.use(authMiddleware.authorize())
 
 patient.get("/list-patients", controller.listPatients)

@@ -147,8 +147,9 @@ model liable {
 }
 
 model notifications {
-  id        BigInt   @id
-  message   String?  @db.VarChar(512)
+  id        BigInt   @id @default(autoincrement())
+  title     String   @db.VarChar(512)
+  body      String   @db.VarChar(512)
   seen      Boolean?
   person_id BigInt
   person    person   @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notifications_fk1")
