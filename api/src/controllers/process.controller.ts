@@ -93,8 +93,8 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
         })
 
         if (permissions?.isMain) {
-          mainTherapistId = therapist.therapist_person_id;
-          mainTherapistName = person?.name;
+          mainTherapistId = therapist.therapist_person_id
+          mainTherapistName = person?.name
         } else {
           colaborators.push(person!.name + " (terapeuta)")
         }
