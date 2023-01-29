@@ -1026,6 +1026,7 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
           patients: patients,
           appointmentStartTime: currentAppointment.slot_start_date,
           appointmentEndTime: currentAppointment.slot_end_date,
+          appointmentArchivedDate: currentAppointment.archived_date,
         })
       }
     }
