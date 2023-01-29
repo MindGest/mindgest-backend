@@ -287,6 +287,7 @@ export async function getAppointmentsOfTheDayGuard(req: Request, res: Response) 
     }
 
     var today = new Date()
+    today.setHours(0,0,0,0);
 
     var appointments = await prisma.appointment.findMany({
       select: {
@@ -301,9 +302,10 @@ export async function getAppointmentsOfTheDayGuard(req: Request, res: Response) 
     // filter the appointments of the current day
     for (let i = 0; i < appointments.length; i++) {
       var tempDate = new Date(appointments[i].slot_start_date)
-      if (tempDate.getDay() == today.getDay()) {
+      tempDate.setHours(0,0,0,0);
+      if (tempDate.getTime() == today.getTime()) {
         // get the appointments
-        appointmentsOfToday.push(getAppointmentInformation(appointments[i].slot_id, false))
+        appointmentsOfToday.push(getAppointmentInformation(appointments[i], false))
       }
     }
 
@@ -336,6 +338,7 @@ export async function getAppointmentsOfTheDayTherapist(req: Request, res: Respon
     }
 
     var today = new Date()
+    today.setHours(0,0,0,0);
 
     // get the processes of the asking therapist (caller)
     var process_therapist = await prisma.therapist_process.findMany({
@@ -365,7 +368,8 @@ export async function getAppointmentsOfTheDayTherapist(req: Request, res: Respon
         }
         var tempDate = new Date(appointment.slot_start_date)
         // filter by the current day
-        if (tempDate.getDay() == today.getDay()) {
+        tempDate.setHours(0,0,0,0);
+        if (tempDate.getTime() == today.getTime()) {
           appointmentsOfToday.push(getAppointmentInformation(appointment, true))
         }
       }
@@ -400,6 +404,7 @@ export async function getAppointmentsOfTheDayIntern(req: Request, res: Response)
     }
 
     var today = new Date()
+    today.setHours(0,0,0,0)
 
     // get the processes of the asking therapist (caller)
     var process_intern = await prisma.intern_process.findMany({
@@ -429,7 +434,8 @@ export async function getAppointmentsOfTheDayIntern(req: Request, res: Response)
         }
         var tempDate = new Date(appointment.slot_start_date)
         // filter by the current day
-        if (tempDate.getDay() == today.getDay()) {
+        tempDate.setHours(0,0,0,0);
+        if (tempDate.getTime() == today.getTime()) {
           appointmentsOfToday.push(getAppointmentInformation(appointment, true))
         }
       }
@@ -899,7 +905,7 @@ export async function getAllActiveAppointments(
       isIntern = true
       internId = req.body.filterId
     } else {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to see this information.",
       })
     }

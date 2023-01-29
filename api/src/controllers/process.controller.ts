@@ -950,7 +950,7 @@ export async function getProcesses(req: Request, res: Response){
     var callerIsAdmin = decodedToken.admin
 
     if (callerRole == 'accountant' && callerRole == 'guard'){
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to access this information."
       })
     }
