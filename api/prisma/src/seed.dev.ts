@@ -9,6 +9,7 @@ async function seed() {
   await prisma.accountant.deleteMany({})
   await prisma.guard.deleteMany({})
   await prisma.admin.deleteMany({})
+  await prisma.intern_process.deleteMany({})
   await prisma.intern.deleteMany({})
   await prisma.patient_process.deleteMany({})
   await prisma.patient.deleteMany({})
