@@ -7,10 +7,22 @@ import schemas from "../utils/schemas"
 const permission = Router()
 permission.use(authMiddleware.authorize())
 
-permission.post("/get-interns-permissions",  middleware.requestValidator(schemas.GetPermissionsSchema), controller.getInternsPermissions)
+permission.post(
+  "/get-interns-permissions",
+  middleware.requestValidator(schemas.GetPermissionsSchema),
+  controller.getInternsPermissions
+)
 
-permission.put("/edit-intern-permissions", middleware.requestValidator(schemas.EditPermissionsSchema), controller.editInternPermissions)
+permission.put(
+  "/edit-intern-permissions",
+  middleware.requestValidator(schemas.EditPermissionsSchema),
+  controller.editInternPermissions
+)
 
-permission.post("/get-intern-permissions",  middleware.requestValidator(schemas.GetPermissionsSchema), controller.getInternPermissions)
+permission.post(
+  "/get-intern-permissions",
+  middleware.requestValidator(schemas.GetPermissionsSchema),
+  controller.getInternPermissions
+)
 
 export default permission

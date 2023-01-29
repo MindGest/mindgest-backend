@@ -7,13 +7,29 @@ import schemas from "../utils/schemas"
 const appointment = Router()
 appointment.use(authMiddleware.authorize())
 
-appointment.post("/list", middleware.requestValidator(schemas.AppointmentsListSchema), controller.getAllAppointments)
+appointment.post(
+  "/list",
+  middleware.requestValidator(schemas.AppointmentsListSchema),
+  controller.getAllAppointments
+)
 
-appointment.post("/list/active", middleware.requestValidator(schemas.AppointmentsListSchema), controller.getAllActiveAppointments)
+appointment.post(
+  "/list/active",
+  middleware.requestValidator(schemas.AppointmentsListSchema),
+  controller.getAllActiveAppointments
+)
 
-appointment.post("/info", middleware.requestValidator(schemas.AppointmentInfoSchema), controller.infoAppointment)
+appointment.post(
+  "/info",
+  middleware.requestValidator(schemas.AppointmentInfoSchema),
+  controller.infoAppointment
+)
 
-appointment.post("/create", middleware.requestValidator(schemas.AppointmentCreateSchema), controller.createAppointment)
+appointment.post(
+  "/create",
+  middleware.requestValidator(schemas.AppointmentCreateSchema),
+  controller.createAppointment
+)
 
 appointment.get("/listLastTerminated", (req: Request, res: Response) => {
   controller.lastTerminatedAppointments(req, res)
@@ -31,8 +47,16 @@ appointment.get("/listAppointmentsOfTheDayIntern", (req: Request, res: Response)
   controller.getAppointmentsOfTheDayIntern(req, res)
 })
 
-appointment.put("/archive", middleware.requestValidator(schemas.AppointmentArchiveSchema), controller.archiveAppointment)
+appointment.put(
+  "/archive",
+  middleware.requestValidator(schemas.AppointmentArchiveSchema),
+  controller.archiveAppointment
+)
 
-appointment.put("/edit", middleware.requestValidator(schemas.AppointmentEditSchema), controller.editAppointment)
+appointment.put(
+  "/edit",
+  middleware.requestValidator(schemas.AppointmentEditSchema),
+  controller.editAppointment
+)
 
 export default appointment

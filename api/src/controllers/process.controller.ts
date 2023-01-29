@@ -848,7 +848,7 @@ export async function getPermissions(req: Request, res: Response) {
   }
 }
 
-export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody>, res: Response){
+export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody>, res: Response) {
   /**
    * Returns info of all the collaborators of the process;
    */
@@ -892,10 +892,14 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
     }
 
     // get the therapists of the process
-    let therapist_process = await prisma.therapist_process.findMany({where: {process_id: processId}});
-    let therapistsInfo = [];
-    for (let i = 0; i < therapist_process.length; i++){
-      let person = await prisma.person.findFirst({where: {id: therapist_process[i].therapist_person_id}});
+    let therapist_process = await prisma.therapist_process.findMany({
+      where: { process_id: processId },
+    })
+    let therapistsInfo = []
+    for (let i = 0; i < therapist_process.length; i++) {
+      let person = await prisma.person.findFirst({
+        where: { id: therapist_process[i].therapist_person_id },
+      })
       therapistsInfo.push({
         id: person?.id,
         name: person?.name,
@@ -903,10 +907,12 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
     }
 
     // get the interns of the process
-    let intern_process = await prisma.intern_process.findMany({where: {process_id: processId}});
-    let internsInfo = [];
-    for (let i = 0; i < intern_process.length; i++){
-      let person = await prisma.person.findFirst({where: {id: intern_process[i].intern_person_id}});
+    let intern_process = await prisma.intern_process.findMany({ where: { process_id: processId } })
+    let internsInfo = []
+    for (let i = 0; i < intern_process.length; i++) {
+      let person = await prisma.person.findFirst({
+        where: { id: intern_process[i].intern_person_id },
+      })
       internsInfo.push({
         id: person?.id,
         name: person?.name,
@@ -915,8 +921,8 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
 
     let infoToReturn = {
       therapists: therapistsInfo,
-      interns: internsInfo
-    };
+      interns: internsInfo,
+    }
 
     res.status(StatusCodes.OK).json({
       data: infoToReturn,
