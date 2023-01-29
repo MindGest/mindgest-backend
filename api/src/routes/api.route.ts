@@ -22,8 +22,9 @@ import PermissionRouter from "./permission.route"
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
 
-// Util
 import cookieParser from "cookie-parser"
+
+// Util
 ;(BigInt.prototype as any).toJSON = function () {
   return Number(this.toString())
 }

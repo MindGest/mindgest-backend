@@ -104,16 +104,27 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
         })
 
         if (speciality === null || speciality === undefined) {
-          console.log("RIP")
-          return
+          logger.info(`REGISTER [${req.body.speciality}] => This speciality does not exist`)
+          return res.status(StatusCodes.NOT_FOUND).json({
+            message: `Specialty ${req.body.speciality} does not exist`,
+          })
         }
 
+        // Create Therapist
         await prisma.therapist.create({
           data: {
             license: req.body.license,
             health_system: req.body.healthSystem,
             extern: false,
             person: { connect: { id: person.id } },
+          },
+        })
+
+        // Attach Speciality
+        await prisma.therapist_speciality.create({
+          data: {
+            therapist: { connect: { person_id: person.id } },
+            speciality: { connect: { speciality: speciality.speciality } },
           },
         })
 

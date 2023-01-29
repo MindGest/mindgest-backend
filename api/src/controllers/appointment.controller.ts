@@ -1044,7 +1044,7 @@ export async function getAllActiveAppointments(
     }
 
     return res.status(StatusCodes.OK).json({
-      message: "[ ListActive ]It is working.",
+      message: "[ ListActive ] It is working.",
       data: allAppointmentsInfo,
     })
   } catch (error) {
