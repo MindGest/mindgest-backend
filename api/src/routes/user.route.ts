@@ -6,7 +6,6 @@ import AdminEditRouter from "./admin.edit.route"
 
 import authMiddleware from "../middleware/auth.middleware"
 
-import adminController from "../controllers/admin.edit.controller"
 import controller from "../controllers/user.controller"
 
 const user = Router()

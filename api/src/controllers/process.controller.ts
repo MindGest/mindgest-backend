@@ -126,7 +126,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       },
     })
 
-    if (decoded.admin == false || permissions!.see == false) {
+    if (decoded.admin == false && permissions!.see == false) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -210,7 +210,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       },
     })
 
-    var isPayed = true
+    var isPaid = true
 
     for (let apointment of apointments) {
       var receipt = await prisma.receipt.findFirst({
@@ -218,8 +218,11 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
           appointment_slot_id: apointment.appointment_slot_id,
         },
       })
-      if (receipt!.payed == false) {
-        isPayed = false
+
+      if (receipt != null) {
+        if (receipt!.payed == false) {
+          isPaid = false
+        }
       }
     }
 
@@ -230,11 +233,12 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       colaborators: colaborators,
       utent: utentName?.name,
       active: process?.active,
-      financialSituation: isPayed,
+      financialSituation: isPaid,
       remarks: process?.remarks,
       speciality: process?.speciality_speciality,
     })
   } catch (error) {
+    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })

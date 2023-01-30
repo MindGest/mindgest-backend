@@ -102,22 +102,45 @@ export async function fetchProfileInfo(req: Request, res: Response) {
     logger.debug(
       `PROFILE-INFO [user-id: ${id}] => Locating and retrieving user info from the database...`
     )
-    const person = await prisma.person.findUnique({
-      where: { id: id },
-      include: {
-        therapist:
-          role === User.THERAPIST
-            ? { select: { extern: true, license: true, health_system: true } }
-            : false,
-      },
-    })
+
+    // Fetch Person
+    const usr = await prisma.person.findUnique({ where: { id: id } })
+
+    // Parse Response
+    let base = {
+      id: 21,
+      name: usr?.name,
+      email: usr?.email,
+      password: usr?.password,
+      address: usr?.address,
+      birthDate: usr?.birth_date,
+      phoneNumber: usr?.phone_number,
+      verified: usr?.verified,
+      active: usr?.active,
+      approved: usr?.approved,
+      taxNumber: usr?.tax_number,
+    }
+
+    let therapist = null
+    let data = null
+    if ((therapist = await prisma.therapist.findUnique({ where: { person_id: usr?.id } }))) {
+      data = {
+        extern: therapist?.extern,
+        license: therapist?.license,
+        healthSystem: therapist?.health_system,
+        ...base,
+      }
+    } else {
+      data = base
+    }
+    const person = { ...data, role: role }
 
     // Return information
     assert(person != null)
     logger.info(`PROFILE-INFO [user-id: ${id}] => Profile information fetched successfully...`)
     res.status(StatusCodes.OK).json({
       message: `${person.name} profile information fetched successfully`,
-      info: person,
+      data: person,
     })
   } catch (error) {
     logger.error(error)
