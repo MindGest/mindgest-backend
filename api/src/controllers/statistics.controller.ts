@@ -1,16 +1,13 @@
 import prisma from "../utils/prisma"
-import { appointment } from "@prisma/client"
 
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { verifyAccessToken, verifyToken } from "../services/auth.service"
 import { QueryStatistics } from "../utils/types"
 import logger from "../utils/logger"
-import moment from "moment"
 
 export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res: Response) {
   var query = req.query
-
+  
   let decode = res.locals.token
   let id = decode.id
 

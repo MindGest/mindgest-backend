@@ -15,6 +15,12 @@ process.use(
 )
 process.use("/:processId/listNotes", controller.listNotes)
 
+process.post(
+  "/:processId/migrate",
+  middleware.requestValidator(schemas.ProcessMigrationSchema),
+  controller.migrate
+)
+
 process.post("/archive/:processId", controller.archive)
 
 process.get("/info/:processId", controller.info)
@@ -28,7 +34,7 @@ process.post("/activate/:processId", controller.activate)
 process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema), controller.create)
 
 process.post(
-  "/edit/:processId",
+  "/:processId/edit",
   middleware.requestValidator(schemas.ProcessEditSchema),
   controller.edit
 )

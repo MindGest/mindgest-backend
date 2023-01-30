@@ -239,6 +239,10 @@ export const ProcessEditSchema = z.object({
   }),
 })
 
+export const ProcessMigrationSchema = z.object({
+  body: z.object({ therapistId: z.number() }).strict(),
+})
+
 export const ProcessEditPermissionsSchema = z.object({
   body: z.object({
     collaboratorId: z.number(),
@@ -303,8 +307,8 @@ export const NotificationFilterSchema = z.object({
 export const NotificationSchema = z.object({
   body: z
     .object({
-      title: z.string(),
-      body: z.string(),
+      data: z.string(),
+      type: z.string(),
     })
     .required(),
 })
@@ -633,4 +637,5 @@ export default {
   GetAvailableRoomsSchema,
   GetCollaboratorsSchema,
   NotificationSchema,
+  ProcessMigrationSchema,
 }

@@ -9,13 +9,12 @@ import schemas from "../utils/schemas"
 
 const notification = Router()
 
-// Middleware
-notification.use(authMiddleware.authorize())
-
 // Endpoints
-notification.put("/mark/:id", controller.mark)
+notification.post("/mark/:id", controller.mark)
+notification.put("/settle/:id", controller.settle)
+
 notification.get("/list", controller.list)
-notification.get(
+notification.post(
   "/create",
   middleware.requestValidator(schemas.NotificationSchema),
   controller.create

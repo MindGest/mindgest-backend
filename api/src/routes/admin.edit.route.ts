@@ -1,8 +1,10 @@
 import { Router } from "express"
 
 import controller from "../controllers/admin.edit.controller"
+
 import middleware from "../middleware/api.middleware"
 import authMiddleware from "../middleware/auth.middleware"
+
 import schemas from "../utils/schemas"
 
 const admin = Router({ mergeParams: true })
@@ -29,5 +31,7 @@ admin
     middleware.requestValidator(schemas.EditProfileParamsSchema),
     controller.fetchUserProfileInfo
   )
+
+admin.put("/approve", controller.approve)
 
 export default admin

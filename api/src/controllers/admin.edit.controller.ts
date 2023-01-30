@@ -226,9 +226,59 @@ export async function editUserProfileInfo(
   }
 }
 
+export async function approve(req: Request, res: Response) {
+  try {
+    // Authenticate / Authorize User
+    logger.info(
+      `APPROVE [user-id: ${req.params.user}] => Access granted to Admin User. Editing profile...`
+    )
+
+    // Fetch User
+    const user = await prisma.person.findUnique({
+      where: { id: Number(req.params.user) },
+    })
+
+    // Check if user exists
+    if (!user) {
+      logger.debug(
+        `APPROVE[user-id: ${req.params.user}] => User with id ${req.params.user} does not exist!`
+      )
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "The user you wish to edit does not exist.",
+      })
+    }
+    const userProps = await fetchPersonProperties(user.id)
+
+    if (userProps.isAdmin) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        message: "This user may not be edited since it has admin privileges too!",
+      })
+    }
+
+    // Approve User Account
+    prisma.person.update({
+      where: { id: user.id },
+      data: {
+        approved: true,
+      },
+    })
+
+    logger.info(`APPROVE [user-id: ${user.id}] => Profile edited successfully!`)
+    return res.status(StatusCodes.OK).json({
+      message: "The user account was approved successfully",
+    })
+  } catch (error) {
+    logger.error(error)
+    res.send(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 export default {
   editUserProfileInfo,
   fetchUserProfileInfo,
   uploadUserProfilePicture,
   downloadUserProfilePicture,
+  approve,
 }

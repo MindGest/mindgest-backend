@@ -106,21 +106,23 @@ export async function forgotPasswordEmail(req: Request<{}, {}, ForgotPasswordBod
 }
 
 export async function sendGenericEmail(req: Request<{}, {}, EmailSchema>, res: Response) {
+  // Authorizing User
+  const { id, role, isAdmin } = res.locals.token
+  logger.debug(`EMAIL [user-id ${id}] => User authorized to send email.`)
   try {
     // Send Email
-    logger.debug(`EMAIL => User authorized to send email.`)
     await sendEmail({
       to: req.body.email,
       subject: req.body.subject,
       html: req.body.body,
     })
 
-    logger.info(`EMAIL => Email message sent successfully to ${req.body.email}...`)
+    logger.info(`EMAIL [user-id ${id}] => Email message sent successfully to ${req.body.email}...`)
     res.status(StatusCodes.OK).json({
       message: "Email sent",
     })
   } catch (error) {
-    logger.error(`EMAIL => Server Error: ${error}`)
+    logger.error(`EMAIL [user-id ${id}] => Server Error: ${error}`)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })

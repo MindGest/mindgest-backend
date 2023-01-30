@@ -2,7 +2,6 @@ import prisma from "../utils/prisma"
 
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { verifyAccessToken, verifyToken } from "../services/auth.service"
 import {
   ProcessCreateBody,
   ProcessEditBody,
@@ -11,8 +10,72 @@ import {
   QueryListProcess,
   NotesCreateBody,
   GetCollaboratorsBody,
+  ProcessMigrationSchemaBody,
 } from "../utils/types"
 import logger from "../utils/logger"
+
+export async function migrate(
+  req: Request<ProcessIDPrams, {}, ProcessMigrationSchemaBody>,
+  res: Response
+) {
+  try {
+    const { id, role, isAdmin } = res.locals.token
+    const processId = parseInt(req.params.processId)
+
+    // Prepare Information
+    let newId = req.body.therapistId
+    let old = await prisma.permissions.findFirst({
+      where: { isMain: false, process_id: processId },
+    })
+    let oldId = old?.person_id
+    logger.info(`MIGRATE [${oldId} -> ${newId}] => Operation Approved! Initiating Migration...`)
+
+    // Check if current user has permissions for executing the migration
+    let permissions = await prisma.permissions.findFirst({
+      where: { person_id: id, process_id: processId },
+    })
+    if (!isAdmin || !permissions?.editprocess) {
+      logger.info(`MIGRATE [${oldId} -> ${newId}] => Migration Failed! User lacks authorization`)
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "User doesn't have authorization to execute this operation",
+      })
+    }
+
+    // Check if `newId` is a Therapist
+    if (await prisma.therapist.findUnique({ where: { person_id: newId } })) {
+      logger.debug(`MIGRATE [${oldId} -> ${newId}] => Migrating process...`)
+
+      // Perform Migration
+      await prisma.permissions.update({
+        where: { id: old?.id },
+        data: { isMain: true },
+      })
+
+      await prisma.permissions.updateMany({
+        where: { person_id: newId, process_id: processId },
+        data: { isMain: true },
+      })
+
+      // Migration Successful
+      logger.debug(`MIGRATE [${oldId} -> ${newId}] => Process Migrated Successfully!`)
+      return res.status(StatusCodes.OK).json({
+        message: "Process Migrated Successfully!",
+      })
+    }
+
+    logger.info(
+      `MIGRATE [${oldId} -> ${newId}] => Migration Failed. User ${newId} must be a therapist`
+    )
+    return res.status(StatusCodes.FORBIDDEN).json({
+      message: `Migration Failed. User ${newId} must be a therapist`,
+    })
+  } catch (error) {
+    logger.error(`MIGRATE => Server Error: ${error}`)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
 
 export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
@@ -1057,4 +1120,5 @@ export default {
   getPermissions,
   getCollaborators,
   getProcesses,
+  migrate,
 }

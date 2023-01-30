@@ -5,8 +5,8 @@ import logger from "../utils/logger"
 import prisma from "../utils/prisma"
 
 enum Health {
-  OK = "Healthy",
-  RIP = "Unhealthy",
+  OK = "HEALTHY",
+  RIP = "UNHEALTHY",
 }
 
 export async function healthCheck(req: Request, res: Response) {

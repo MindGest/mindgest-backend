@@ -27,7 +27,7 @@ export function createRefreshToken(payload: RefreshToken) {
 
 export function createToken(payload: Object) {
   const token = signJWT({ ...payload }, JWT_UTIL_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "5m",
   })
   return token
 }
@@ -49,8 +49,7 @@ export function attachCookies(res: Response, accessToken: string, refreshToken: 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     signed: true,
-    secure: true, // has to be true
-    // secure: NODE_ENV !== "development",
+    secure: true,
     maxAge: 15 * 60 * 1000,
     sameSite: "none",
   })
@@ -59,8 +58,7 @@ export function attachCookies(res: Response, accessToken: string, refreshToken: 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     signed: true,
-    secure: true, // has to be true
-    // secure: NODE_ENV !== "development",
+    secure: true,
     maxAge: 60 * 60 * 1000,
     sameSite: "none",
   })

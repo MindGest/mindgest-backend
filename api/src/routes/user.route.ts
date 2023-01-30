@@ -6,6 +6,7 @@ import AdminEditRouter from "./admin.edit.route"
 
 import authMiddleware from "../middleware/auth.middleware"
 
+import adminController from "../controllers/admin.edit.controller"
 import controller from "../controllers/user.controller"
 
 const user = Router()
@@ -18,7 +19,7 @@ user.use("/profile", ProfileRouter)
 user.use("/:user/profile", AdminEditRouter)
 user.use("/notifications", NotificationRouter)
 
-// Endpoints
+// User Endpoints
 user.get("/list", controller.getUsers)
 
 user.get("/get-all-therapists", (req: Request, res: Response) => {
