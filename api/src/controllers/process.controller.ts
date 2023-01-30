@@ -286,8 +286,8 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
           },
         })
 
-        if(therapist?.id == decoded.id){
-          flag = true;
+        if (therapist?.id == decoded.id) {
+          flag = true
           console.log("Oila")
         }
 
@@ -348,8 +348,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
         },
       })
 
-      if(decoded.role==="admin" || flag===true){
-
+      if (decoded.role === "admin" || flag === true) {
         listing.push({
           therapistListing: therapistListing,
           patientName: utentName?.name,

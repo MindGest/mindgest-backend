@@ -117,12 +117,12 @@ export async function list(req: Request<{}, {}, {}, NotificationListQueryParams>
       // Filtered List
       let list = await prisma.notifications.findMany({
         where: { person_id: id, seen: req.query.filter === NotificationFilterType.READ },
-        select:{
+        select: {
           type: true,
           seen: true,
           settled: true,
-          data: true
-        }
+          data: true,
+        },
       })
 
       // Send Notification List (filtered)
@@ -135,12 +135,12 @@ export async function list(req: Request<{}, {}, {}, NotificationListQueryParams>
       return res.status(StatusCodes.OK).json({
         message: "Successfully retrieved all notifications",
         data: await prisma.notifications.findMany({
-          select:{
+          select: {
             type: true,
             seen: true,
             settled: true,
-            data: true
-          }
+            data: true,
+          },
         }),
       })
     }

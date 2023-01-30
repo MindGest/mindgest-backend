@@ -1219,47 +1219,52 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
         if (tempDate.getTime() > today.getTime()) {
           // get the appointments
           let date = appointments[i].slot_start_date
-              const formattedStartDate = date?.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-              })
+          const formattedStartDate = date?.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
 
-              date = appointments[i].slot_start_date
-              const formattedEndDate = date?.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-              })
+          date = appointments[i].slot_start_date
+          const formattedEndDate = date?.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
 
-              let processId = await prisma.appointment_process.findFirst({
-                where:{
-                  appointment_slot_id: appointments[i].slot_id
-                }
-              })
+          let processId = await prisma.appointment_process.findFirst({
+            where: {
+              appointment_slot_id: appointments[i].slot_id,
+            },
+          })
 
-              let therapistsIds = await prisma.therapist_process.findMany({
-                where:{
-                  process_id:processId?.process_id
-                }
-              })
+          let therapistsIds = await prisma.therapist_process.findMany({
+            where: {
+              process_id: processId?.process_id,
+            },
+          })
 
-              let therapistsNames = []
+          let therapistsNames = []
 
-              for(let id of therapistsIds){
-                let name = await prisma.person.findUnique({
-                  where:{
-                    id:id.therapist_person_id
-                  }
-                })
+          for (let id of therapistsIds) {
+            let name = await prisma.person.findUnique({
+              where: {
+                id: id.therapist_person_id,
+              },
+            })
 
-                therapistsNames.push(name?.name)
-              }
-              appointmentsOfToday.push({"therapists": therapistsNames ,"room":appointments[i].room, "start":formattedStartDate, "end": formattedEndDate})
+            therapistsNames.push(name?.name)
+          }
+          appointmentsOfToday.push({
+            therapists: therapistsNames,
+            room: appointments[i].room,
+            start: formattedStartDate,
+            end: formattedEndDate,
+          })
         }
       }
     } else {
@@ -1304,7 +1309,7 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
                 month: "2-digit",
                 year: "numeric",
                 hour: "2-digit",
-                minute: "2-digit"
+                minute: "2-digit",
               })
 
               date = appointment.slot_start_date
@@ -1313,27 +1318,32 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
                 month: "2-digit",
                 year: "numeric",
                 hour: "2-digit",
-                minute: "2-digit"
+                minute: "2-digit",
               })
 
               let therapistsIds = await prisma.therapist_process.findMany({
-                where:{
-                  process_id:process_user[i].process_id
-                }
+                where: {
+                  process_id: process_user[i].process_id,
+                },
               })
 
               let therapistsNames = []
 
-              for(let id of therapistsIds){
+              for (let id of therapistsIds) {
                 let name = await prisma.person.findUnique({
-                  where:{
-                    id:id.therapist_person_id
-                  }
+                  where: {
+                    id: id.therapist_person_id,
+                  },
                 })
 
                 therapistsNames.push(name?.name)
               }
-              appointmentsOfToday.push({"therapists": therapistsNames ,"room":appointment.room, "start":formattedStartDate, "end": formattedEndDate})
+              appointmentsOfToday.push({
+                therapists: therapistsNames,
+                room: appointment.room,
+                start: formattedStartDate,
+                end: formattedEndDate,
+              })
             }
           }
         }
@@ -1362,5 +1372,5 @@ export default {
   lastTerminatedAppointments,
   listAppointmentsOfTheDay,
   onGoingAppointments,
-  listAppointmentsOfNextDays
+  listAppointmentsOfNextDays,
 }

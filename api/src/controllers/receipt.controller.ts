@@ -454,37 +454,47 @@ export async function listProcess(req: Request, res: Response) {
   var decoded = res.locals.token
 
   let appointmentsProcess = await prisma.appointment_process.findMany({
-    where:{
-      process_id:processId
-    }
+    where: {
+      process_id: processId,
+    },
   })
 
   var info = []
-  for(let appointmentId of appointmentsProcess){
+  for (let appointmentId of appointmentsProcess) {
     let receiptAppointment = await prisma.receipt.findFirst({
-      where:{
-        appointment_slot_id: appointmentId.appointment_slot_id
-      }
+      where: {
+        appointment_slot_id: appointmentId.appointment_slot_id,
+      },
     })
 
-    if(receiptAppointment != null){
+    if (receiptAppointment != null) {
       let date = receiptAppointment!.datetime
       let formattedDate = date?.toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
       })
-      if(decoded.role=="admin"){
-        info.push({"id":receiptAppointment.id, "ref": receiptAppointment.ref, "date": formattedDate, "paid": receiptAppointment.payed, "appointmentId": receiptAppointment.appointment_slot_id})
-      }
-      else{
-        info.push({"id":receiptAppointment.id,  "date": formattedDate, "paid": receiptAppointment.payed, "appointmentId": receiptAppointment.appointment_slot_id})
+      if (decoded.role == "admin") {
+        info.push({
+          id: receiptAppointment.id,
+          ref: receiptAppointment.ref,
+          date: formattedDate,
+          paid: receiptAppointment.payed,
+          appointmentId: receiptAppointment.appointment_slot_id,
+        })
+      } else {
+        info.push({
+          id: receiptAppointment.id,
+          date: formattedDate,
+          paid: receiptAppointment.payed,
+          appointmentId: receiptAppointment.appointment_slot_id,
+        })
       }
     }
   }
 
   return res.status(StatusCodes.OK).json({
-    message: info
+    message: info,
   })
 }
 
@@ -493,5 +503,5 @@ export default {
   create,
   pay,
   info,
-  listProcess
+  listProcess,
 }
