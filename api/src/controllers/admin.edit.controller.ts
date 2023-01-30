@@ -147,7 +147,7 @@ export async function fetchUserProfileInfo(req: Request, res: Response) {
     // Parse Response
     let data = null
     let base = {
-      id: 21,
+      id: user.id,
       name: usr?.name,
       email: usr?.email,
       password: usr?.password,
