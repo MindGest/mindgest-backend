@@ -28,7 +28,7 @@ import uploadPicture from "../utils/upload"
 
 export async function uploadProfilePicture(req: Request, res: Response) {
   try {
-    // Authenticate / Authorize user
+    // Authorize user
     const { id } = res.locals.token
     logger.info(`UPLOAD [user-id: ${id}] => Profile Picture upload authorized...`)
 
@@ -66,7 +66,7 @@ export async function uploadProfilePicture(req: Request, res: Response) {
 
 export async function downloadProfilePicture(req: Request, res: Response) {
   try {
-    // Authenticate / Authorize user
+    // Authorize user
     const { id } = res.locals.token
     logger.info(`DOWNLOAD [user-id: ${id}] => Profile Picture download authorized...`)
 
@@ -92,7 +92,7 @@ export async function downloadProfilePicture(req: Request, res: Response) {
 
 export async function fetchProfileInfo(req: Request, res: Response) {
   try {
-    // Authenticate / Authorize user
+    // Authorize user
     const { id, role } = res.locals.token
     logger.info(
       `PROFILE-INFO [user-id: ${id}] => Profile Info access granted. Fetching information...`
@@ -129,7 +129,7 @@ export async function fetchProfileInfo(req: Request, res: Response) {
 
 export async function editProfileInfo(req: Request<{}, {}, SelfEditProfileBody>, res: Response) {
   try {
-    // Authenticate / Authorize User
+    // Authorize User
     const { id, role } = res.locals.token
     logger.info(`EDIT-PROFILE [user-id: ${id}] => Access granted. Editing profile...`)
 
