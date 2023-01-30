@@ -71,13 +71,15 @@ export async function statistics(req: Request<{}, {}, StatisticsBody>, res: Resp
   }
 
   // if the caller is an intern, filter the processes by the ones that he has permissions to do the statistics
-  if (callerRole == "intern"){
-    let tempProcesses = processes;
-    processes = [];
-    for (let i = 0; i < tempProcesses.length; i++){
-      let permissionsIntern = await prisma.permissions.findFirst({where: {person_id: callerId, process_id: tempProcesses[i].process_id}});
-      if (permissionsIntern != null && permissionsIntern.statitics){
-        processes.push(tempProcesses[i]);
+  if (callerRole == "intern") {
+    let tempProcesses = processes
+    processes = []
+    for (let i = 0; i < tempProcesses.length; i++) {
+      let permissionsIntern = await prisma.permissions.findFirst({
+        where: { person_id: callerId, process_id: tempProcesses[i].process_id },
+      })
+      if (permissionsIntern != null && permissionsIntern.statitics) {
+        processes.push(tempProcesses[i])
       }
     }
   }
