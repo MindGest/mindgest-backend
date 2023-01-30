@@ -126,7 +126,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       },
     })
 
-    if (!(decoded.isAdmin || (permissions != null && permissions.archive))){
+    if (!(decoded.isAdmin || (permissions != null && permissions.archive))) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -519,28 +519,30 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
   try {
     var decoded = res.locals.token
 
-    let callerIsAdmin = decoded.isAdmin;
-    let callerRole = decoded.role;
-    let callerId = decoded.id;
+    let callerIsAdmin = decoded.isAdmin
+    let callerRole = decoded.role
+    let callerId = decoded.id
 
     // verify if the caller is an admin
     // only admins ca create processes
-    if (!callerIsAdmin){
+    if (!callerIsAdmin) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You do not have permission to perform this action."
+        message: "You do not have permission to perform this action.",
       })
     }
 
     // get info of the patients, to use the name of one of them to create the process ref.
-    let patient = await prisma.person.findFirst({where: {id: req.body.patientIds[0]}});
+    let patient = await prisma.person.findFirst({ where: { id: req.body.patientIds[0] } })
 
     // get the info of the speciality
-    let speciality = await prisma.speciality.findFirst({where: {speciality: req.body.speciality}});
+    let speciality = await prisma.speciality.findFirst({
+      where: { speciality: req.body.speciality },
+    })
 
     // get the current date, so that the ref is unique.
-    let now = Date.now();
+    let now = Date.now()
 
-    let ref = `${speciality?.code}_${patient?.name}_${now}`;
+    let ref = `${speciality?.code}_${patient?.name}_${now}`
 
     // create the process
     var process = await prisma.process.create({
@@ -739,7 +741,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
     })
 
     // get the current date, so that the ref is unique.
-    let now = Date.now();
+    let now = Date.now()
 
     // update speciality and remarks
     await prisma.process.update({

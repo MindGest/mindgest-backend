@@ -57,12 +57,15 @@ export async function getInternsPermissions(
       },
     })
 
-    let interns_permissions = [];
+    let interns_permissions = []
     // remove the collaborators that are therapists
-    for (let collaborator_permissions of collaborators_permissions){
-      let intern = await prisma.intern.findFirst({where: {person_id: collaborator_permissions.person_id}});
-      if (intern != null){ // is intern
-        interns_permissions.push(collaborator_permissions);
+    for (let collaborator_permissions of collaborators_permissions) {
+      let intern = await prisma.intern.findFirst({
+        where: { person_id: collaborator_permissions.person_id },
+      })
+      if (intern != null) {
+        // is intern
+        interns_permissions.push(collaborator_permissions)
       }
     }
 

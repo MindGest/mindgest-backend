@@ -478,7 +478,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     // prepare vars
     var isProcessTherapist: boolean = false // if the caller is a therapist in the process of the specified appointment
     var isProcessIntern: boolean = false // ...
-    let canSee = false;
+    let canSee = false
 
     // get the appointment info
     var appointment = await prisma.appointment.findFirst({
@@ -508,22 +508,31 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     }
 
     // get the name of the mainTherapist
-    let mainTherapistPermissions = await prisma.permissions.findFirst({where: {process_id: process.id}});
-    let mainTherapist = await prisma.person.findFirst({where: {id: mainTherapistPermissions?.person_id}});
-    if (callerId == mainTherapist?.id){// if the caller is the main therapist, he can see this info.
-      canSee = true;
+    let mainTherapistPermissions = await prisma.permissions.findFirst({
+      where: { process_id: process.id },
+    })
+    let mainTherapist = await prisma.person.findFirst({
+      where: { id: mainTherapistPermissions?.person_id },
+    })
+    if (callerId == mainTherapist?.id) {
+      // if the caller is the main therapist, he can see this info.
+      canSee = true
     }
 
     // get the names of the collaborators
-    let collaboratorsPermissions = await prisma.permissions.findMany({where: {process_id: process.id, isMain: false}});
+    let collaboratorsPermissions = await prisma.permissions.findMany({
+      where: { process_id: process.id, isMain: false },
+    })
     // build the names and see if the caller has permissions to see the info
-    let collaborators = [];
-    for (let collaboratorPermissions of collaboratorsPermissions){
-      let person = await prisma.person.findFirst({where: {id: collaboratorPermissions.person_id}});
-      collaborators.push(person?.name);
+    let collaborators = []
+    for (let collaboratorPermissions of collaboratorsPermissions) {
+      let person = await prisma.person.findFirst({
+        where: { id: collaboratorPermissions.person_id },
+      })
+      collaborators.push(person?.name)
       // verify if the caller (if therapist or intern) can access this information
-      if (callerId == collaboratorPermissions.person_id && collaboratorPermissions.see == true){
-        canSee = true;
+      if (callerId == collaboratorPermissions.person_id && collaboratorPermissions.see == true) {
+        canSee = true
       }
     }
 
@@ -565,7 +574,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         //process: processes[i]
         speciality: process.speciality_speciality,
         processRef: process.ref,
-      }
+      },
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
