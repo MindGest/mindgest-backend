@@ -282,7 +282,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
     var callerRole = decodedToken.role
     var callerId = decodedToken.id
 
-    if (callerRole == 'acountant') {
+    if (callerRole == "acountant") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have access to this information.",
       })
@@ -349,7 +349,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
             // filter by the current day
             tempDate.setHours(0, 0, 0, 0)
             if (tempDate.getTime() == today.getTime()) {
-              appointmentsOfToday.push(getAppointmentInformation(appointment, true));
+              appointmentsOfToday.push(getAppointmentInformation(appointment, true))
             }
           }
         }
