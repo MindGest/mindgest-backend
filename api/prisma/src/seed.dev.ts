@@ -2,32 +2,31 @@ import prisma from "../../src/utils/prisma"
 import argon2 from "argon2"
 
 async function seed() {
-  // Flush DB
-  await prisma.appointment_process.deleteMany()
-  await prisma.therapist_speciality.deleteMany()
-  await prisma.school.deleteMany()
-  await prisma.profession.deleteMany()
-  await prisma.accountant.deleteMany()
-  await prisma.guard.deleteMany()
-  await prisma.admin.deleteMany()
-  await prisma.intern_process.deleteMany()
-  await prisma.process_liable.deleteMany()
-  await prisma.notes.deleteMany()
-  await prisma.notifications.deleteMany()
-  await prisma.intern.deleteMany()
-  await prisma.patient_process.deleteMany()
-  await prisma.patient.deleteMany()
-  await prisma.patienttype.deleteMany()
-  await prisma.therapist_process.deleteMany()
-  await prisma.therapist.deleteMany()
-  await prisma.receipt.deleteMany()
-  await prisma.appointment.deleteMany()
-  await prisma.permissions.deleteMany()
-  await prisma.pricetable.deleteMany()
-  await prisma.process.deleteMany()
-  await prisma.speciality.deleteMany()
-  await prisma.person.deleteMany()
-  await prisma.room.deleteMany()
+  await prisma.appointment_process.deleteMany({})
+  await prisma.therapist_speciality.deleteMany({})
+  await prisma.school.deleteMany({})
+  await prisma.profession.deleteMany({})
+  await prisma.accountant.deleteMany({})
+  await prisma.guard.deleteMany({})
+  await prisma.admin.deleteMany({})
+  await prisma.intern_process.deleteMany({})
+  await prisma.process_liable.deleteMany({})
+  await prisma.notes.deleteMany({})
+  await prisma.notifications.deleteMany({})
+  await prisma.intern.deleteMany({})
+  await prisma.patient_process.deleteMany({})
+  await prisma.patient.deleteMany({})
+  await prisma.patienttype.deleteMany({})
+  await prisma.therapist_process.deleteMany({})
+  await prisma.therapist.deleteMany({})
+  await prisma.receipt.deleteMany({})
+  await prisma.appointment.deleteMany({})
+  await prisma.permissions.deleteMany({})
+  await prisma.pricetable.deleteMany({})
+  await prisma.process.deleteMany({})
+  await prisma.speciality.deleteMany({})
+  await prisma.person.deleteMany({})
+  await prisma.room.deleteMany({})
 
   let person1 = await prisma.person.create({
     data: {
@@ -346,29 +345,40 @@ async function seed() {
   })
 
   let liable = await prisma.liable.create({
-    data: {
-      name: "Pai do burro",
-      email: "paidoburro@gmail.com",
+    data:{
+      name:"Pai do burro",
+      email:"paidoburro@gmail.com",
       phonenumber: 91312312,
       type: "Pai",
       remarks: "Ele é mesmo burro pah",
-    },
+    }
   })
 
   await prisma.process_liable.create({
-    data: {
-      process_id: process.id,
-      liable_id: liable.id,
-    },
+    data:{
+      process_id:process.id,
+      liable_id:liable.id
+    }
+  })
+
+  await prisma.notifications.create({
+    data:{
+      ref:"12345",
+      type:"Teste123",
+      data:"Teste123",
+      seen:false,
+      settled: false,
+      person_id: person6.id,
+    }
   })
 
   await prisma.notes.create({
-    data: {
+    data:{
       title: "ele é burro",
       body: "IMANINHOCABURRO",
       datetime: new Date("2023-01-22T22:50:28.538Z"),
-      process_id: process.id,
-    },
+      process_id: process.id
+    }
   })
 }
 

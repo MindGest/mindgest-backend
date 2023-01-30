@@ -244,6 +244,8 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
   try {
     var queryParams = req.query
 
+    var decoded = res.locals.token
+
     if (queryParams.active == null) {
       queryParams.active = "true"
     }
@@ -275,12 +277,19 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
 
       var therapistListing: string[] = []
 
+      var flag = false
+
       for (var therapist_process of therapists) {
         var therapist = await prisma.person.findUnique({
           where: {
             id: therapist_process.therapist_person_id,
           },
         })
+
+        if(therapist?.id == decoded.id){
+          flag = true;
+          console.log("Oila")
+        }
 
         therapistListing.push(therapist!.name)
       }
@@ -323,7 +332,12 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
 
       var nextAppointmentString: string = ""
       if (dateChanged) {
-        nextAppointmentString = new Date(nextAppointment).toString()
+        let date = apointment!.slot_start_date
+        nextAppointmentString = date?.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
       } else {
         nextAppointmentString = "No next Appointment"
       }
@@ -334,13 +348,16 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
         },
       })
 
-      listing.push({
-        therapistListing: therapistListing,
-        patientName: utentName?.name,
-        refCode: ref,
-        nextAppointment: nextAppointmentString,
-        speciality: speciality?.speciality,
-      })
+      if(decoded.role==="admin" || flag===true){
+
+        listing.push({
+          therapistListing: therapistListing,
+          patientName: utentName?.name,
+          refCode: ref,
+          nextAppointment: nextAppointmentString,
+          speciality: speciality?.speciality,
+        })
+      }
     }
     return res.status(StatusCodes.OK).json({
       list: listing,
