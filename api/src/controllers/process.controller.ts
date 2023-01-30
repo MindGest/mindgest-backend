@@ -740,12 +740,18 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
     }
 
     // get the code of the given speciality
-    let speciality = await prisma.speciality.findFirst({where: {speciality: req.body.speciality}});
+    let speciality = await prisma.speciality.findFirst({
+      where: { speciality: req.body.speciality },
+    })
 
     // get the name of the patients
-    let patient_process = await prisma.patient_process.findMany({where: {process_id: processId}});
+    let patient_process = await prisma.patient_process.findMany({
+      where: { process_id: processId },
+    })
     // get only the name of one of them
-    let patient = await prisma.person.findFirst({where: {id: patient_process[0].patient_person_id}});
+    let patient = await prisma.person.findFirst({
+      where: { id: patient_process[0].patient_person_id },
+    })
 
     // update speciality and remarks
     await prisma.process.update({
@@ -760,7 +766,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
     })
 
     // update the collaborators of the process
-    updateCollaborators(req.body.colaborators, processId);
+    updateCollaborators(req.body.colaborators, processId)
 
     return res.status(StatusCodes.OK).json({
       message: "Edit done!",
@@ -1180,7 +1186,7 @@ async function getProcessTherapists(processId: bigint | undefined) {
   return therapists
 }
 
-async function updateCollaborators(collaboratorIds: number[], processId: number){
+async function updateCollaborators(collaboratorIds: number[], processId: number) {
   /**
    * Add new collaborators
    * Delete old collaborators
@@ -1188,18 +1194,20 @@ async function updateCollaborators(collaboratorIds: number[], processId: number)
    */
 
   // iterate over the given ids
-  for (let newCollaborator of collaboratorIds){
+  for (let newCollaborator of collaboratorIds) {
     // if already collaborator, do nothing
-    let permission = await prisma.permissions.findFirst({where: {person_id: newCollaborator}});
-    
+    let permission = await prisma.permissions.findFirst({ where: { person_id: newCollaborator } })
+
     // if new, create link and permissions
-    if (permission == null){
+    if (permission == null) {
       // check if the id is of a therapist or an intern
-      let therapist = await prisma.therapist.findFirst({where: {person_id: newCollaborator}});
-      if (therapist != null){
+      let therapist = await prisma.therapist.findFirst({ where: { person_id: newCollaborator } })
+      if (therapist != null) {
         // is therapist
         // create link to process
-        await prisma.therapist_process.create({data: {therapist_person_id: newCollaborator, process_id: processId}});
+        await prisma.therapist_process.create({
+          data: { therapist_person_id: newCollaborator, process_id: processId },
+        })
         // create permissions
         await prisma.permissions.create({
           data: {
@@ -1210,13 +1218,15 @@ async function updateCollaborators(collaboratorIds: number[], processId: number)
             editprocess: true,
             isMain: false, // not the main therapist
             process_id: processId,
-            person_id: newCollaborator
-          }})
-      }
-      else{
+            person_id: newCollaborator,
+          },
+        })
+      } else {
         // is intern
         // create link to process
-        await prisma.intern_process.create({data: {intern_person_id: newCollaborator, process_id: processId}});
+        await prisma.intern_process.create({
+          data: { intern_person_id: newCollaborator, process_id: processId },
+        })
         // create permissions
         await prisma.permissions.create({
           data: {
@@ -1227,30 +1237,36 @@ async function updateCollaborators(collaboratorIds: number[], processId: number)
             editprocess: false,
             isMain: false, // not the main therapist
             process_id: processId,
-            person_id: newCollaborator
-          }})
+            person_id: newCollaborator,
+          },
+        })
       }
     }
   }
-  
+
   // if there are collaborators in the process not in the given ids, delete them
   // remove old collaborators
-  let collaborators = await prisma.permissions.findMany({where: {process_id: processId}});
-  for (let collaborator of collaborators){
+  let collaborators = await prisma.permissions.findMany({ where: { process_id: processId } })
+  for (let collaborator of collaborators) {
     // if this collaborator is not in the given array, delete him.
-    if (!collaboratorIds.includes(Number(collaborator.person_id))){
+    if (!collaboratorIds.includes(Number(collaborator.person_id))) {
       // check if the collaborator is a therapist or an intern.
-      let therapist = await prisma.therapist.findFirst({where: {person_id: collaborator.person_id}});
+      let therapist = await prisma.therapist.findFirst({
+        where: { person_id: collaborator.person_id },
+      })
       // delete permissions
-      await prisma.permissions.delete({where: {id: collaborator.id}});
-      if (therapist != null){
+      await prisma.permissions.delete({ where: { id: collaborator.id } })
+      if (therapist != null) {
         // delete the link to the process
         // it has to be deleteMany so that I can pass those parameters to the query
-        await prisma.therapist_process.deleteMany({where: {therapist_person_id: collaborator.person_id, process_id: processId}});
-      }
-      else {
+        await prisma.therapist_process.deleteMany({
+          where: { therapist_person_id: collaborator.person_id, process_id: processId },
+        })
+      } else {
         // delete the link to the process
-        await prisma.intern_process.deleteMany({where: {intern_person_id: collaborator.person_id, process_id: processId}});
+        await prisma.intern_process.deleteMany({
+          where: { intern_person_id: collaborator.person_id, process_id: processId },
+        })
       }
     }
   }

@@ -56,11 +56,14 @@ export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody
     }
 
     // verify if a speciality with the given code already exists
-    let speciality = await prisma.speciality.findFirst({where: {OR: [{code: req.body.code}, {speciality: req.body.speciality}]}});
+    let speciality = await prisma.speciality.findFirst({
+      where: { OR: [{ code: req.body.code }, { speciality: req.body.speciality }] },
+    })
 
-    if (speciality != null){
+    if (speciality != null) {
       return res.status(StatusCodes.CONFLICT).json({
-        message: "A speciality already exists with the given code or name. Cannot create another with the same code or name."
+        message:
+          "A speciality already exists with the given code or name. Cannot create another with the same code or name.",
       })
     }
 
