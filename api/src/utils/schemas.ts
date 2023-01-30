@@ -141,6 +141,7 @@ export const TherapistUpdateSchema = z
     license: z.string(),
     extern: z.boolean(),
     taxNumber: z.number(),
+    speciality: z.string(),
   })
   .merge(PersonUpdateSchema)
 

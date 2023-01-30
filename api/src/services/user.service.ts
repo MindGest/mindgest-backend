@@ -68,13 +68,28 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          phone_number: body.phoneNumber,  
+          phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
       },
     },
     where: { person_id: id },
   })
+
+  // Find Speciality
+  const speciality = await prisma.speciality.findUnique({
+    where: {
+      speciality: body.speciality,
+    },
+  })
+
+  // Attach Speciality
+  if (speciality !== null || speciality !== undefined) {
+    await prisma.therapist_speciality.updateMany({
+      where: { therapist_person_id: id },
+      data: { speciality_speciality: body.speciality },
+    })
+  }
 }
 
 export async function selfUpdateInfoTherapist(id: number, body: SelfTherapistUpdateBody) {
@@ -89,13 +104,28 @@ export async function selfUpdateInfoTherapist(id: number, body: SelfTherapistUpd
           name: body.name,
           email: body.email,
           birth_date: body.birthDate,
-          phone_number: body.phoneNumber, 
+          phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
       },
     },
     where: { person_id: id },
   })
+
+  // Find Speciality
+  const speciality = await prisma.speciality.findUnique({
+    where: {
+      speciality: body.speciality,
+    },
+  })
+
+  // Attach Speciality
+  if (speciality !== null || speciality !== undefined) {
+    await prisma.therapist_speciality.updateMany({
+      where: { therapist_person_id: id },
+      data: { speciality_speciality: body.speciality },
+    })
+  }
 }
 
 export async function updateInfoIntern(id: number, body: InternUpdateBody) {
