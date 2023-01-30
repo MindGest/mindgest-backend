@@ -125,7 +125,6 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       },
     })
 
-
     if (decoded.admin == false && permissions!.see == false) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
@@ -149,7 +148,6 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
           id: therapist.therapist_person_id,
         },
       })
-
 
       if (flag == false) {
         var permissions = await prisma.permissions.findFirst({
@@ -220,7 +218,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
         },
       })
 
-      if(receipt!=null){
+      if (receipt != null) {
         if (receipt!.payed == false) {
           isPaid = false
         }
