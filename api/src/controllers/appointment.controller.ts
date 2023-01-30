@@ -478,7 +478,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     // prepare vars
     var isProcessTherapist: boolean = false // if the caller is a therapist in the process of the specified appointment
     var isProcessIntern: boolean = false // ...
-    // var isGuard: boolean = callerRole == "guard" ? true : false
+    let canSee = false;
 
     // get the appointment info
     var appointment = await prisma.appointment.findFirst({
@@ -506,50 +506,29 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         message: "Somehow, this appointment's process does not exist.",
       })
     }
-    // get the terapists
-    var therapists: any = []
-    var therapist
-    var therapist_process = await prisma.therapist_process.findMany({
-      where: { process_id: process.id },
-    })
-    if (therapist_process.length == 0) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        message: "It appears that there are no therapits assigned to this process.",
-      })
+
+    // get the name of the mainTherapist
+    let mainTherapistPermissions = await prisma.permissions.findFirst({where: {process_id: process.id}});
+    let mainTherapist = await prisma.person.findFirst({where: {id: mainTherapistPermissions?.person_id}});
+    if (callerId == mainTherapist?.id){// if the caller is the main therapist, he can see this info.
+      canSee = true;
     }
-    for (let i = 0; i < therapist_process.length; i++) {
-      therapist = await prisma.therapist.findFirst({
-        where: { person_id: therapist_process[i].therapist_person_id },
-        select: { person: { select: { name: true } } },
-      })
-      therapists.push(therapist?.person.name)
-      if (callerId == Number(therapist_process[i].therapist_person_id)) {
-        isProcessTherapist = true
-      }
-    }
-    //get the interns
-    var interns: any = []
-    var intern
-    var intern_process = await prisma.intern_process.findMany({
-      where: { process_id: process.id },
-    })
-    for (let i = 0; i < intern_process.length; i++) {
-      intern = await prisma.intern.findFirst({
-        where: { person_id: intern_process[i].intern_person_id },
-        select: { person: { select: { name: true } } },
-      })
-      interns.push(intern?.person.name)
-      if (callerId == Number(intern_process[i].intern_person_id)) {
-        // get the permissions of this intern for this process
-        var permissions = await retrieveInternPermissions(callerId, Number(process.id))
-        if (permissions != null && permissions.see) {
-          isProcessIntern = true // this means that the caller is an intern that is associated with the process and the see permission has been granted
-        }
+
+    // get the names of the collaborators
+    let collaboratorsPermissions = await prisma.permissions.findMany({where: {process_id: process.id, isMain: false}});
+    // build the names and see if the caller has permissions to see the info
+    let collaborators = [];
+    for (let collaboratorPermissions of collaboratorsPermissions){
+      let person = await prisma.person.findFirst({where: {id: collaboratorPermissions.person_id}});
+      collaborators.push(person?.name);
+      // verify if the caller (if therapist or intern) can access this information
+      if (callerId == collaboratorPermissions.person_id && collaboratorPermissions.see == true){
+        canSee = true;
       }
     }
 
     // verify if the caller has the right permissions
-    if (!(callerIsAdmin || isProcessTherapist || isProcessIntern)) {
+    if (!(callerIsAdmin || canSee)) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "It seems that you do not have permission access this information.",
       })
@@ -575,17 +554,18 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
     }
 
     res.status(StatusCodes.OK).json({
-      message: "It is working.",
-      appointmentStartTime: appointment.slot_start_date,
-      appointmentEndTime: appointment.slot_end_date,
-      appointmentRoom: appointment.room.name,
-      //appointment: appointmentInfo,
-      therapists: therapists,
-      interns: interns,
-      patients: patients,
-      //process: processes[i]
-      speciality: process.speciality_speciality,
-      processRef: process.ref,
+      data: {
+        appointmentStartTime: appointment.slot_start_date,
+        appointmentEndTime: appointment.slot_end_date,
+        appointmentRoom: appointment.room.name,
+        //appointment: appointmentInfo,
+        mainTherapist: mainTherapist?.name,
+        collaborators: collaborators,
+        patients: patients,
+        //process: processes[i]
+        speciality: process.speciality_speciality,
+        processRef: process.ref,
+      }
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

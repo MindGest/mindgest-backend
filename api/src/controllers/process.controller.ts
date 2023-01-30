@@ -537,7 +537,10 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
     // get the info of the speciality
     let speciality = await prisma.speciality.findFirst({where: {speciality: req.body.speciality}});
 
-    let ref = `${speciality?.code}_${patient?.name}`;
+    // get the current date, so that the ref is unique.
+    let now = Date.now();
+
+    let ref = `${speciality?.code}_${patient?.name}_${now}`;
 
     // create the process
     var process = await prisma.process.create({
@@ -729,6 +732,9 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
     // get only the name of one of them
     let patient = await prisma.person.findFirst({where: {id: patient_process[0].patient_person_id}});
 
+    // get the current date, so that the ref is unique.
+    let now = Date.now();
+
     // update speciality and remarks
     await prisma.process.update({
       where: {
@@ -737,7 +743,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
       data: {
         speciality_speciality: req.body.speciality,
         remarks: req.body.remarks,
-        ref: `${speciality?.code}_${patient?.name}`,
+        ref: `${speciality?.code}_${patient?.name}_${now}`,
       },
     })
 

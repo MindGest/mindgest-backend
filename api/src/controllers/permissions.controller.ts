@@ -44,7 +44,7 @@ export async function getInternsPermissions(
     }
 
     // get the permissions of the interns in the proces
-    let intern_permissions = await prisma.permissions.findMany({
+    let collaborators_permissions = await prisma.permissions.findMany({
       where: { process_id: processId },
       select: {
         editprocess: true,
@@ -57,23 +57,32 @@ export async function getInternsPermissions(
       },
     })
 
+    let interns_permissions = [];
+    // remove the collaborators that are therapists
+    for (let collaborator_permissions of collaborators_permissions){
+      let intern = await prisma.intern.findFirst({where: {person_id: collaborator_permissions.person_id}});
+      if (intern != null){ // is intern
+        interns_permissions.push(collaborator_permissions);
+      }
+    }
+
     let infoToReturn = []
 
-    for (let i = 0; i < intern_permissions.length; i++) {
+    for (let i = 0; i < interns_permissions.length; i++) {
       // get the name of the intern
       let intern = await prisma.person.findFirst({
-        where: { id: intern_permissions[i].person_id },
+        where: { id: interns_permissions[i].person_id },
         select: { name: true },
       })
       infoToReturn.push({
-        editprocess: intern_permissions[i].editprocess,
-        see: intern_permissions[i].see,
-        appoint: intern_permissions[i].appoint,
-        statistics: intern_permissions[i].statitics,
-        editpatient: intern_permissions[i].editpatitent,
-        archive: intern_permissions[i].archive,
+        editprocess: interns_permissions[i].editprocess,
+        see: interns_permissions[i].see,
+        appoint: interns_permissions[i].appoint,
+        statistics: interns_permissions[i].statitics,
+        editpatient: interns_permissions[i].editpatitent,
+        archive: interns_permissions[i].archive,
         name: intern?.name,
-        collaboratorId: intern_permissions[i].person_id,
+        collaboratorId: interns_permissions[i].person_id,
       })
     }
 
@@ -183,7 +192,7 @@ export async function editInternPermissions(
     }
 
     // check if caller is admin or a therapist of the process
-    if (isProcessTherapist == false || !callerIsAdmin) {
+    if (isProcessTherapist == false && !callerIsAdmin) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You don't have permissions to access this information.",
       })
