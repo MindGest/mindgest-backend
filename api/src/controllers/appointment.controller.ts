@@ -282,12 +282,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
     var callerRole = decodedToken.role
     var callerId = decodedToken.id
 
-    if (
-      callerRole != "therapist" &&
-      callerRole != "intern" &&
-      callerRole != "guard" &&
-      callerRole != "admin"
-    ) {
+    if (callerRole == "acountant") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have access to this information.",
       })
@@ -319,10 +314,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
         }
       }
     } else {
-      if (callerRole == "admin") {
-        // get all processes
-        process_user = await prisma.therapist_process.findMany({})
-      } else if (callerRole == "therapist") {
+      if (callerRole == "therapist") {
         // get the processes of the asking therapist (caller)
         process_user = await prisma.therapist_process.findMany({
           where: { therapist_person_id: callerId },
@@ -357,48 +349,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
             // filter by the current day
             tempDate.setHours(0, 0, 0, 0)
             if (tempDate.getTime() == today.getTime()) {
-              let date = appointment.slot_start_date
-              const formattedStartDate = date?.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-
-              date = appointment.slot_start_date
-              const formattedEndDate = date?.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-
-              let therapistsIds = await prisma.therapist_process.findMany({
-                where: {
-                  process_id: process_user[i].process_id,
-                },
-              })
-
-              let therapistsNames = []
-
-              for (let id of therapistsIds) {
-                let name = await prisma.person.findUnique({
-                  where: {
-                    id: id.therapist_person_id,
-                  },
-                })
-
-                therapistsNames.push(name?.name)
-              }
-
-              appointmentsOfToday.push({
-                therapists: therapistsNames,
-                room: appointment.room,
-                start: formattedStartDate,
-                end: formattedEndDate,
-              })
+              appointmentsOfToday.push(getAppointmentInformation(appointment, true))
             }
           }
         }
