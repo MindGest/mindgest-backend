@@ -59,6 +59,7 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
     data: {
       extern: body.extern,
       license: body.license,
+      health_system: body.healthSystem,
       person: {
         update: {
           active: body.active,
@@ -67,7 +68,8 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          phone_number: body.phoneNumber,
+          phone_number: body.phoneNumber,  
+          tax_number: body.taxNumber,
         },
       },
     },
@@ -79,13 +81,16 @@ export async function selfUpdateInfoTherapist(id: number, body: SelfTherapistUpd
   await prisma.therapist.update({
     data: {
       license: body.license,
+      extern: body.extern,
+      health_system: body.healthSystem,
       person: {
         update: {
           address: body.address,
           name: body.name,
           email: body.email,
           birth_date: body.birthDate,
-          phone_number: body.phoneNumber,
+          phone_number: body.phoneNumber, 
+          tax_number: body.taxNumber,
         },
       },
     },
