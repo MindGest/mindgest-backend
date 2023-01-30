@@ -20,9 +20,9 @@
     "prisma:generate": "npx prisma generate",
     "prisma:push": "npx prisma db push",
     "prisma:studio": "npx prisma studio",
-    "prisma:seed": "dotenv -v NODE_ENV=production npx prisma db seed --reset",
-    "prisma:seed-dev": "dotenv -v NODE_ENV=development npx prisma db seed --reset",
-    "prisma:seed-test": "dotenv -v NODE_ENV=test npx prisma db seed --reset",
+    "prisma:seed": "dotenv -v NODE_ENV=production npx prisma db seed",
+    "prisma:seed-dev": "dotenv -v NODE_ENV=development npx prisma db seed",
+    "prisma:seed-test": "dotenv -v NODE_ENV=test npx prisma db seed",
     "format:check": "prettier --check ."
   },
   "repository": {

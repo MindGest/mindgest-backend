@@ -128,7 +128,7 @@ export async function list(req: Request<{}, {}, {}, NotificationListQueryParams>
       // Send Notification List
       return res.status(StatusCodes.OK).json({
         message: "Successfully retrieved all notifications",
-        info: list,
+        data: await prisma.notifications.findMany({}),
       })
     }
     logger.info(`NOTIFICATIONS [user-id: ${id}] => Successfully retrieved notifications!`)
