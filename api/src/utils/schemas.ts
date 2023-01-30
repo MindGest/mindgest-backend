@@ -227,7 +227,6 @@ export const ProcessCreateSchema = z.object({
     therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
-    colaborators: z.array(z.number()),
   }),
 })
 

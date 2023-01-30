@@ -126,7 +126,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       },
     })
 
-    if (decoded.admin == false && permissions!.see == false) {
+    if (!(decoded.isAdmin || (permissions != null && permissions.archive))){
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -519,23 +519,37 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
   try {
     var decoded = res.locals.token
 
-    var admin = false
-    //FALTA CRIAR NOTIFICACAO
-    if (decoded.admin == false) {
-      admin = true
+    let callerIsAdmin = decoded.isAdmin;
+    let callerRole = decoded.role;
+    let callerId = decoded.id;
+
+    // verify if the caller is an admin
+    // only admins ca create processes
+    if (!callerIsAdmin){
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "You do not have permission to perform this action."
+      })
     }
 
-    var ref = (Math.random() + 1).toString(36).substring(7) //isto ta a fazer random, depois mudar i guess
+    // get info of the patients, to use the name of one of them to create the process ref.
+    let patient = await prisma.person.findFirst({where: {id: req.body.patientIds[0]}});
 
+    // get the info of the speciality
+    let speciality = await prisma.speciality.findFirst({where: {speciality: req.body.speciality}});
+
+    let ref = `${speciality?.code}_${patient?.name}`;
+
+    // create the process
     var process = await prisma.process.create({
       data: {
-        active: admin,
+        active: true,
         ref: ref,
         remarks: req.body.remarks,
         speciality_speciality: req.body.speciality,
       },
     })
 
+    // assign the main therapist
     await prisma.therapist_process.create({
       data: {
         therapist_person_id: req.body.therapistId,
@@ -556,44 +570,12 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
       },
     })
 
+    // add patients to the process
     for (let patientId of req.body.patientIds) {
       await prisma.patient_process.create({
         data: {
           patient_person_id: patientId,
           process_id: process.id,
-        },
-      })
-    }
-
-    for (let collaboratorId of req.body.colaborators) {
-      var type = await prisma.intern.findUnique({
-        where: {
-          person_id: collaboratorId,
-        },
-      })
-
-      if (type != null) {
-        //é interno
-        await prisma.intern_process.create({
-          data: {
-            process_id: process.id,
-            intern_person_id: collaboratorId,
-          },
-        })
-      } else {
-        //é terapeuta
-        await prisma.therapist_process.create({
-          data: {
-            process_id: process.id,
-            therapist_person_id: collaboratorId,
-          },
-        })
-      }
-
-      await prisma.permissions.create({
-        data: {
-          process_id: process.id,
-          person_id: collaboratorId,
         },
       })
     }
