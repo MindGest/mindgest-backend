@@ -104,5 +104,4 @@ export type GetAvailableRoomsBody = z.TypeOf<typeof schemas.GetAvailableRoomsSch
 
 export type GetCollaboratorsBody = z.TypeOf<typeof schemas.GetCollaboratorsSchema>["body"]
 
-
 export type ProcessMigrationSchemaBody = z.TypeOf<typeof schemas.ProcessMigrationSchema>["body"]
