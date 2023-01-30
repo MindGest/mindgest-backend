@@ -9,6 +9,6 @@ const statistics = Router()
 
 statistics.use(authMiddleware.authorize())
 
-statistics.get("/", controller.statistics)
+statistics.post("/", controller.statistics)
 
 export default statistics

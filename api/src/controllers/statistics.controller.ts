@@ -4,21 +4,21 @@ import { appointment } from "@prisma/client"
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 import { verifyAccessToken, verifyToken } from "../services/auth.service"
-import { QueryStatistics } from "../utils/types"
+import { StatisticsBody } from "../utils/types"
 import logger from "../utils/logger"
 import moment from "moment"
 
-export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res: Response) {
-  var query = req.query
+export async function statistics(req: Request<{}, {}, StatisticsBody>, res: Response) {
+  var body = req.body
 
   let decode = res.locals.token
   let callerId = decode.id
   let callerRole = decode.role
 
-  let parsedDateStart = new Date(query.startDate)
+  let parsedDateStart = new Date(body.startDate)
   let timestampStart = parsedDateStart.getTime()
 
-  let parsedDateEnd = new Date(query.endDate)
+  let parsedDateEnd = new Date(body.endDate)
   let timestampEnd = parsedDateEnd.getTime()
 
   let processes = []
@@ -26,19 +26,19 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
   // obter os ids dos processos
   // criar um array de {process_id: <id>}
   // given the process, ignore other filters
-  if (req.query.processId != null) {
-    processes.push({ process_id: req.query.processId })
+  if (body.processId != null) {
+    processes.push({ process_id: body.processId })
   }
   // given therapist and speciality
-  else if (req.query.therapistId != null && req.query.speciality != null) {
+  else if (body.therapistId != null && body.speciality != null) {
     // all the therapists processess
     let therapist_process = await prisma.therapist_process.findMany({
-      where: { therapist_person_id: req.query.therapistId },
+      where: { therapist_person_id: body.therapistId },
     })
     // filter by speciality
     for (let i = 0; i < therapist_process.length; i++) {
       let process = await prisma.process.findFirst({
-        where: { id: therapist_process[i].process_id, speciality_speciality: req.query.speciality },
+        where: { id: therapist_process[i].process_id, speciality_speciality: body.speciality },
       })
       if (process != null) {
         processes.push({ process_id: process.id })
@@ -46,16 +46,16 @@ export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res:
     }
   }
   // given only therapist
-  else if (req.query.therapistId != null) {
+  else if (body.therapistId != null) {
     processes = await prisma.therapist_process.findMany({
-      where: { therapist_person_id: req.query.therapistId },
+      where: { therapist_person_id: body.therapistId },
     })
   }
   // given only speciality
-  else if (req.query.speciality != null) {
+  else if (body.speciality != null) {
     // used to get the id, so that a pre defined array can be assembled
     let processesInfo = await prisma.process.findMany({
-      where: { speciality_speciality: req.query.speciality },
+      where: { speciality_speciality: body.speciality },
       select: { id: true },
     })
     for (let i = 0; i < processes.length; i++) {
