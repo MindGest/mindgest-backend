@@ -32,6 +32,7 @@ import cookieParser from "cookie-parser"
 
 const FRONTEND_URL = String(process.env.FRONTEND_URL)
 const COOKIE_SECRET = String(process.env.COOKIE_SECRET)
+const NODE_ENV = String(process.env.NODE_ENV)
 
 // MindGest API Router
 const api = Router()
@@ -50,7 +51,9 @@ api.use(
   })
 )
 api.use(compression({ filter: middleware.shouldCompress }))
-api.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
+
+if (NODE_ENV !== "production") api.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
+
 api.use(middleware.bodyParserErrorValidator())
 api.use(cookieParser(COOKIE_SECRET))
 

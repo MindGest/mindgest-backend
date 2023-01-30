@@ -503,7 +503,7 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
     if (decoded.admin == false) {
       admin = true
     }
-
+    
     var ref = (Math.random() + 1).toString(36).substring(7) //isto ta a fazer random, depois mudar i guess
 
     var process = await prisma.process.create({

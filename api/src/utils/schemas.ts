@@ -21,6 +21,7 @@ export const PersonSchema = z.object({
 
 export const TherapistSchema = z
   .object({
+    extern: z.boolean(),
     healthSystem: z.string().optional(),
     license: z.string(),
     speciality: z.string(),
@@ -296,8 +297,8 @@ export const AppointmentEditSchema = z.object({
 })
 
 export enum NotificationFilterType {
-  READ = "read",
-  UNREAD = "unread",
+  READ = "seen",
+  UNREAD = "unseen",
 }
 
 export const NotificationFilterSchema = z.object({
@@ -313,11 +314,14 @@ export const NotificationSchema = z.object({
     .required(),
 })
 
+export enum ReceiptFilterType {
+  PAYED = "settled",
+  NOT_PAYED = "debt",
+}
+
 export const ReceiptListQuery = z.object({
   query: z.object({
-    payed: z.string(),
-    notPayed: z.string(),
-    userId: z.string(),
+    filter: z.enum([ReceiptFilterType.PAYED, ReceiptFilterType.NOT_PAYED]).optional(),
   }),
 })
 

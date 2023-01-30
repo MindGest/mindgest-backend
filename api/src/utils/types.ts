@@ -69,7 +69,7 @@ export type MarkNotificationQueryParams = { id: Number }
 export type NotificationListQueryParams = z.TypeOf<typeof schemas.NotificationFilterSchema>
 
 export type QueryListProcess = z.TypeOf<typeof schemas.QueryListProcess>["query"]
-export type QueryListReceipt = z.TypeOf<typeof schemas.ReceiptListQuery>["query"]
+export type ReceiptFilterQuery = z.TypeOf<typeof schemas.ReceiptListQuery>["query"]
 export type QueryListRooms = z.TypeOf<typeof schemas.QueryListRooms>["query"]
 export type StatisticsBody = z.TypeOf<typeof schemas.StatisticsSchema>["body"]
 

@@ -115,7 +115,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
           data: {
             license: req.body.license,
             health_system: req.body.healthSystem,
-            extern: false,
+            extern: req.body.extern,
             person: { connect: { id: person.id } },
           },
         })
