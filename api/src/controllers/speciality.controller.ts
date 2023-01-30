@@ -4,6 +4,7 @@ import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
 import { SpecialityCreateBody } from "../utils/types"
+import speciality from "../routes/speciality.route"
 
 /**
  * listar especialidades
@@ -51,6 +52,18 @@ export async function createSpeciality(req: Request<{}, {}, SpecialityCreateBody
     if (callerRole == "guard" || callerRole == "accountant") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to create a speciality.",
+      })
+    }
+
+    // verify if a speciality with the given code already exists
+    let speciality = await prisma.speciality.findFirst({
+      where: { OR: [{ code: req.body.code }, { speciality: req.body.speciality }] },
+    })
+
+    if (speciality != null) {
+      return res.status(StatusCodes.CONFLICT).json({
+        message:
+          "A speciality already exists with the given code or name. Cannot create another with the same code or name.",
       })
     }
 
