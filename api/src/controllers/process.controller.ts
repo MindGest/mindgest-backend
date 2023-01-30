@@ -89,7 +89,8 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
       },
     })
 
-    if (decoded.admin == false || permissions!.archive == false) {
+    // if (decoded.admin == false || permissions?.archive == false) {
+    if (!(decoded.isAdmin || (permissions != null && permissions.archive))) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -604,11 +605,122 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
   }
 }
 
+// export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, res: Response) {
+//   try {
+//     var decoded = res.locals.token
+//     var processId = parseInt(req.params.processId)
+
+//     var permissions = await prisma.permissions.findFirst({
+//       where: {
+//         process_id: processId,
+//         person_id: decoded.id,
+//       },
+//     })
+
+//     if (decoded.admin == false || permissions!.see == false) {
+//       return res.status(StatusCodes.UNAUTHORIZED).json({
+//         message: "User doesn't have authorization",
+//       })
+//     }
+
+//     let permissionMainTherapist = await prisma.permissions.findFirst({
+//       where: {
+//         process_id: processId,
+//         isMain: true,
+//       },
+//     })
+
+//     await prisma.permissions.delete({
+//       where: {
+//         id: permissionMainTherapist?.id,
+//       },
+//     })
+
+//     await prisma.therapist_process.deleteMany({
+//       where: {
+//         therapist_person_id: permissionMainTherapist?.person_id,
+//         process_id: permissionMainTherapist?.id,
+//       },
+//     })
+
+//     await prisma.therapist_process.create({
+//       data: {
+//         process_id: processId,
+//         therapist_person_id: req.body.therapistId,
+//       },
+//     })
+
+//     await prisma.permissions.create({
+//       data: {
+//         editpatitent: true,
+//         see: true,
+//         appoint: true,
+//         statitics: true,
+//         editprocess: true,
+//         isMain: true,
+//         process_id: processId,
+//         person_id: req.body.therapistId,
+//       },
+//     })
+
+//     await prisma.process.update({
+//       where: {
+//         id: processId,
+//       },
+//       data: {
+//         speciality_speciality: req.body.speciality,
+//       },
+//     })
+
+//     for (let colaboratorId of req.body.colaborators) {
+//       var type = await prisma.intern.findUnique({
+//         where: {
+//           person_id: colaboratorId,
+//         },
+//       })
+
+//       if (type != null) {
+//         //é interno
+//         await prisma.intern_process.create({
+//           data: {
+//             process_id: processId,
+//             intern_person_id: colaboratorId,
+//           },
+//         })
+//       } else {
+//         //é terapeuta
+//         await prisma.therapist_process.create({
+//           data: {
+//             process_id: processId,
+//             therapist_person_id: colaboratorId,
+//           },
+//         })
+//       }
+
+//       await prisma.permissions.create({
+//         data: {
+//           process_id: processId,
+//           person_id: colaboratorId,
+//         },
+//       })
+//     }
+
+//     return res.status(StatusCodes.OK).json({
+//       message: "Edit done!",
+//     })
+//   } catch (error) {
+//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+//       message: "Ups... Something went wrong",
+//     })
+//   }
+// }
+
 export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, res: Response) {
   try {
     var decoded = res.locals.token
     var processId = parseInt(req.params.processId)
 
+    // obtain the permissions of the caller (therapists and interns)
     var permissions = await prisma.permissions.findFirst({
       where: {
         process_id: processId,
@@ -616,93 +728,35 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
       },
     })
 
-    if (decoded.admin == false || permissions!.see == false) {
+    // if not admin or an intern with editprocess permissions
+    if (decoded.admin == false || (permissions != null && permissions.editprocess == false)) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
     }
 
-    let permissionMainTherapist = await prisma.permissions.findFirst({
-      where: {
-        process_id: processId,
-        isMain: true,
-      },
-    })
+    // get the code of the given speciality
+    let speciality = await prisma.speciality.findFirst({where: {speciality: req.body.speciality}});
 
-    await prisma.permissions.delete({
-      where: {
-        id: permissionMainTherapist?.id,
-      },
-    })
+    // get the name of the patients
+    let patient_process = await prisma.patient_process.findMany({where: {process_id: processId}});
+    // get only the name of one of them
+    let patient = await prisma.person.findFirst({where: {id: patient_process[0].patient_person_id}});
 
-    await prisma.therapist_process.deleteMany({
-      where: {
-        therapist_person_id: permissionMainTherapist?.person_id,
-        process_id: permissionMainTherapist?.id,
-      },
-    })
-
-    await prisma.therapist_process.create({
-      data: {
-        process_id: processId,
-        therapist_person_id: req.body.therapistId,
-      },
-    })
-
-    await prisma.permissions.create({
-      data: {
-        editpatitent: true,
-        see: true,
-        appoint: true,
-        statitics: true,
-        editprocess: true,
-        isMain: true,
-        process_id: processId,
-        person_id: req.body.therapistId,
-      },
-    })
-
+    // update speciality and remarks
     await prisma.process.update({
       where: {
         id: processId,
       },
       data: {
         speciality_speciality: req.body.speciality,
+        remarks: req.body.remarks,
+        ref: `${speciality?.code}_${patient?.name}`,
       },
     })
 
-    for (let colaboratorId of req.body.colaborators) {
-      var type = await prisma.intern.findUnique({
-        where: {
-          person_id: colaboratorId,
-        },
-      })
-
-      if (type != null) {
-        //é interno
-        await prisma.intern_process.create({
-          data: {
-            process_id: processId,
-            intern_person_id: colaboratorId,
-          },
-        })
-      } else {
-        //é terapeuta
-        await prisma.therapist_process.create({
-          data: {
-            process_id: processId,
-            therapist_person_id: colaboratorId,
-          },
-        })
-      }
-
-      await prisma.permissions.create({
-        data: {
-          process_id: processId,
-          person_id: colaboratorId,
-        },
-      })
-    }
+    // update the collaborators of the process
+    updateCollaborators(req.body.colaborators, processId);
 
     return res.status(StatusCodes.OK).json({
       message: "Edit done!",
@@ -1120,6 +1174,82 @@ async function getProcessTherapists(processId: bigint | undefined) {
     })
   }
   return therapists
+}
+
+async function updateCollaborators(collaboratorIds: number[], processId: number){
+  /**
+   * Add new collaborators
+   * Delete old collaborators
+   * Maintains the current collaboratos.
+   */
+
+  // iterate over the given ids
+  for (let newCollaborator of collaboratorIds){
+    // if already collaborator, do nothing
+    let permission = await prisma.permissions.findFirst({where: {person_id: newCollaborator}});
+    
+    // if new, create link and permissions
+    if (permission == null){
+      // check if the id is of a therapist or an intern
+      let therapist = await prisma.therapist.findFirst({where: {person_id: newCollaborator}});
+      if (therapist != null){
+        // is therapist
+        // create link to process
+        await prisma.therapist_process.create({data: {therapist_person_id: newCollaborator, process_id: processId}});
+        // create permissions
+        await prisma.permissions.create({
+          data: {
+            editpatitent: true,
+            see: true,
+            appoint: true,
+            statitics: true,
+            editprocess: true,
+            isMain: false, // not the main therapist
+            process_id: processId,
+            person_id: newCollaborator
+          }})
+      }
+      else{
+        // is intern
+        // create link to process
+        await prisma.intern_process.create({data: {intern_person_id: newCollaborator, process_id: processId}});
+        // create permissions
+        await prisma.permissions.create({
+          data: {
+            editpatitent: false,
+            see: false,
+            appoint: false,
+            statitics: false,
+            editprocess: false,
+            isMain: false, // not the main therapist
+            process_id: processId,
+            person_id: newCollaborator
+          }})
+      }
+    }
+  }
+  
+  // if there are collaborators in the process not in the given ids, delete them
+  // remove old collaborators
+  let collaborators = await prisma.permissions.findMany({where: {process_id: processId}});
+  for (let collaborator of collaborators){
+    // if this collaborator is not in the given array, delete him.
+    if (!collaboratorIds.includes(Number(collaborator.person_id))){
+      // check if the collaborator is a therapist or an intern.
+      let therapist = await prisma.therapist.findFirst({where: {person_id: collaborator.person_id}});
+      // delete permissions
+      await prisma.permissions.delete({where: {id: collaborator.id}});
+      if (therapist != null){
+        // delete the link to the process
+        // it has to be deleteMany so that I can pass those parameters to the query
+        await prisma.therapist_process.deleteMany({where: {therapist_person_id: collaborator.person_id, process_id: processId}});
+      }
+      else {
+        // delete the link to the process
+        await prisma.intern_process.deleteMany({where: {intern_person_id: collaborator.person_id, process_id: processId}});
+      }
+    }
+  }
 }
 
 export default {
