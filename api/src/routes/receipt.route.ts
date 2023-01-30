@@ -13,6 +13,12 @@ const receipt = Router()
 receipt.use(authMiddleware.authorize())
 
 // Endpoints
+receipt.get("/list", controller.list)
+
+receipt.get("/:processId/list", controller.listProcess)
+
+receipt.get("/:receiptId/info", controller.info)
+
 receipt.post("/:appointmentId/create", controller.create)
 
 receipt.get("/list/:patientId", controller.list)

@@ -125,7 +125,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       },
     })
 
-    if (decoded.admin == false || permissions!.see == false) {
+    if (decoded.admin == false && permissions!.see == false) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -209,7 +209,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       },
     })
 
-    var isPayed = true
+    var isPaid = true
 
     for (let apointment of apointments) {
       var receipt = await prisma.receipt.findFirst({
@@ -217,8 +217,11 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
           appointment_slot_id: apointment.appointment_slot_id,
         },
       })
-      if (receipt!.payed == false) {
-        isPayed = false
+
+      if (receipt != null) {
+        if (receipt!.payed == false) {
+          isPaid = false
+        }
       }
     }
 
@@ -229,11 +232,12 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       colaborators: colaborators,
       utent: utentName?.name,
       active: process?.active,
-      financialSituation: isPayed,
+      financialSituation: isPaid,
       remarks: process?.remarks,
       speciality: process?.speciality_speciality,
     })
   } catch (error) {
+    console.log(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
@@ -243,6 +247,8 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
 export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Response) {
   try {
     var queryParams = req.query
+
+    var decoded = res.locals.token
 
     if (queryParams.active == null) {
       queryParams.active = "true"
@@ -275,12 +281,19 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
 
       var therapistListing: string[] = []
 
+      var flag = false
+
       for (var therapist_process of therapists) {
         var therapist = await prisma.person.findUnique({
           where: {
             id: therapist_process.therapist_person_id,
           },
         })
+
+        if (therapist?.id == decoded.id) {
+          flag = true
+          console.log("Oila")
+        }
 
         therapistListing.push(therapist!.name)
       }
@@ -323,7 +336,12 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
 
       var nextAppointmentString: string = ""
       if (dateChanged) {
-        nextAppointmentString = new Date(nextAppointment).toString()
+        let date = apointment!.slot_start_date
+        nextAppointmentString = date?.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
       } else {
         nextAppointmentString = "No next Appointment"
       }
@@ -334,13 +352,15 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
         },
       })
 
-      listing.push({
-        therapistListing: therapistListing,
-        patientName: utentName?.name,
-        refCode: ref,
-        nextAppointment: nextAppointmentString,
-        speciality: speciality?.speciality,
-      })
+      if (decoded.role === "admin" || flag === true) {
+        listing.push({
+          therapistListing: therapistListing,
+          patientName: utentName?.name,
+          refCode: ref,
+          nextAppointment: nextAppointmentString,
+          speciality: speciality?.speciality,
+        })
+      }
     }
     return res.status(StatusCodes.OK).json({
       list: listing,

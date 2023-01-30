@@ -1179,6 +1179,189 @@ async function getAppointmentInformation(appointment: any, needsSpeciality: bool
   }
 }
 
+async function listAppointmentsOfNextDays(req: Request, res: Response) {
+  /**
+   * Returns all the appointments of the current day for the calling therapist, intern or guard
+   */
+  try {
+    var decodedToken = res.locals.token
+
+    // otbain the caller properties
+    var callerRole = decodedToken.role
+    var callerId = decodedToken.id
+
+    if (callerRole == "acountant") {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "You do not have access to this information.",
+      })
+    }
+
+    var appointmentsOfToday = []
+    var today = new Date()
+    today.setHours(0, 0, 0, 0)
+    var process_user = null
+
+    if (callerRole == "guard" || callerRole == "admin") {
+      // return all the appointments of the day
+      var appointments = await prisma.appointment.findMany({
+        select: {
+          slot_start_date: true,
+          slot_end_date: true,
+          slot_id: true,
+          room: { select: { name: true } },
+        },
+      })
+
+      // filter the appointments of the current day
+      for (let i = 0; i < appointments.length; i++) {
+        var tempDate = new Date(appointments[i].slot_start_date)
+        tempDate.setHours(0, 0, 0, 0)
+        if (tempDate.getTime() > today.getTime()) {
+          // get the appointments
+          let date = appointments[i].slot_start_date
+          const formattedStartDate = date?.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+
+          date = appointments[i].slot_start_date
+          const formattedEndDate = date?.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+
+          let processId = await prisma.appointment_process.findFirst({
+            where: {
+              appointment_slot_id: appointments[i].slot_id,
+            },
+          })
+
+          let therapistsIds = await prisma.therapist_process.findMany({
+            where: {
+              process_id: processId?.process_id,
+            },
+          })
+
+          let therapistsNames = []
+
+          for (let id of therapistsIds) {
+            let name = await prisma.person.findUnique({
+              where: {
+                id: id.therapist_person_id,
+              },
+            })
+
+            therapistsNames.push(name?.name)
+          }
+          appointmentsOfToday.push({
+            therapists: therapistsNames,
+            room: appointments[i].room,
+            start: formattedStartDate,
+            end: formattedEndDate,
+          })
+        }
+      }
+    } else {
+      if (callerRole == "therapist") {
+        // get the processes of the asking therapist (caller)
+        process_user = await prisma.therapist_process.findMany({
+          where: { therapist_person_id: callerId },
+        })
+      } else if (callerRole == "intern") {
+        // get the processes of the asking intern (caller)
+        process_user = await prisma.intern_process.findMany({
+          where: { intern_person_id: callerId },
+        })
+      }
+      if (process_user != null) {
+        for (let i = 0; i < process_user.length; i++) {
+          var appointment_process = await prisma.appointment_process.findMany({
+            where: { process_id: process_user[i].process_id },
+          })
+          for (let e = 0; e < appointment_process.length; e++) {
+            // get the appointment
+            var appointment = await prisma.appointment.findFirst({
+              where: { slot_id: appointment_process[e].appointment_slot_id },
+              select: {
+                slot_start_date: true,
+                slot_end_date: true,
+                slot_id: true,
+                room: { select: { name: true } },
+              },
+            })
+
+            if (appointment == null) {
+              continue
+            }
+            var tempDate = new Date(appointment.slot_start_date)
+            // filter by the current day
+            tempDate.setHours(0, 0, 0, 0)
+            if (tempDate.getTime() >= today.getTime()) {
+              let date = appointment.slot_start_date
+              const formattedStartDate = date?.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+
+              date = appointment.slot_start_date
+              const formattedEndDate = date?.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+
+              let therapistsIds = await prisma.therapist_process.findMany({
+                where: {
+                  process_id: process_user[i].process_id,
+                },
+              })
+
+              let therapistsNames = []
+
+              for (let id of therapistsIds) {
+                let name = await prisma.person.findUnique({
+                  where: {
+                    id: id.therapist_person_id,
+                  },
+                })
+
+                therapistsNames.push(name?.name)
+              }
+              appointmentsOfToday.push({
+                therapists: therapistsNames,
+                room: appointment.room,
+                start: formattedStartDate,
+                end: formattedEndDate,
+              })
+            }
+          }
+        }
+      }
+    }
+
+    // return info
+    res.status(StatusCodes.OK).json({
+      message: "It is working.",
+      data: appointmentsOfToday,
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 export default {
   getAllAppointments,
   createAppointment,
@@ -1189,4 +1372,5 @@ export default {
   lastTerminatedAppointments,
   listAppointmentsOfTheDay,
   onGoingAppointments,
+  listAppointmentsOfNextDays,
 }

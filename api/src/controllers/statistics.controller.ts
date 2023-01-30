@@ -56,14 +56,14 @@ export async function statistics(req: Request<{}, {}, StatisticsBody>, res: Resp
       where: { speciality_speciality: body.speciality },
       select: { id: true },
     })
-    for (let i = 0; i < processes.length; i++) {
+    for (let i = 0; i < processesInfo.length; i++) {
       processes.push({ process_id: processesInfo[i].id })
     }
   }
   // else, use all the processes
   else {
     let processesInfo = await prisma.process.findMany({ select: { id: true } })
-    for (let i = 0; i < processes.length; i++) {
+    for (let i = 0; i < processesInfo.length; i++) {
       processes.push({ process_id: processesInfo[i].id })
     }
   }
@@ -84,7 +84,6 @@ export async function statistics(req: Request<{}, {}, StatisticsBody>, res: Resp
 
   // calcular as cenas
   let data = []
-
   for (let processInfo of processes) {
     let info = await prisma.process.findUnique({
       where: {

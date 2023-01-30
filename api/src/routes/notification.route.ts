@@ -6,10 +6,11 @@ import controller from "../controllers/notification.controller"
 import middleware from "../middleware/api.middleware"
 import authMiddleware from "../middleware/auth.middleware"
 import schemas from "../utils/schemas"
-
 const notification = Router()
 
 // Endpoints
+
+notification.use(authMiddleware.authorize())
 
 notification.get("/list", controller.list)
 

@@ -43,6 +43,8 @@ appointment.get("/last-terminated", (req: Request, res: Response) => {
 
 appointment.get("/list-appointments-of-the-day", controller.listAppointmentsOfTheDay)
 
+appointment.get("/next", controller.listAppointmentsOfNextDays)
+
 appointment.get("/ongoing", controller.onGoingAppointments)
 
 appointment.put(
