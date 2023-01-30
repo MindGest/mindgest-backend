@@ -52,7 +52,7 @@ api.use(
 )
 api.use(compression({ filter: middleware.shouldCompress }))
 
-if (NODE_ENV !== "production") api.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
+if (NODE_ENV === "production") api.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
 
 api.use(middleware.bodyParserErrorValidator())
 api.use(cookieParser(COOKIE_SECRET))

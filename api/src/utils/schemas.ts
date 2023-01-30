@@ -140,7 +140,8 @@ export const TherapistUpdateSchema = z
     healthSystem: z.string().optional(),
     license: z.string(),
     extern: z.boolean(),
-    taxNumber: z.object({ taxNumber: z.number() }),
+    taxNumber: z.number(),
+    speciality: z.string(),
   })
   .merge(PersonUpdateSchema)
 

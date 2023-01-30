@@ -59,6 +59,7 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
     data: {
       extern: body.extern,
       license: body.license,
+      health_system: body.healthSystem,
       person: {
         update: {
           active: body.active,
@@ -67,32 +68,64 @@ export async function updateInfoTherapist(id: number, body: TherapistUpdateBody)
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
         },
       },
     },
     where: { person_id: id },
   })
+
+  // Find Speciality
+  const speciality = await prisma.speciality.findUnique({
+    where: {
+      speciality: body.speciality,
+    },
+  })
+
+  // Attach Speciality
+  if (speciality !== null || speciality !== undefined) {
+    await prisma.therapist_speciality.updateMany({
+      where: { therapist_person_id: id },
+      data: { speciality_speciality: body.speciality },
+    })
+  }
 }
 
 export async function selfUpdateInfoTherapist(id: number, body: SelfTherapistUpdateBody) {
   await prisma.therapist.update({
     data: {
       license: body.license,
+      extern: body.extern,
+      health_system: body.healthSystem,
       person: {
         update: {
           address: body.address,
           name: body.name,
           email: body.email,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
         },
       },
     },
     where: { person_id: id },
   })
+
+  // Find Speciality
+  const speciality = await prisma.speciality.findUnique({
+    where: {
+      speciality: body.speciality,
+    },
+  })
+
+  // Attach Speciality
+  if (speciality !== null || speciality !== undefined) {
+    await prisma.therapist_speciality.updateMany({
+      where: { therapist_person_id: id },
+      data: { speciality_speciality: body.speciality },
+    })
+  }
 }
 
 export async function updateInfoIntern(id: number, body: InternUpdateBody) {
@@ -106,7 +139,6 @@ export async function updateInfoIntern(id: number, body: InternUpdateBody) {
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
         },
       },
@@ -144,7 +176,6 @@ export async function updateInfoAdmin(id: number, body: AdminUpdateBody) {
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
@@ -163,7 +194,6 @@ export async function selfUpdateInfoAdmin(id: number, body: SelfAdminUpdateBody)
           name: body.name,
           email: body.email,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
@@ -184,7 +214,6 @@ export async function updateInfoGuard(id: number, body: GuardUpdateBody) {
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
@@ -203,7 +232,6 @@ export async function selfUpdateInfoGuard(id: number, body: SelfGuardUpdateBody)
           name: body.name,
           email: body.email,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
@@ -224,7 +252,6 @@ export async function updateInfoAccountant(id: number, body: AccountantUpdateBod
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
@@ -245,7 +272,6 @@ export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantU
             name: body.name,
             email: body.email,
             birth_date: body.birthDate,
-            password: await argon2.hash(body.password),
             phone_number: body.phoneNumber,
             tax_number: body.taxNumber,
           },
@@ -291,7 +317,6 @@ export async function updateInfoPatient(id: number, body: any) {
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.tax_number,
         },

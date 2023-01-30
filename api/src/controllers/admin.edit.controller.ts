@@ -147,7 +147,7 @@ export async function fetchUserProfileInfo(req: Request, res: Response) {
     // Parse Response
     let data = null
     let base = {
-      id: 21,
+      id: user.id,
       name: usr?.name,
       email: usr?.email,
       password: usr?.password,
@@ -162,10 +162,16 @@ export async function fetchUserProfileInfo(req: Request, res: Response) {
 
     let therapist = null
     if ((therapist = await prisma.therapist.findUnique({ where: { person_id: usr?.id } }))) {
+      const speciality = await prisma.therapist_speciality.findFirst({
+        where: {
+          therapist_person_id: usr?.id,
+        },
+      })
       data = {
         extern: therapist?.extern,
         license: therapist?.license,
         healthSystem: therapist?.health_system,
+        speciality: speciality?.speciality_speciality,
         ...base,
       }
     } else {
