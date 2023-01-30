@@ -9,7 +9,7 @@ const therapist = Router()
 
 therapist.use(authMiddleware.authorize())
 
-therapist.get("/listPatients", controller.listPatients)
+therapist.get("/patients", controller.listPatients)
 
 therapist.get("/list", controller.list)
 

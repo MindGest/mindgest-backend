@@ -10,6 +10,7 @@ import {
   AppointmentInfo,
   AppointmentEdit,
 } from "../utils/types"
+import { min } from "moment"
 
 export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>, res: Response) {
   /**
@@ -270,59 +271,9 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
   }
 }
 
-export async function getAppointmentsOfTheDayGuard(req: Request, res: Response) {
+export async function listAppointmentsOfTheDay(req: Request, res: Response) {
   /**
-   * Returns all the appointments of the current day for the guards
-   */
-  try {
-    var decodedToken = res.locals.token
-
-    // otbain the caller properties
-    var callerRole = decodedToken.role
-
-    if (callerRole != "guard") {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "This endpoint is just for guards.",
-      })
-    }
-
-    var today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    var appointments = await prisma.appointment.findMany({
-      select: {
-        slot_start_date: true,
-        slot_end_date: true,
-        slot_id: true,
-        room: { select: { name: true } },
-      },
-    })
-    var appointmentsOfToday = []
-
-    // filter the appointments of the current day
-    for (let i = 0; i < appointments.length; i++) {
-      var tempDate = new Date(appointments[i].slot_start_date)
-      tempDate.setHours(0, 0, 0, 0)
-      if (tempDate.getTime() == today.getTime()) {
-        // get the appointments
-        appointmentsOfToday.push(getAppointmentInformation(appointments[i], false))
-      }
-    }
-
-    res.status(StatusCodes.OK).json({
-      message: "It is working.",
-      data: appointmentsOfToday,
-    })
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "Ups... Something went wrong",
-    })
-  }
-}
-
-export async function getAppointmentsOfTheDayTherapist(req: Request, res: Response) {
-  /**
-   * Returns all the appointments of the current day for the calling therapist
+   * Returns all the appointments of the current day for the calling therapist, intern or guard
    */
   try {
     var decodedToken = res.locals.token
@@ -331,116 +282,130 @@ export async function getAppointmentsOfTheDayTherapist(req: Request, res: Respon
     var callerRole = decodedToken.role
     var callerId = decodedToken.id
 
-    if (callerRole != "therapist") {
+    if (
+      callerRole != "therapist" &&
+      callerRole != "intern" &&
+      callerRole != "guard" &&
+      callerRole != "admin"
+    ) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "This endpoint is just for therapists.",
+        message: "You do not have access to this information.",
       })
     }
 
+    var appointmentsOfToday = []
     var today = new Date()
     today.setHours(0, 0, 0, 0)
+    var process_user = null
 
-    // get the processes of the asking therapist (caller)
-    var process_therapist = await prisma.therapist_process.findMany({
-      where: { therapist_person_id: callerId },
-    })
-
-    var appointmentsOfToday = []
-
-    for (let i = 0; i < process_therapist.length; i++) {
-      var appointment_process = await prisma.appointment_process.findMany({
-        where: { process_id: process_therapist[i].process_id },
+    if (callerRole == "guard" || callerRole == "admin") {
+      // return all the appointments of the day
+      var appointments = await prisma.appointment.findMany({
+        select: {
+          slot_start_date: true,
+          slot_end_date: true,
+          slot_id: true,
+          room: { select: { name: true } },
+        },
       })
-      for (let e = 0; e < appointment_process.length; e++) {
-        // get the appointment
-        var appointment = await prisma.appointment.findFirst({
-          where: { slot_id: appointment_process[e].appointment_slot_id },
-          select: {
-            slot_start_date: true,
-            slot_end_date: true,
-            slot_id: true,
-            room: { select: { name: true } },
-          },
-        })
 
-        if (appointment == null) {
-          continue
-        }
-        var tempDate = new Date(appointment.slot_start_date)
-        // filter by the current day
+      // filter the appointments of the current day
+      for (let i = 0; i < appointments.length; i++) {
+        var tempDate = new Date(appointments[i].slot_start_date)
         tempDate.setHours(0, 0, 0, 0)
         if (tempDate.getTime() == today.getTime()) {
-          appointmentsOfToday.push(getAppointmentInformation(appointment, true))
+          // get the appointments
+          appointmentsOfToday.push(getAppointmentInformation(appointments[i], false))
+        }
+      }
+    } else {
+      if (callerRole == "admin") {
+        // get all processes
+        process_user = await prisma.therapist_process.findMany({})
+      } else if (callerRole == "therapist") {
+        // get the processes of the asking therapist (caller)
+        process_user = await prisma.therapist_process.findMany({
+          where: { therapist_person_id: callerId },
+        })
+      } else if (callerRole == "intern") {
+        // get the processes of the asking intern (caller)
+        process_user = await prisma.intern_process.findMany({
+          where: { intern_person_id: callerId },
+        })
+      }
+      if (process_user != null) {
+        for (let i = 0; i < process_user.length; i++) {
+          var appointment_process = await prisma.appointment_process.findMany({
+            where: { process_id: process_user[i].process_id },
+          })
+          for (let e = 0; e < appointment_process.length; e++) {
+            // get the appointment
+            var appointment = await prisma.appointment.findFirst({
+              where: { slot_id: appointment_process[e].appointment_slot_id },
+              select: {
+                slot_start_date: true,
+                slot_end_date: true,
+                slot_id: true,
+                room: { select: { name: true } },
+              },
+            })
+
+            if (appointment == null) {
+              continue
+            }
+            var tempDate = new Date(appointment.slot_start_date)
+            // filter by the current day
+            tempDate.setHours(0, 0, 0, 0)
+            if (tempDate.getTime() == today.getTime()) {
+              let date = appointment.slot_start_date
+              const formattedStartDate = date?.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+
+              date = appointment.slot_start_date
+              const formattedEndDate = date?.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+
+              let therapistsIds = await prisma.therapist_process.findMany({
+                where: {
+                  process_id: process_user[i].process_id,
+                },
+              })
+
+              let therapistsNames = []
+
+              for (let id of therapistsIds) {
+                let name = await prisma.person.findUnique({
+                  where: {
+                    id: id.therapist_person_id,
+                  },
+                })
+
+                therapistsNames.push(name?.name)
+              }
+
+              appointmentsOfToday.push({
+                therapists: therapistsNames,
+                room: appointment.room,
+                start: formattedStartDate,
+                end: formattedEndDate,
+              })
+            }
+          }
         }
       }
     }
 
-    res.status(StatusCodes.OK).json({
-      message: "It is working.",
-      data: appointmentsOfToday,
-    })
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "Ups... Something went wrong",
-    })
-  }
-}
-
-export async function getAppointmentsOfTheDayIntern(req: Request, res: Response) {
-  /**
-   * Returns all the appointments of the current day for the calling intern
-   */
-  try {
-    var decodedToken = res.locals.token
-
-    // otbain the caller properties
-    var callerRole = decodedToken.role
-    var callerId = decodedToken.id
-
-    if (callerRole != "intern") {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "This endpoint is just for intern.",
-      })
-    }
-
-    var today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    // get the processes of the asking therapist (caller)
-    var process_intern = await prisma.intern_process.findMany({
-      where: { intern_person_id: callerId },
-    })
-
-    var appointmentsOfToday = []
-
-    for (let i = 0; i < process_intern.length; i++) {
-      var appointment_process = await prisma.appointment_process.findMany({
-        where: { process_id: process_intern[i].process_id },
-      })
-      for (let e = 0; e < appointment_process.length; e++) {
-        // get the appointment
-        var appointment = await prisma.appointment.findFirst({
-          where: { slot_id: appointment_process[e].appointment_slot_id },
-          select: {
-            slot_start_date: true,
-            slot_end_date: true,
-            slot_id: true,
-            room: { select: { name: true } },
-          },
-        })
-
-        if (appointment == null) {
-          continue
-        }
-        var tempDate = new Date(appointment.slot_start_date)
-        // filter by the current day
-        tempDate.setHours(0, 0, 0, 0)
-        if (tempDate.getTime() == today.getTime()) {
-          appointmentsOfToday.push(getAppointmentInformation(appointment, true))
-        }
-      }
-    }
-
+    // return info
     res.status(StatusCodes.OK).json({
       message: "It is working.",
       data: appointmentsOfToday,
@@ -904,7 +869,7 @@ export async function getAllActiveAppointments(
     } else if (callerRole == "intern") {
       isIntern = true
       internId = req.body.filterId
-    } else {
+    } else if (callerRole == "accountant") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to see this information.",
       })
@@ -1066,8 +1031,8 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (callerRole != "accountant") {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+    if (callerRole != "accountant" && !callerIsAdmin) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You do not have permission to use this endpoint.",
       })
     }
@@ -1083,7 +1048,7 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
     var appointmentsLast24h = []
     for (let i = 0; i < appointments.length; i++) {
       var archivedDate = new Date(appointments[i].archived_date)
-      if (archivedDate.getTime() > now - dayInMilliseconds) {
+      if (archivedDate.getTime() <= now && archivedDate.getTime() >= now - dayInMilliseconds) {
         // if in the last 24 hours
         // get the info from each appointment
         var currentAppointment = appointments[i]
@@ -1109,12 +1074,55 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
           patients: patients,
           appointmentStartTime: currentAppointment.slot_start_date,
           appointmentEndTime: currentAppointment.slot_end_date,
+          appointmentArchivedDate: currentAppointment.archived_date,
         })
       }
     }
 
     return res.status(StatusCodes.OK).json({
       data: appointmentsLast24h,
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export async function onGoingAppointments(req: Request, res: Response) {
+  /**
+   * Returns all the on going appointments.
+   */
+  try {
+    var decodedToken = res.locals.token
+
+    // otbain the caller properties
+    var callerId = decodedToken.id
+    var callerRole = decodedToken.role
+    var callerIsAdmin = decodedToken.admin
+
+    // who can see this info???
+    // TODO: check authorization
+
+    // current time
+    let now = Date.now()
+
+    let onGoingAppointments = []
+    // get all the appointments
+    let appointments = await prisma.appointment.findMany()
+    for (let i = 0; i < appointments.length; i++) {
+      let startDate = new Date(appointments[i].slot_start_date)
+      let startTime = startDate.getTime()
+      let archivedDate = appointments[i].archived_date
+      // filter the appointments
+      if (startTime < now && archivedDate == null) {
+        // on going appointment (it started but is yet to be completed.)
+        onGoingAppointments.push(getAppointmentInformation(appointments[i], false))
+      }
+    }
+
+    res.status(StatusCodes.OK).json({
+      data: onGoingAppointments,
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -1203,6 +1211,7 @@ async function getAppointmentInformation(appointment: any, needsSpeciality: bool
     return {
       appointmentStartTime: appointment.slot_start_date,
       appointmentEndTime: appointment.slot_end_date,
+      appointmentArchivedDate: appointment.archived_date,
       appointmentRoom: appointment.room.name,
       therapists: therapists,
       speciality: process?.speciality_speciality,
@@ -1213,6 +1222,7 @@ async function getAppointmentInformation(appointment: any, needsSpeciality: bool
   return {
     appointmentStartTime: appointment.slot_start_date,
     appointmentEndTime: appointment.slot_end_date,
+    appointmentArchivedDate: appointment.archived_date,
     appointmentRoom: appointment.room.name,
     therapists: therapists,
   }
@@ -1226,7 +1236,6 @@ export default {
   archiveAppointment,
   getAllActiveAppointments,
   lastTerminatedAppointments,
-  getAppointmentsOfTheDayGuard,
-  getAppointmentsOfTheDayIntern,
-  getAppointmentsOfTheDayTherapist,
+  listAppointmentsOfTheDay,
+  onGoingAppointments,
 }

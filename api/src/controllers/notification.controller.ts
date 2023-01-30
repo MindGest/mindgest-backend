@@ -12,6 +12,7 @@ import {
 
 import logger from "../utils/logger"
 import { randomUUID } from "crypto"
+import notification from "../routes/notification.route"
 
 export async function mark(req: Request<MarkNotificationQueryParams>, res: Response) {
   // Authorizing User
@@ -107,33 +108,30 @@ export async function settle(req: Request, res: Response) {
 export async function list(req: Request<{}, {}, {}, NotificationListQueryParams>, res: Response) {
   // Authorizing User
   const { id, role, admin } = res.locals.token
-  logger.info(
-    `LIST NOTIFICATIONS [user-id: ${id}] => Authorization to list notifications granted...`
-  )
+  logger.info(`NOTIFICATIONS [user-id: ${id}] => Authorization to list notifications granted...`)
   try {
     // Applying Filter
     if (req.query.filter) {
-      logger.debug(
-        `LIST NOTIFICATIONS [user-id: ${id}] => Applying Filter (${req.query.filter})...`
-      )
-        
+      logger.debug(`NOTIFICATIONS [user-id: ${id}] => Applying Filter (${req.query.filter})...`)
+
+      // Filtered List
+      let list = await prisma.notifications.findMany({
+        where: { person_id: id, seen: req.query.filter === NotificationFilterType.READ },
+      })
+
       // Send Notification List (filtered)
       res.status(StatusCodes.OK).json({
         message: `Successfully retrieve all ${req.query.filter} notifications.`,
-        info: await prisma.notifications.findMany({
-          where: { person_id: id, seen: req.query.filter === NotificationFilterType.READ },
-        }),
+        data: list,
       })
     } else {
       // Send Notification List
-      res.status(StatusCodes.OK).json({
+      return res.status(StatusCodes.OK).json({
         message: "Successfully retrieved all notifications",
-        info: await prisma.notifications.findMany({
-          where: { person_id: id },
-        }),
+        info: list,
       })
     }
-    logger.info(`LIST NOTIFICATIONS [user-id: ${id}] => Successfully retrieved notifications!`)
+    logger.info(`NOTIFICATIONS [user-id: ${id}] => Successfully retrieved notifications!`)
   } catch (error) {
     logger.error(`LIST NOTIFICATIONS => Server Error: ${error}`)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

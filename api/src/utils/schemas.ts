@@ -341,13 +341,13 @@ export const RoomCreate = z.object({
   }),
 })
 
-export const QueryStatistics = z.object({
-  query: z.object({
+export const StatisticsSchema = z.object({
+  body: z.object({
     startDate: z.string(),
     endDate: z.string(),
-    therapistId: z.string().optional(),
-    specialityId: z.string().optional(),
-    processId: z.string().optional(),
+    therapistId: z.number().optional(),
+    speciality: z.string().optional(),
+    processId: z.number().optional(),
   }),
 })
 
@@ -618,7 +618,7 @@ export default {
   NotesCreate,
   QueryListRooms,
   RoomCreate,
-  QueryStatistics,
+  StatisticsSchema,
   SpecialityCreateSchema,
   EmailSchema,
   GetPermissionsSchema,

@@ -230,6 +230,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       utent: utentName?.name,
       active: process?.active,
       financialSituation: isPayed,
+      remarks: process?.remarks,
       speciality: process?.speciality_speciality,
     })
   } catch (error) {

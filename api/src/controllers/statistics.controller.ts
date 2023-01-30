@@ -2,42 +2,87 @@ import prisma from "../utils/prisma"
 
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
-import { QueryStatistics } from "../utils/types"
+import { verifyAccessToken, verifyToken } from "../services/auth.service"
+import { StatisticsBody } from "../utils/types"
 import logger from "../utils/logger"
 
-export async function statistics(req: Request<{}, {}, {}, QueryStatistics>, res: Response) {
-  var query = req.query
-  
+export async function statistics(req: Request<{}, {}, StatisticsBody>, res: Response) {
+  var body = req.body
+
   let decode = res.locals.token
-  let id = decode.id
+  let callerId = decode.id
+  let callerRole = decode.role
 
-  if (query.therapistId != null) {
-    id = query.therapistId
-  }
-
-  let parsedDateStart = new Date(query.startDate)
+  let parsedDateStart = new Date(body.startDate)
   let timestampStart = parsedDateStart.getTime()
 
-  let parsedDateEnd = new Date(query.endDate)
+  let parsedDateEnd = new Date(body.endDate)
   let timestampEnd = parsedDateEnd.getTime()
 
-  let processes
+  let processes = []
 
-  if (query.processId != null) {
-    processes = await prisma.therapist_process.findMany({
-      where: {
-        therapist_person_id: id,
-        process_id: parseInt(query.processId),
-      },
+  // obter os ids dos processos
+  // criar um array de {process_id: <id>}
+  // given the process, ignore other filters
+  if (body.processId != null) {
+    processes.push({ process_id: body.processId })
+  }
+  // given therapist and speciality
+  else if (body.therapistId != null && body.speciality != null) {
+    // all the therapists processess
+    let therapist_process = await prisma.therapist_process.findMany({
+      where: { therapist_person_id: body.therapistId },
     })
-  } else {
+    // filter by speciality
+    for (let i = 0; i < therapist_process.length; i++) {
+      let process = await prisma.process.findFirst({
+        where: { id: therapist_process[i].process_id, speciality_speciality: body.speciality },
+      })
+      if (process != null) {
+        processes.push({ process_id: process.id })
+      }
+    }
+  }
+  // given only therapist
+  else if (body.therapistId != null) {
     processes = await prisma.therapist_process.findMany({
-      where: {
-        therapist_person_id: id,
-      },
+      where: { therapist_person_id: body.therapistId },
     })
   }
+  // given only speciality
+  else if (body.speciality != null) {
+    // used to get the id, so that a pre defined array can be assembled
+    let processesInfo = await prisma.process.findMany({
+      where: { speciality_speciality: body.speciality },
+      select: { id: true },
+    })
+    for (let i = 0; i < processes.length; i++) {
+      processes.push({ process_id: processesInfo[i].id })
+    }
+  }
+  // else, use all the processes
+  else {
+    let processesInfo = await prisma.process.findMany({ select: { id: true } })
+    for (let i = 0; i < processes.length; i++) {
+      processes.push({ process_id: processesInfo[i].id })
+    }
+  }
 
+  // if the caller is an intern, filter the processes by the ones that he has permissions to do the statistics
+  if (callerRole == "intern") {
+    let tempProcesses = processes
+    processes = []
+    for (let i = 0; i < tempProcesses.length; i++) {
+      let permissionsIntern = await prisma.permissions.findFirst({
+        where: { person_id: callerId, process_id: tempProcesses[i].process_id },
+      })
+      if (permissionsIntern != null && permissionsIntern.statitics) {
+        processes.push(tempProcesses[i])
+      }
+    }
+  }
+
+  // calcular as cenas
   let data = []
 
   for (let processInfo of processes) {

@@ -184,7 +184,7 @@ export async function editInternPermissions(
 
     // check if caller is admin or a therapist of the process
     if (isProcessTherapist == false || !callerIsAdmin) {
-      res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You don't have permissions to access this information.",
       })
     }
@@ -194,7 +194,7 @@ export async function editInternPermissions(
       where: { process_id: processId, intern_person_id: req.body.collaboratorId },
     })
     if (intern_process == null) {
-      res.status(StatusCodes.NOT_FOUND).json({
+      return res.status(StatusCodes.NOT_FOUND).json({
         message: "The given intern id is not associated with the given process.",
       })
     }
