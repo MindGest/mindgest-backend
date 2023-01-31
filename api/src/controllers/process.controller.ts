@@ -966,7 +966,7 @@ export async function listNotes(req: Request, res: Response) {
       }
     })
 
-    if(role!="admin" || permissions == null || !permissions?.see){
+    if(role!="admin" && permissions == null && !permissions!.see){
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "Not enough permissions"
       })
@@ -1340,6 +1340,8 @@ async function note(req: Request, res: Response) {
       person_id: id,
     },
   })
+
+  console.log(role)
 
   if (permissions?.see || role == "admin") {
     let date = noteInfo?.datetime
