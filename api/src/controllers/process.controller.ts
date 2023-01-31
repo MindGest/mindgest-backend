@@ -80,6 +80,12 @@ export async function migrate(
 export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
     var decoded = res.locals.token
+
+    let callerIsAdmin = decoded.admin
+    let callerRole = decoded.role
+    let callerId = decoded.id
+
+
     var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findFirst({
@@ -89,8 +95,7 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
       },
     })
 
-    // if (decoded.admin == false || permissions?.archive == false) {
-    if (!(decoded.isAdmin || (permissions != null && permissions.archive))) {
+    if (!callerIsAdmin && !(permissions != null && permissions.see)){
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -117,6 +122,12 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
 export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
     var decoded = res.locals.token
+
+    let callerIsAdmin = decoded.admin
+    let callerRole = decoded.role
+    let callerId = decoded.id
+
+
     var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findFirst({
@@ -125,8 +136,8 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
         person_id: decoded.id,
       },
     })
-
-    if (!(decoded.isAdmin || (permissions != null && permissions.archive))) {
+    
+    if (!callerIsAdmin && !(permissions != null && permissions.see)){
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -519,7 +530,7 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
   try {
     var decoded = res.locals.token
 
-    let callerIsAdmin = decoded.isAdmin
+    let callerIsAdmin = decoded.admin
     let callerRole = decoded.role
     let callerId = decoded.id
 
@@ -709,6 +720,11 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
 export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, res: Response) {
   try {
     var decoded = res.locals.token
+
+    let callerIsAdmin = decoded.admin
+    let callerRole = decoded.role
+    let callerId = decoded.id
+
     var processId = parseInt(req.params.processId)
 
     // obtain the permissions of the caller (therapists and interns)
@@ -719,8 +735,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
       },
     })
 
-    // if not admin or an intern with editprocess permissions
-    if (decoded.admin == false || (permissions != null && permissions.editprocess == false)) {
+    if (!callerIsAdmin && !(permissions != null && permissions.see)){
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
