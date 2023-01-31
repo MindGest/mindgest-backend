@@ -395,7 +395,6 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
             // filter by the current day
             tempDate.setHours(0, 0, 0, 0)
             if (tempDate.getTime() == today.getTime()) {
-              
               let date = appointment.slot_start_date
               const formattedStartDate = date?.toLocaleDateString("en-GB", {
                 day: "2-digit",

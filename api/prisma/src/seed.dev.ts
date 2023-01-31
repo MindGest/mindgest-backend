@@ -217,7 +217,6 @@ async function seed() {
     },
   })
 
-
   await prisma.therapist_speciality.create({
     data: {
       speciality_speciality: speciality.speciality,
