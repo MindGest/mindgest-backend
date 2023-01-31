@@ -960,15 +960,15 @@ export async function listNotes(req: Request, res: Response) {
     let role = decoded.role
 
     let permissions = await prisma.permissions.findFirst({
-      where:{
-        process_id:processId,
-        person_id: id
-      }
+      where: {
+        process_id: processId,
+        person_id: id,
+      },
     })
 
-    if(role!="admin" && permissions == null && !permissions!.see){
+    if (role != "admin" && permissions == null && !permissions!.see) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "Not enough permissions"
+        message: "Not enough permissions",
       })
     }
 

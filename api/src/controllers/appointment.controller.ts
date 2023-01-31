@@ -309,54 +309,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
         var tempDate = new Date(appointments[i].slot_start_date)
         tempDate.setHours(0, 0, 0, 0)
         if (tempDate.getTime() == today.getTime()) {
-          // get the appointments
-          let date = appointments[i].slot_start_date
-          const formattedStartDate = date?.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-
-          date = appointments[i].slot_start_date
-          const formattedEndDate = date?.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-
-          let processId = await prisma.appointment_process.findFirst({
-            where: {
-              appointment_slot_id: appointments[i].slot_id,
-            },
-          })
-
-          let therapistsIds = await prisma.therapist_process.findMany({
-            where: {
-              process_id: processId?.process_id,
-            },
-          })
-
-          let therapistsNames = []
-
-          for (let id of therapistsIds) {
-            let name = await prisma.person.findUnique({
-              where: {
-                id: id.therapist_person_id,
-              },
-            })
-
-            therapistsNames.push(name?.name)
-          }
-          appointmentsOfToday.push({
-            therapists: therapistsNames,
-            room: appointments[i].room,
-            start: formattedStartDate,
-            end: formattedEndDate,
-          })
+          appointmentsOfToday.push(await getAppointmentInformation(appointments[i], false))
         }
       }
     } else {
@@ -395,47 +348,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
             // filter by the current day
             tempDate.setHours(0, 0, 0, 0)
             if (tempDate.getTime() == today.getTime()) {
-              let date = appointment.slot_start_date
-              const formattedStartDate = date?.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-
-              date = appointment.slot_start_date
-              const formattedEndDate = date?.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-
-              let therapistsIds = await prisma.therapist_process.findMany({
-                where: {
-                  process_id: process_user[i].process_id,
-                },
-              })
-
-              let therapistsNames = []
-
-              for (let id of therapistsIds) {
-                let name = await prisma.person.findUnique({
-                  where: {
-                    id: id.therapist_person_id,
-                  },
-                })
-
-                therapistsNames.push(name?.name)
-              }
-              appointmentsOfToday.push({
-                therapists: therapistsNames,
-                room: appointment.room,
-                start: formattedStartDate,
-                end: formattedEndDate,
-              })
+              appointmentsOfToday.push(await getAppointmentInformation(appointment, true))
             }
           }
         }
@@ -1288,7 +1201,7 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
       })
     }
 
-    var appointmentsOfToday = []
+    var appointmentsOfNextDays = []
     var today = new Date()
     today.setHours(0, 0, 0, 0)
     var process_user = null
@@ -1309,54 +1222,7 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
         var tempDate = new Date(appointments[i].slot_start_date)
         tempDate.setHours(0, 0, 0, 0)
         if (tempDate.getTime() > today.getTime()) {
-          // get the appointments
-          let date = appointments[i].slot_start_date
-          const formattedStartDate = date?.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-
-          date = appointments[i].slot_start_date
-          const formattedEndDate = date?.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-
-          let processId = await prisma.appointment_process.findFirst({
-            where: {
-              appointment_slot_id: appointments[i].slot_id,
-            },
-          })
-
-          let therapistsIds = await prisma.therapist_process.findMany({
-            where: {
-              process_id: processId?.process_id,
-            },
-          })
-
-          let therapistsNames = []
-
-          for (let id of therapistsIds) {
-            let name = await prisma.person.findUnique({
-              where: {
-                id: id.therapist_person_id,
-              },
-            })
-
-            therapistsNames.push(name?.name)
-          }
-          appointmentsOfToday.push({
-            therapists: therapistsNames,
-            room: appointments[i].room,
-            start: formattedStartDate,
-            end: formattedEndDate,
-          })
+          appointmentsOfNextDays.push(await getAppointmentInformation(appointments[i], false))
         }
       }
     } else {
@@ -1395,47 +1261,7 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
             // filter by the current day
             tempDate.setHours(0, 0, 0, 0)
             if (tempDate.getTime() >= today.getTime()) {
-              let date = appointment.slot_start_date
-              const formattedStartDate = date?.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-
-              date = appointment.slot_start_date
-              const formattedEndDate = date?.toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-
-              let therapistsIds = await prisma.therapist_process.findMany({
-                where: {
-                  process_id: process_user[i].process_id,
-                },
-              })
-
-              let therapistsNames = []
-
-              for (let id of therapistsIds) {
-                let name = await prisma.person.findUnique({
-                  where: {
-                    id: id.therapist_person_id,
-                  },
-                })
-
-                therapistsNames.push(name?.name)
-              }
-              appointmentsOfToday.push({
-                therapists: therapistsNames,
-                room: appointment.room,
-                start: formattedStartDate,
-                end: formattedEndDate,
-              })
+              appointmentsOfNextDays.push(await getAppointmentInformation(appointment, true))
             }
           }
         }
@@ -1445,7 +1271,7 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
     // return info
     res.status(StatusCodes.OK).json({
       message: "It is working.",
-      data: appointmentsOfToday,
+      data: appointmentsOfNextDays,
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
