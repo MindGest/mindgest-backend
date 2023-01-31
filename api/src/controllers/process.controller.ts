@@ -1351,7 +1351,9 @@ async function updateCollaborators(collaboratorIds: number[], processId: number)
 
   // if there are collaborators in the process not in the given ids, delete them
   // remove old collaborators
-  let collaborators = await prisma.permissions.findMany({ where: { process_id: processId, isMain: false } });
+  let collaborators = await prisma.permissions.findMany({
+    where: { process_id: processId, isMain: false },
+  })
   for (let collaborator of collaborators) {
     // if this collaborator is not in the given array, delete him.
     if (!collaboratorIds.includes(Number(collaborator.person_id))) {
