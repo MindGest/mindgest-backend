@@ -826,7 +826,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
       data: {
         speciality_speciality: req.body.speciality,
         remarks: req.body.remarks,
-        ref: `${speciality?.code}_${patient?.name}_${now}`,
+        // ref: `${speciality?.code}_${patient?.name}_${now}`,
       },
     })
 
@@ -1301,7 +1301,7 @@ async function updateCollaborators(collaboratorIds: number[], processId: number)
   // iterate over the given ids
   for (let newCollaborator of collaboratorIds) {
     // if already collaborator, do nothing
-    let permission = await prisma.permissions.findFirst({ where: { person_id: newCollaborator } })
+    let permission = await prisma.permissions.findFirst({ where: { person_id: newCollaborator, process_id: processId } })
 
     // if new, create link and permissions
     if (permission == null) {
