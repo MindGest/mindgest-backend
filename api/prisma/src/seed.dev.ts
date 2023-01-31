@@ -208,14 +208,14 @@ async function seed() {
     },
   })
 
-  let process2 = await prisma.process.create({
+  /*let process2 = await prisma.process.create({
     data: {
       ref: "wefdewfw",
       active: true,
       remarks: "fuck this shit",
       speciality_speciality: speciality.speciality,
     },
-  })
+  })*/
 
   await prisma.therapist_speciality.create({
     data: {
