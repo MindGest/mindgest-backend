@@ -1301,7 +1301,9 @@ async function updateCollaborators(collaboratorIds: number[], processId: number)
   // iterate over the given ids
   for (let newCollaborator of collaboratorIds) {
     // if already collaborator, do nothing
-    let permission = await prisma.permissions.findFirst({ where: { person_id: newCollaborator, process_id: processId } })
+    let permission = await prisma.permissions.findFirst({
+      where: { person_id: newCollaborator, process_id: processId },
+    })
 
     // if new, create link and permissions
     if (permission == null) {
