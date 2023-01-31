@@ -211,6 +211,7 @@ export const ProcessIDSchema = z.object({
   params: z
     .object({
       processId: z.string(),
+      noteId: z.string().optional()
     })
     .strict(),
 })
@@ -324,6 +325,13 @@ export const ReceiptListQuery = z.object({
 })
 
 export const NotesCreate = z.object({
+  body: z.object({
+    title: z.string(),
+    body: z.string(),
+  }),
+})
+
+export const NotesUpdate = z.object({
   body: z.object({
     title: z.string(),
     body: z.string(),
@@ -640,4 +648,5 @@ export default {
   GetCollaboratorsSchema,
   NotificationSchema,
   ProcessMigrationSchema,
+  NotesUpdate
 }
