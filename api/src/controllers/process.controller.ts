@@ -11,6 +11,7 @@ import {
   NotesCreateBody,
   GetCollaboratorsBody,
   ProcessMigrationSchemaBody,
+  UpdateNoteBody,
 } from "../utils/types"
 import logger from "../utils/logger"
 
@@ -987,7 +988,7 @@ export async function createNote(req: Request<ProcessIDPrams, {}, NotesCreateBod
       data: {
         datetime: date,
         title: req.body.title,
-        body: req.body.title,
+        body: req.body.body,
         process_id: processId,
       },
     })
@@ -1021,7 +1022,7 @@ export async function listNotes(req: Request, res: Response) {
       },
     })
 
-    if (role != "admin" || permissions == null || !permissions?.see) {
+    if (role != "admin" && permissions == null && !permissions!.see) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "Not enough permissions",
       })
@@ -1393,14 +1394,14 @@ async function note(req: Request, res: Response) {
     },
   })
 
+  console.log(role)
+
   if (permissions?.see || role == "admin") {
     let date = noteInfo?.datetime
     const formattedStartDate = date?.toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     })
 
     return res.status(StatusCodes.OK).json({
@@ -1411,6 +1412,51 @@ async function note(req: Request, res: Response) {
   } else {
     return res.status(StatusCodes.UNAUTHORIZED).json({
       message: "Don't have permissions",
+    })
+  }
+}
+
+async function updateNote(req: Request<ProcessIDPrams, {}, UpdateNoteBody>, res: Response) {
+  try {
+    var date = new Date()
+
+    var decoded = res.locals.token
+    var processId = parseInt(req.params.processId)
+
+    let id = decoded.id
+    let role = decoded.role
+
+    let permissions = await prisma.permissions.findFirst({
+      where: {
+        process_id: processId,
+        person_id: id,
+      },
+    })
+
+    if (role == "admin" || (permissions != null && permissions.editprocess)) {
+      await prisma.notes.update({
+        where: {
+          id: parseInt(req.params.noteId!),
+        },
+        data: {
+          datetime: date,
+          title: req.body.title,
+          body: req.body.body,
+        },
+      })
+
+      return res.status(StatusCodes.OK).json({
+        message: "Note Updated",
+      })
+    } else {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Don't have permissions",
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
     })
   }
 }
@@ -1432,4 +1478,5 @@ export default {
   getProcesses,
   migrate,
   note,
+  updateNote,
 }

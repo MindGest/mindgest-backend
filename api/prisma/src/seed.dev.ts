@@ -841,7 +841,7 @@ async function seed() {
       statitics: true,
       archive: true,
       isMain: true,
-      process_id: process.id,
+      process_id: process2.id,
       person_id: person9.id,
     },
   })
@@ -855,7 +855,7 @@ async function seed() {
       statitics: true,
       archive: true,
       isMain: true,
-      process_id: process.id,
+      process_id: process2.id,
       person_id: person10.id,
     },
   })
@@ -884,7 +884,7 @@ async function seed() {
       statitics: false,
       archive: false,
       isMain: false,
-      process_id: process.id,
+      process_id: process2.id,
       person_id: intern2.person_id,
     },
   })
@@ -1045,7 +1045,7 @@ async function seed() {
       statitics: false,
       archive: false,
       isMain: false,
-      process_id: process.id,
+      process_id: process3.id,
       person_id: intern2.person_id,
     },
   })
@@ -1059,7 +1059,7 @@ async function seed() {
       statitics: false,
       archive: false,
       isMain: false,
-      process_id: process.id,
+      process_id: process3.id,
       person_id: intern3.person_id,
     },
   })
@@ -1220,7 +1220,7 @@ async function seed() {
       statitics: false,
       archive: false,
       isMain: false,
-      process_id: process.id,
+      process_id: process4.id,
       person_id: intern2.person_id,
     },
   })
@@ -1234,7 +1234,7 @@ async function seed() {
       statitics: false,
       archive: false,
       isMain: false,
-      process_id: process.id,
+      process_id: process4.id,
       person_id: intern3.person_id,
     },
   })

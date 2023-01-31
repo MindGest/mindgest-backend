@@ -309,7 +309,7 @@ export async function listAppointmentsOfTheDay(req: Request, res: Response) {
         var tempDate = new Date(appointments[i].slot_start_date)
         tempDate.setHours(0, 0, 0, 0)
         if (tempDate.getTime() == today.getTime()) {
-          appointmentsOfToday.push(await getAppointmentInformation(appointments[i], false));
+          appointmentsOfToday.push(await getAppointmentInformation(appointments[i], false))
         }
       }
     } else {
@@ -1222,7 +1222,7 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
         var tempDate = new Date(appointments[i].slot_start_date)
         tempDate.setHours(0, 0, 0, 0)
         if (tempDate.getTime() > today.getTime()) {
-          appointmentsOfNextDays.push(await getAppointmentInformation(appointments[i], false));
+          appointmentsOfNextDays.push(await getAppointmentInformation(appointments[i], false))
         }
       }
     } else {
@@ -1261,7 +1261,7 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
             // filter by the current day
             tempDate.setHours(0, 0, 0, 0)
             if (tempDate.getTime() >= today.getTime()) {
-              appointmentsOfNextDays.push(await getAppointmentInformation(appointment, true));
+              appointmentsOfNextDays.push(await getAppointmentInformation(appointment, true))
             }
           }
         }
