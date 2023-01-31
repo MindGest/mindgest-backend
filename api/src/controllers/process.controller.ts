@@ -1302,6 +1302,50 @@ async function updateCollaborators(collaboratorIds: number[], processId: number)
   }
 }
 
+async function note(req: Request, res: Response) {
+  var decoded = res.locals.token
+  var noteId = parseInt(req.params.noteId)
+
+  let id = decoded.id
+  let role = decoded.role
+
+  let noteInfo = await prisma.notes.findUnique({
+    where:{
+      id: noteId
+    }
+  })
+
+  let permissions = await prisma.permissions.findFirst({
+    where:{
+      process_id:noteInfo?.process_id,
+      person_id: id
+    }
+  })
+
+  if(permissions?.see || role=="admin"){
+
+    let date = noteInfo?.datetime
+    const formattedStartDate = date?.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+
+
+    return res.status(StatusCodes.OK).json({
+      title: noteInfo?.title, body: noteInfo?.body, date:formattedStartDate
+    })
+  }
+  else{
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      message: "Don't have permissions"
+    })
+  }
+  
+}
+
 export default {
   archive,
   info,
@@ -1318,4 +1362,5 @@ export default {
   getCollaborators,
   getProcesses,
   migrate,
+  note
 }

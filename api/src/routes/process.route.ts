@@ -51,6 +51,10 @@ process
   .get(controller.listNotes)
   .post(middleware.requestValidator(schemas.NotesCreate), controller.createNote)
 
+  process
+  .route("/:processId/notes/:noteId")
+  .get(controller.note)
+
 process
   .route("/:processId/permissions")
   .get(controller.getPermissions)
