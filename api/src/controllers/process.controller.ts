@@ -953,6 +953,25 @@ export async function listNotes(req: Request, res: Response) {
     var date = new Date()
     var processId = parseInt(req.params.processId)
 
+    var decoded = res.locals.token
+    var noteId = parseInt(req.params.noteId)
+
+    let id = decoded.id
+    let role = decoded.role
+
+    let permissions = await prisma.permissions.findFirst({
+      where:{
+        process_id:processId,
+        person_id: id
+      }
+    })
+
+    if(role!="admin" || permissions == null || !permissions?.see){
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Not enough permissions"
+      })
+    }
+
     var notes = await prisma.notes.findMany({
       where: {
         process_id: processId,
