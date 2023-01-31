@@ -516,12 +516,14 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
     }
 
     // create the appointment
+    console.log("here")
+    console.log(req.body)
     var appointment = await prisma.appointment.create({
       data: {
         online: req.body.online,
         slot_start_date: req.body.startDate,
         slot_end_date: req.body.endDate,
-        archived_date: req.body.archiveDate,
+        active: true,
         pricetable: {
           connect: { id: req.body.priceTableId },
         },
@@ -530,7 +532,7 @@ export async function createAppointment(req: Request<{}, {}, AppointmentCreate>,
         },
       },
     })
-
+    console.log("here")
     // create the link between the process and the appointment
     await prisma.appointment_process.create({
       data: {
@@ -1073,35 +1075,38 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
     })
     var appointmentsLast24h = []
     for (let i = 0; i < appointments.length; i++) {
-      var archivedDate = new Date(appointments[i].archived_date)
-      if (archivedDate.getTime() <= now && archivedDate.getTime() >= now - dayInMilliseconds) {
-        // if in the last 24 hours
-        // get the info from each appointment
-        var currentAppointment = appointments[i]
-        var appointmentProcess = await prisma.appointment_process.findFirst({
-          where: { appointment_slot_id: currentAppointment.slot_id },
-        })
+      let appointmentArchivedDate = appointments[i].archived_date;
+      if (appointmentArchivedDate != null){
+        var archivedDate = new Date(appointmentArchivedDate)
+        if (archivedDate.getTime() <= now && archivedDate.getTime() >= now - dayInMilliseconds) {
+          // if in the last 24 hours
+          // get the info from each appointment
+          var currentAppointment = appointments[i]
+          var appointmentProcess = await prisma.appointment_process.findFirst({
+            where: { appointment_slot_id: currentAppointment.slot_id },
+          })
 
-        // get patients for this process
-        var patient_process = await prisma.patient_process.findMany({
-          where: { process_id: appointmentProcess?.process_id },
-        })
-        var patients = [] // list of the names of the patients associated with the current process
-        for (let e = 0; e < patient_process.length; e++) {
-          patients.push(
-            await prisma.person.findFirst({
-              where: { id: patient_process[e].patient_person_id },
-              select: { name: true },
-            })
-          )
+          // get patients for this process
+          var patient_process = await prisma.patient_process.findMany({
+            where: { process_id: appointmentProcess?.process_id },
+          })
+          var patients = [] // list of the names of the patients associated with the current process
+          for (let e = 0; e < patient_process.length; e++) {
+            patients.push(
+              await prisma.person.findFirst({
+                where: { id: patient_process[e].patient_person_id },
+                select: { name: true },
+              })
+            )
+          }
+          // assemble appointment information (name of the patient, start and end dates of the appointment)
+          appointmentsLast24h.push({
+            patients: patients,
+            appointmentStartTime: currentAppointment.slot_start_date,
+            appointmentEndTime: currentAppointment.slot_end_date,
+            appointmentArchivedDate: currentAppointment.archived_date,
+          })
         }
-        // assemble appointment information (name of the patient, start and end dates of the appointment)
-        appointmentsLast24h.push({
-          patients: patients,
-          appointmentStartTime: currentAppointment.slot_start_date,
-          appointmentEndTime: currentAppointment.slot_end_date,
-          appointmentArchivedDate: currentAppointment.archived_date,
-        })
       }
     }
 
@@ -1135,15 +1140,25 @@ export async function onGoingAppointments(req: Request, res: Response) {
 
     let onGoingAppointments = []
     // get all the appointments
-    let appointments = await prisma.appointment.findMany()
+    let appointments = await prisma.appointment.findMany({select: {
+      online: true,
+      room: {
+        select: {name: true},
+      },
+      pricetable_id: true,
+      slot_start_date: true,
+      slot_end_date: true,
+      archived_date: true,
+    }})
     for (let i = 0; i < appointments.length; i++) {
       let startDate = new Date(appointments[i].slot_start_date)
       let startTime = startDate.getTime()
       let archivedDate = appointments[i].archived_date
       // filter the appointments
+      console.log(appointments[i])
       if (startTime < now && archivedDate == null) {
         // on going appointment (it started but is yet to be completed.)
-        onGoingAppointments.push(getAppointmentInformation(appointments[i], false))
+        onGoingAppointments.push(await getAppointmentInformation(appointments[i], false))
       }
     }
 
