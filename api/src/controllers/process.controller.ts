@@ -305,7 +305,26 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
 
         if (therapist?.id == decoded.id) {
           flag = true
-          console.log("Oila")
+        }
+
+        therapistListing.push(therapist!.name)
+      }
+
+      var interns = await prisma.intern_process.findMany({
+        where: {
+          process_id: process.id,
+        },
+      })
+
+      for (var intern_process of interns) {
+        var intern = await prisma.person.findUnique({
+          where: {
+            id: intern_process.intern_person_id,
+          },
+        })
+
+        if (intern?.id == decoded.id) {
+          flag = true
         }
 
         therapistListing.push(therapist!.name)
