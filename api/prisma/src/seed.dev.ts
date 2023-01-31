@@ -76,8 +76,8 @@ async function seed() {
   let utente = await prisma.patient.create({
     data: {
       health_number: 12231,
-      request: "burro",
-      remarks: "burro e parvo",
+      request: "quero cenas",
+      remarks: "precisa de cenas",
       patienttype_id: patientType.id,
       person_id: person2.id,
     },
@@ -92,8 +92,8 @@ async function seed() {
 
   await prisma.school.create({
     data: {
-      name: "escola dos burros",
-      course: "burrice",
+      name: "amadora",
+      course: "carpintaria",
       grade: 18,
       patient_person_id: person2.id,
     },
@@ -162,6 +162,48 @@ async function seed() {
     },
   })
 
+  let person7 = await prisma.person.create({
+    data: {
+      active: true,
+      verified: true,
+      approved: true,
+      name: "intern2",
+      email: "intern2@student.dei.uc.pt",
+      password: await argon2.hash("12345"),
+      address: "Rua dos Bananas",
+      birth_date: new Date("1990-11-21T23:50:28.538Z"),
+      phone_number: 9313231942,
+      tax_number: 1233124223,
+    },
+  })
+
+  let intern2 = await prisma.intern.create({
+    data: {
+      person_id: person7.id,
+    },
+  })
+
+  let person8 = await prisma.person.create({
+    data: {
+      active: true,
+      verified: true,
+      approved: true,
+      name: "intern2",
+      email: "intern2@student.dei.uc.pt",
+      password: await argon2.hash("12345"),
+      address: "Rua dos Bananas",
+      birth_date: new Date("1990-11-21T23:50:28.538Z"),
+      phone_number: 9313231942,
+      tax_number: 1233124223,
+    },
+  })
+
+  let intern3 = await prisma.intern.create({
+    data: {
+      person_id: person8.id,
+    },
+  })
+
   let person6 = await prisma.person.create({
     data: {
       active: true,
@@ -185,17 +227,17 @@ async function seed() {
 
   let speciality = await prisma.speciality.create({
     data: {
-      speciality: "burrice",
-      code: "burr123",
-      description: "bued burros",
+      speciality: "familia",
+      code: "fam123",
+      description: "familiy",
     },
   })
 
   let speciality2 = await prisma.speciality.create({
     data: {
-      speciality: "wefwef",
-      code: "ewfwef",
-      description: "ewfwefewf",
+      speciality: "trauma",
+      code: "tram123",
+      description: "bued traumas",
     },
   })
 
@@ -203,7 +245,7 @@ async function seed() {
     data: {
       ref: "tard123",
       active: true,
-      remarks: "é bue burro",
+      remarks: "quer cenas",
       speciality_speciality: speciality.speciality,
     },
   })

@@ -310,6 +310,8 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
         therapistListing.push(therapist!.name)
       }
 
+      var internListing: string[] = []
+
       var interns = await prisma.intern_process.findMany({
         where: {
           process_id: process.id,
@@ -327,7 +329,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
           flag = true
         }
 
-        therapistListing.push(therapist!.name)
+        internListing.push(intern!.name)
       }
 
       var ref = process.ref
@@ -387,6 +389,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
       if (decoded.role === "admin" || flag === true) {
         listing.push({
           therapistListing: therapistListing,
+          internListing: internListing,
           patientName: utentName?.name,
           refCode: ref,
           processId: process.id,
