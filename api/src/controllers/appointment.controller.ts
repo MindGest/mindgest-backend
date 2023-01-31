@@ -1075,8 +1075,8 @@ export async function lastTerminatedAppointments(req: Request, res: Response) {
     })
     var appointmentsLast24h = []
     for (let i = 0; i < appointments.length; i++) {
-      let appointmentArchivedDate = appointments[i].archived_date;
-      if (appointmentArchivedDate != null){
+      let appointmentArchivedDate = appointments[i].archived_date
+      if (appointmentArchivedDate != null) {
         var archivedDate = new Date(appointmentArchivedDate)
         if (archivedDate.getTime() <= now && archivedDate.getTime() >= now - dayInMilliseconds) {
           // if in the last 24 hours
@@ -1140,16 +1140,18 @@ export async function onGoingAppointments(req: Request, res: Response) {
 
     let onGoingAppointments = []
     // get all the appointments
-    let appointments = await prisma.appointment.findMany({select: {
-      online: true,
-      room: {
-        select: {name: true},
+    let appointments = await prisma.appointment.findMany({
+      select: {
+        online: true,
+        room: {
+          select: { name: true },
+        },
+        pricetable_id: true,
+        slot_start_date: true,
+        slot_end_date: true,
+        archived_date: true,
       },
-      pricetable_id: true,
-      slot_start_date: true,
-      slot_end_date: true,
-      archived_date: true,
-    }})
+    })
     for (let i = 0; i < appointments.length; i++) {
       let startDate = new Date(appointments[i].slot_start_date)
       let startTime = startDate.getTime()
