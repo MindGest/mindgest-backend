@@ -19,6 +19,13 @@ export async function migrate(
   req: Request<ProcessIDPrams, {}, ProcessMigrationSchemaBody>,
   res: Response
 ) {
+  /**
+   * Migrates a process from a therapist to another.
+   * The current therapist remains as a collaborator of the process.
+   * The new becomes the main therapist.
+   *  If the new is already a collaborator in the process, simply make him main therapist
+   *  else, add the new as a therapist in the process and mak him main therapist.
+   */
   try {
     const { id, role, isAdmin } = res.locals.token
     const processId = parseInt(req.params.processId)
@@ -49,13 +56,33 @@ export async function migrate(
       // Perform Migration
       await prisma.permissions.update({
         where: { id: old?.id },
-        data: { isMain: true },
+        data: { isMain: false }, // remove isMain from the previous main therapist
       })
 
-      await prisma.permissions.updateMany({
-        where: { person_id: newId, process_id: processId },
-        data: { isMain: true },
-      })
+      // check if the new therapist is associated with the process already
+      if (await prisma.therapist_process.findFirst({where: {therapist_person_id: newId, process_id: processId}})){
+        // if already associated with the process, simply change the permission to isMain = true
+        await prisma.permissions.updateMany({
+          where: { person_id: newId, process_id: processId },
+          data: { isMain: true },
+        })
+      } else {
+        // add the therapist to the process
+        await prisma.therapist_process.create({data: {therapist_person_id: newId, process_id: processId}});
+        // create the permissions in the process for this therapist
+        await prisma.permissions.create({data: {
+          person_id: newId,
+          process_id: processId,
+
+          editprocess: true,
+          see: true,
+          appoint: true,
+          statitics: true,
+          editpatitent: true,
+          archive: true,
+          isMain: true, // make him the main therapist
+        }})
+      }
 
       // Migration Successful
       logger.debug(`MIGRATE [${oldId} -> ${newId}] => Process Migrated Successfully!`)
