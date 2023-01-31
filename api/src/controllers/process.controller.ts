@@ -1310,20 +1310,19 @@ async function note(req: Request, res: Response) {
   let role = decoded.role
 
   let noteInfo = await prisma.notes.findUnique({
-    where:{
-      id: noteId
-    }
+    where: {
+      id: noteId,
+    },
   })
 
   let permissions = await prisma.permissions.findFirst({
-    where:{
-      process_id:noteInfo?.process_id,
-      person_id: id
-    }
+    where: {
+      process_id: noteInfo?.process_id,
+      person_id: id,
+    },
   })
 
-  if(permissions?.see || role=="admin"){
-
+  if (permissions?.see || role == "admin") {
     let date = noteInfo?.datetime
     const formattedStartDate = date?.toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -1333,17 +1332,16 @@ async function note(req: Request, res: Response) {
       minute: "2-digit",
     })
 
-
     return res.status(StatusCodes.OK).json({
-      title: noteInfo?.title, body: noteInfo?.body, date:formattedStartDate
+      title: noteInfo?.title,
+      body: noteInfo?.body,
+      date: formattedStartDate,
     })
-  }
-  else{
+  } else {
     return res.status(StatusCodes.UNAUTHORIZED).json({
-      message: "Don't have permissions"
+      message: "Don't have permissions",
     })
   }
-  
 }
 
 export default {
@@ -1362,5 +1360,5 @@ export default {
   getCollaborators,
   getProcesses,
   migrate,
-  note
+  note,
 }
