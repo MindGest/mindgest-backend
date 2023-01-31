@@ -211,7 +211,7 @@ export const ProcessIDSchema = z.object({
   params: z
     .object({
       processId: z.string(),
-      noteId: z.string().optional()
+      noteId: z.string().optional(),
     })
     .strict(),
 })
@@ -648,5 +648,5 @@ export default {
   GetCollaboratorsSchema,
   NotificationSchema,
   ProcessMigrationSchema,
-  NotesUpdate
+  NotesUpdate,
 }

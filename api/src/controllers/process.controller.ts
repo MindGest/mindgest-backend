@@ -1382,12 +1382,11 @@ async function updateNote(req: Request<ProcessIDPrams, {}, UpdateNoteBody>, res:
         person_id: id,
       },
     })
-    
-    if(role=="admin" || (permissions!=null && permissions.editprocess)){
 
+    if (role == "admin" || (permissions != null && permissions.editprocess)) {
       await prisma.notes.update({
-        where:{
-          id: parseInt(req.params.noteId!)
+        where: {
+          id: parseInt(req.params.noteId!),
         },
         data: {
           datetime: date,
@@ -1399,8 +1398,7 @@ async function updateNote(req: Request<ProcessIDPrams, {}, UpdateNoteBody>, res:
       return res.status(StatusCodes.OK).json({
         message: "Note Updated",
       })
-    }
-    else{
+    } else {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "Don't have permissions",
       })
@@ -1430,5 +1428,5 @@ export default {
   getProcesses,
   migrate,
   note,
-  updateNote
+  updateNote,
 }
