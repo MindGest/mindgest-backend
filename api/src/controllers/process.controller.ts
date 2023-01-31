@@ -85,7 +85,6 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
     let callerRole = decoded.role
     let callerId = decoded.id
 
-
     var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findFirst({
@@ -95,7 +94,7 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
       },
     })
 
-    if (!callerIsAdmin && !(permissions != null && permissions.see)){
+    if (!callerIsAdmin && !(permissions != null && permissions.see)) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -127,7 +126,6 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
     let callerRole = decoded.role
     let callerId = decoded.id
 
-
     var processId = parseInt(req.params.processId)
 
     var permissions = await prisma.permissions.findFirst({
@@ -136,8 +134,8 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
         person_id: decoded.id,
       },
     })
-    
-    if (!callerIsAdmin && !(permissions != null && permissions.see)){
+
+    if (!callerIsAdmin && !(permissions != null && permissions.see)) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -735,7 +733,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
       },
     })
 
-    if (!callerIsAdmin && !(permissions != null && permissions.see)){
+    if (!callerIsAdmin && !(permissions != null && permissions.see)) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
