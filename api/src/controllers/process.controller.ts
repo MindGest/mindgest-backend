@@ -91,12 +91,11 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
     // check if the process exists.
     let process = await prisma.process.findFirst({ where: { id: processId } })
 
-    if (process == null){
+    if (process == null) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: "The given id is not associated with a process."
+        message: "The given id is not associated with a process.",
       })
     }
-
 
     var permissions = await prisma.permissions.findFirst({
       where: {
@@ -110,7 +109,6 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
         message: "User doesn't have authorization",
       })
     }
-
 
     await prisma.process.update({
       data: { active: !process?.active },
@@ -141,12 +139,11 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
     // check if the process exists.
     let process = await prisma.process.findFirst({ where: { id: processId } })
 
-    if (process == null){
+    if (process == null) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: "The given id is not associated with a process."
+        message: "The given id is not associated with a process.",
       })
     }
-
 
     var permissions = await prisma.permissions.findFirst({
       where: {
@@ -553,9 +550,9 @@ export async function activate(req: Request<ProcessIDPrams, {}, {}>, res: Respon
     // check if the process exists.
     let process = await prisma.process.findFirst({ where: { id: processId } })
 
-    if (process == null){
+    if (process == null) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: "The given id is not associated with a process."
+        message: "The given id is not associated with a process.",
       })
     }
 
@@ -784,9 +781,9 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
     // check if the process exists.
     let process = await prisma.process.findFirst({ where: { id: processId } })
 
-    if (process == null){
+    if (process == null) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: "The given id is not associated with a process."
+        message: "The given id is not associated with a process.",
       })
     }
 
@@ -854,9 +851,9 @@ export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Re
     // check if the process exists.
     let process = await prisma.process.findFirst({ where: { id: processId } })
 
-    if (process == null){
+    if (process == null) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: "The given id is not associated with a process."
+        message: "The given id is not associated with a process.",
       })
     }
 
@@ -978,9 +975,9 @@ export async function createNote(req: Request<ProcessIDPrams, {}, NotesCreateBod
     // check if the process exists.
     let process = await prisma.process.findFirst({ where: { id: processId } })
 
-    if (process == null){
+    if (process == null) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: "The given id is not associated with a process."
+        message: "The given id is not associated with a process.",
       })
     }
 
@@ -1120,9 +1117,9 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
     // check if the process exists.
     let process = await prisma.process.findFirst({ where: { id: processId } })
 
-    if (process == null){
+    if (process == null) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: "The given id is not associated with a process."
+        message: "The given id is not associated with a process.",
       })
     }
 
@@ -1152,18 +1149,24 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
     }
 
     // get the process collaborators
-    let collaborators_permissions = await prisma.permissions.findMany({where: {process_id: processId, isMain: false}});
-    let therapistsInfo = [];
-    let internsInfo = [];
+    let collaborators_permissions = await prisma.permissions.findMany({
+      where: { process_id: processId, isMain: false },
+    })
+    let therapistsInfo = []
+    let internsInfo = []
     for (let collaborator_permissions of collaborators_permissions) {
-      let intern = await prisma.intern.findFirst({where: { person_id: collaborator_permissions.person_id }})
-      let person = await prisma.person.findFirst({where: { id: collaborator_permissions.person_id }});
+      let intern = await prisma.intern.findFirst({
+        where: { person_id: collaborator_permissions.person_id },
+      })
+      let person = await prisma.person.findFirst({
+        where: { id: collaborator_permissions.person_id },
+      })
       if (intern != null) {
         // is intern
-        internsInfo.push({id: person?.id, name: person?.name})
-      }
-      else{ // is therapist
-        therapistsInfo.push({id: person?.id, name: person?.name})
+        internsInfo.push({ id: person?.id, name: person?.name })
+      } else {
+        // is therapist
+        therapistsInfo.push({ id: person?.id, name: person?.name })
       }
     }
 
