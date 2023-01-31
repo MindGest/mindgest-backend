@@ -260,24 +260,27 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
 
     var decoded = res.locals.token
 
-    if (queryParams.active == null) {
-      queryParams.active = "true"
-    }
-    var active = queryParams.active === "true"
+    // active null e speciality null, enviar todos
+    // active null e speciality != null
+    // active != null e speciality != null
+    // active != null e speciality == null
+    let active = req.query.active; // to know if active was given
+    let active_value = req.query.active === "true"; // the actual value of active
+    let speciality = req.query.speciality;
 
-    if (queryParams.speciality == null) {
-      var processes = await prisma.process.findMany({
-        where: {
-          active: active,
-        },
-      })
-    } else {
-      var processes = await prisma.process.findMany({
-        where: {
-          active: active,
-          speciality_speciality: queryParams.speciality,
-        },
-      })
+    let processes;
+
+    if (active != null  && speciality != null){
+      processes = await prisma.process.findMany({where: {active: active_value, speciality_speciality: speciality}});
+    }
+    else if (active != null && speciality == null){
+      processes = await prisma.process.findMany({where: {active: active_value}});
+    }
+    else if (active == null && speciality != null){
+      processes = await prisma.process.findMany({where: {speciality_speciality: speciality}});
+    }
+    else { // todos
+      processes = await prisma.process.findMany();
     }
 
     var listing: any = []
@@ -356,7 +359,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
         nextAppointmentString = "No next Appointment"
       }
 
-      var speciality = await prisma.speciality.findFirst({
+      let speciality = await prisma.speciality.findFirst({
         where: {
           speciality: process.speciality_speciality,
         },
@@ -367,6 +370,8 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
           therapistListing: therapistListing,
           patientName: utentName?.name,
           refCode: ref,
+          processId: process.id,
+          active: process.active,
           nextAppointment: nextAppointmentString,
           speciality: speciality?.speciality,
         })
