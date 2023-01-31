@@ -264,23 +264,23 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
     // active null e speciality != null
     // active != null e speciality != null
     // active != null e speciality == null
-    let active = req.query.active; // to know if active was given
-    let active_value = req.query.active === "true"; // the actual value of active
-    let speciality = req.query.speciality;
+    let active = req.query.active // to know if active was given
+    let active_value = req.query.active === "true" // the actual value of active
+    let speciality = req.query.speciality
 
-    let processes;
+    let processes
 
-    if (active != null  && speciality != null){
-      processes = await prisma.process.findMany({where: {active: active_value, speciality_speciality: speciality}});
-    }
-    else if (active != null && speciality == null){
-      processes = await prisma.process.findMany({where: {active: active_value}});
-    }
-    else if (active == null && speciality != null){
-      processes = await prisma.process.findMany({where: {speciality_speciality: speciality}});
-    }
-    else { // todos
-      processes = await prisma.process.findMany();
+    if (active != null && speciality != null) {
+      processes = await prisma.process.findMany({
+        where: { active: active_value, speciality_speciality: speciality },
+      })
+    } else if (active != null && speciality == null) {
+      processes = await prisma.process.findMany({ where: { active: active_value } })
+    } else if (active == null && speciality != null) {
+      processes = await prisma.process.findMany({ where: { speciality_speciality: speciality } })
+    } else {
+      // todos
+      processes = await prisma.process.findMany()
     }
 
     var listing: any = []
