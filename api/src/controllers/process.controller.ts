@@ -87,6 +87,16 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
 
     var processId = parseInt(req.params.processId)
 
+    // check if the process exists.
+    let process = await prisma.process.findFirst({ where: { id: processId } })
+
+    if (process == null){
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "The given id is not associated with a process."
+      })
+    }
+
+
     var permissions = await prisma.permissions.findFirst({
       where: {
         process_id: processId,
@@ -100,7 +110,6 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
       })
     }
 
-    let process = await prisma.process.findFirst({ where: { id: processId } })
 
     await prisma.process.update({
       data: { active: !process?.active },
@@ -127,6 +136,16 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
     let callerId = decoded.id
 
     var processId = parseInt(req.params.processId)
+
+    // check if the process exists.
+    let process = await prisma.process.findFirst({ where: { id: processId } })
+
+    if (process == null){
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "The given id is not associated with a process."
+      })
+    }
+
 
     var permissions = await prisma.permissions.findFirst({
       where: {
@@ -178,7 +197,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       colaborators.push(person!.name + " (terapeuta)")
     }
 
-    var process = await prisma.process.findUnique({
+    process = await prisma.process.findUnique({
       where: {
         id: processId,
       },
@@ -530,6 +549,15 @@ export async function activate(req: Request<ProcessIDPrams, {}, {}>, res: Respon
     var decoded = res.locals.token
     var processId = parseInt(req.params.processId)
 
+    // check if the process exists.
+    let process = await prisma.process.findFirst({ where: { id: processId } })
+
+    if (process == null){
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "The given id is not associated with a process."
+      })
+    }
+
     //Falta saber se o user é admin ou n
     if (decoded.admin == false) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -752,6 +780,15 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
 
     var processId = parseInt(req.params.processId)
 
+    // check if the process exists.
+    let process = await prisma.process.findFirst({ where: { id: processId } })
+
+    if (process == null){
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "The given id is not associated with a process."
+      })
+    }
+
     // obtain the permissions of the caller (therapists and interns)
     var permissions = await prisma.permissions.findFirst({
       where: {
@@ -812,6 +849,15 @@ export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Re
   try {
     var decoded = res.locals.token
     var processId = parseInt(req.params.processId)
+
+    // check if the process exists.
+    let process = await prisma.process.findFirst({ where: { id: processId } })
+
+    if (process == null){
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "The given id is not associated with a process."
+      })
+    }
 
     var appointments = await prisma.appointment_process.findMany({
       where: {
@@ -927,6 +973,15 @@ export async function createNote(req: Request<ProcessIDPrams, {}, NotesCreateBod
   try {
     var date = new Date()
     var processId = parseInt(req.params.processId)
+
+    // check if the process exists.
+    let process = await prisma.process.findFirst({ where: { id: processId } })
+
+    if (process == null){
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "The given id is not associated with a process."
+      })
+    }
 
     await prisma.notes.create({
       data: {
@@ -1061,6 +1116,15 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
 
     let canSee = false
 
+    // check if the process exists.
+    let process = await prisma.process.findFirst({ where: { id: processId } })
+
+    if (process == null){
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "The given id is not associated with a process."
+      })
+    }
+
     // check permission therapist
     if (callerRole == "therapist") {
       let therapist_process = await prisma.therapist_process.findFirst({
@@ -1086,32 +1150,20 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
       })
     }
 
-    // get the therapists of the process
-    let therapist_process = await prisma.therapist_process.findMany({
-      where: { process_id: processId },
-    })
-    let therapistsInfo = []
-    for (let i = 0; i < therapist_process.length; i++) {
-      let person = await prisma.person.findFirst({
-        where: { id: therapist_process[i].therapist_person_id },
-      })
-      therapistsInfo.push({
-        id: person?.id,
-        name: person?.name,
-      })
-    }
-
-    // get the interns of the process
-    let intern_process = await prisma.intern_process.findMany({ where: { process_id: processId } })
-    let internsInfo = []
-    for (let i = 0; i < intern_process.length; i++) {
-      let person = await prisma.person.findFirst({
-        where: { id: intern_process[i].intern_person_id },
-      })
-      internsInfo.push({
-        id: person?.id,
-        name: person?.name,
-      })
+    // get the process collaborators
+    let collaborators_permissions = await prisma.permissions.findMany({where: {process_id: processId, isMain: false}});
+    let therapistsInfo = [];
+    let internsInfo = [];
+    for (let collaborator_permissions of collaborators_permissions) {
+      let intern = await prisma.intern.findFirst({where: { person_id: collaborator_permissions.person_id }})
+      let person = await prisma.person.findFirst({where: { id: collaborator_permissions.person_id }});
+      if (intern != null) {
+        // is intern
+        internsInfo.push({id: person?.id, name: person?.name})
+      }
+      else{ // is therapist
+        therapistsInfo.push({id: person?.id, name: person?.name})
+      }
     }
 
     let infoToReturn = {
