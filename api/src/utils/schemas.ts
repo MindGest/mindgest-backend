@@ -263,7 +263,6 @@ export const AppointmentCreateSchema = z.object({
     priceTableId: z.string(),
     startDate: DateSchema,
     endDate: DateSchema,
-    archiveDate: DateSchema,
   }),
 })
 

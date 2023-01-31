@@ -623,7 +623,6 @@ async function seed() {
       slot_start_date: new Date("2023-01-31T22:50:28.538Z"),
       slot_end_date: new Date("2023-01-31T03:50:28.538Z"),
       active: false,
-      archived_date: new Date("2023-01-31T22:50:28.538Z"),
     },
   })
 
@@ -635,7 +634,6 @@ async function seed() {
       slot_start_date: new Date("2023-01-22T22:50:28.538Z"),
       slot_end_date: new Date("2023-01-22T03:50:28.538Z"),
       active: true,
-      archived_date: new Date("2023-01-22T22:50:28.538Z"),
     },
   })
 
@@ -647,7 +645,6 @@ async function seed() {
       slot_start_date: new Date("2023-01-30T22:50:28.538Z"),
       slot_end_date: new Date("2023-01-30T03:50:28.538Z"),
       active: false,
-      archived_date: new Date("2023-01-30T22:50:28.538Z"),
     },
   })
 
