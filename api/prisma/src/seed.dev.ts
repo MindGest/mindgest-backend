@@ -262,7 +262,6 @@ async function seed() {
     },
   })
 
-
   let person6 = await prisma.person.create({
     data: {
       active: true,
@@ -465,7 +464,6 @@ async function seed() {
       speciality_speciality: speciality4.speciality,
     },
   })
-
 
   await prisma.therapist_speciality.create({
     data: {
