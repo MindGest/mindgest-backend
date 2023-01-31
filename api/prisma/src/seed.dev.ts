@@ -191,6 +191,14 @@ async function seed() {
     },
   })
 
+  let speciality2 = await prisma.speciality.create({
+    data: {
+      speciality: "wefwef",
+      code: "ewfwef",
+      description: "ewfwefewf",
+    },
+  })
+
   let process = await prisma.process.create({
     data: {
       ref: "tard123",
@@ -199,6 +207,16 @@ async function seed() {
       speciality_speciality: speciality.speciality,
     },
   })
+
+  let process2 = await prisma.process.create({
+    data: {
+      ref: "wefdewfw",
+      active: true,
+      remarks: "fuck this shit",
+      speciality_speciality: speciality.speciality,
+    },
+  })
+
 
   await prisma.therapist_speciality.create({
     data: {
@@ -227,10 +245,44 @@ async function seed() {
     },
   })
 
+  let room2 = await prisma.room.create({
+    data: {
+      name: "X",
+    },
+  })
+
+  let room3 = await prisma.room.create({
+    data: {
+      name: "Y",
+    },
+  })
+
+  let room4 = await prisma.room.create({
+    data: {
+      name: "Z",
+    },
+  })
+
   let pricetable1 = await prisma.pricetable.create({
     data: {
       id: "burritos",
       type: "burritos",
+      price: 23.2,
+    },
+  })
+
+  let pricetable2 = await prisma.pricetable.create({
+    data: {
+      id: "merdas",
+      type: "merditas",
+      price: 23.2,
+    },
+  })
+
+  let pricetable3 = await prisma.pricetable.create({
+    data: {
+      id: "toufartodestamerda",
+      type: "toufartodestamerda",
       price: 23.2,
     },
   })

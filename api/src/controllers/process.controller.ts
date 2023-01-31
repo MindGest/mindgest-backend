@@ -946,7 +946,7 @@ export async function listNotes(req: Request, res: Response) {
         month: "2-digit",
         year: "numeric",
       })
-      list.push({ title: note.title, body: note.body, date: formattedDate })
+      list.push({ title: note.title, body: note.body, date: formattedDate, id: note.id })
     }
 
     return res.status(StatusCodes.OK).json({
