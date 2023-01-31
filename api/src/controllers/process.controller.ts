@@ -95,7 +95,7 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
       },
     })
 
-    if (!callerIsAdmin && !(permissions != null && permissions.see)){
+    if (!callerIsAdmin && !(permissions != null && permissions.archive)){
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
@@ -735,7 +735,7 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
       },
     })
 
-    if (!callerIsAdmin && !(permissions != null && permissions.see)){
+    if (!callerIsAdmin && !(permissions != null && permissions.editprocess)){
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization",
       })
