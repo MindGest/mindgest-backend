@@ -391,7 +391,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
         where: { process_id: process.id },
       })
       let patients = [] // store the names of the patients
-      for (let i = 0; patient_process.length; i++) {
+      for (let i = 0; i < patient_process.length; i++) {
         let person = await prisma.person.findFirst({
           where: { id: patient_process[i].patient_person_id },
         })
