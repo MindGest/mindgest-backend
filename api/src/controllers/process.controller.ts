@@ -132,6 +132,7 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
       })
     }
 
+    // verify if the caller has permissions to archive the process.
     var permissions = await prisma.permissions.findFirst({
       where: {
         process_id: processId,
@@ -162,6 +163,9 @@ export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Respons
 }
 
 export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
+  /**
+   * Returns the info of the process associated with the given id.
+   */
   try {
     var decoded = res.locals.token
 
@@ -183,7 +187,7 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
     var permissions = await prisma.permissions.findFirst({
       where: {
         process_id: processId,
-        person_id: decoded.id,
+        person_id: callerId,
       },
     })
 
@@ -193,110 +197,42 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
       })
     }
 
-    var therapists = await prisma.therapist_process.findMany({
-      where: {
-        process_id: processId,
-      },
+    // main therapist, id and name
+    let mainTherapistPermissions = await prisma.permissions.findFirst({
+      where: { process_id: processId, isMain: true },
+    })
+    let mainTherapistPerson = await prisma.person.findFirst({
+      where: { id: mainTherapistPermissions?.person_id },
     })
 
-    var colaborators: string[] = []
-    var mainTherapistId
-    var mainTherapistName
+    // collaborators
+    let collaborators = await privateGetCollaborators(processId)
 
-    var flag = false
-    for (let therapist of therapists) {
-      var person = await prisma.person.findUnique({
-        where: {
-          id: therapist.therapist_person_id,
-        },
-      })
+    // care takers
+    let careTakers = await privateGetCareTakers(processId)
 
-      if (flag == false) {
-        var permissions = await prisma.permissions.findFirst({
-          where: {
-            person_id: therapist.therapist_person_id,
-            process_id: processId,
-          },
-        })
+    // patients, name and id
+    let patients = await privateGetPatients(processId)
 
-        if (permissions?.isMain) {
-          mainTherapistId = therapist.therapist_person_id
-          mainTherapistName = person?.name
-        } else {
-          colaborators.push(person!.name + " (terapeuta)")
-        }
-      }
+    // financial state (if every past appointments have been paid)
+    let paid = await privateGetFinancialState(processId)
 
-      colaborators.push(person!.name + " (terapeuta)")
-    }
-
-    process = await prisma.process.findUnique({
-      where: {
-        id: processId,
-      },
-    })
-
-    var processRef = process?.ref
-
-    var interns = await prisma.intern_process.findMany({
-      where: {
-        process_id: processId,
-      },
-    })
-
-    for (let intern of interns) {
-      var internName = await prisma.person.findUnique({
-        where: {
-          id: intern.intern_person_id,
-        },
-      })
-      colaborators.push(internName!.name + " (Em estágio)")
-    }
-
-    var utent = await prisma.patient_process.findFirst({
-      where: {
-        process_id: processId,
-      },
-    })
-
-    var utentName = await prisma.person.findFirst({
-      where: {
-        id: utent?.patient_person_id,
-      },
-    })
-
-    var apointments = await prisma.appointment_process.findMany({
-      where: {
-        process_id: processId,
-      },
-    })
-
-    var isPaid = true
-
-    for (let apointment of apointments) {
-      var receipt = await prisma.receipt.findFirst({
-        where: {
-          appointment_slot_id: apointment.appointment_slot_id,
-        },
-      })
-
-      if (receipt != null) {
-        if (receipt!.payed == false) {
-          isPaid = false
-        }
-      }
+    // build info to return
+    let infoToReturn = {
+      mainTherapist: { id: mainTherapistPerson?.id, name: mainTherapistPerson?.name },
+      collaborators: collaborators,
+      careTakers: careTakers,
+      patients: patients,
+      paid: paid,
+      ref: process.ref,
+      remarks: process.remarks,
+      speciality: process.speciality_speciality,
+      active: process.active,
+      processId: processId,
     }
 
     return res.status(StatusCodes.OK).json({
-      therapistId: mainTherapistId,
-      therapistName: mainTherapistName,
-      ref: processRef,
-      colaborators: colaborators,
-      utent: utentName?.name,
-      active: process?.active,
-      financialSituation: isPaid,
-      remarks: process?.remarks,
-      speciality: process?.speciality_speciality,
+      data: infoToReturn,
     })
   } catch (error) {
     console.log(error)
@@ -307,10 +243,26 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
 }
 
 export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Response) {
+  /**
+   * Returns a list of processes that the caller can see.
+   * Admin can see all
+   * Therapist, the ones that he is associated with
+   * Intern, the ones that he is associated with and has see permission
+   */
   try {
     var queryParams = req.query
 
     var decoded = res.locals.token
+
+    let callerIsAdmin = decoded.admin
+    let callerRole = decoded.role
+    let callerId = decoded.id
+
+    if (callerRole == "accountant" || callerRole == "guard") {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "You do not have permission to acces this information.",
+      })
+    }
 
     // active null e speciality null, enviar todos
     // active null e speciality != null
@@ -335,124 +287,67 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
       processes = await prisma.process.findMany()
     }
 
-    var listing: any = []
+    let infoToReturn = []
 
-    for (var process of processes) {
-      var therapists = await prisma.therapist_process.findMany({
+    for (let process of processes) {
+      let processId = Number(process.id)
+
+      // check if the caller can see this process
+      var permissions = await prisma.permissions.findFirst({
         where: {
-          process_id: process.id,
+          process_id: processId,
+          person_id: callerId,
         },
       })
 
-      var therapistListing: string[] = []
-
-      var flag = false
-
-      for (var therapist_process of therapists) {
-        var therapist = await prisma.person.findUnique({
-          where: {
-            id: therapist_process.therapist_person_id,
-          },
-        })
-
-        if (therapist?.id == decoded.id) {
-          flag = true
-        }
-
-        therapistListing.push(therapist!.name)
+      if (!callerIsAdmin && !(permissions != null && permissions.see)) {
+        // if the caller cannot see this process, skip
+        continue
       }
 
-      var internListing: string[] = []
-
-      var interns = await prisma.intern_process.findMany({
-        where: {
-          process_id: process.id,
-        },
+      // main therapist, id and name
+      let mainTherapistPermissions = await prisma.permissions.findFirst({
+        where: { process_id: processId, isMain: true },
+      })
+      let mainTherapistPerson = await prisma.person.findFirst({
+        where: { id: mainTherapistPermissions?.person_id },
       })
 
-      for (var intern_process of interns) {
-        var intern = await prisma.person.findUnique({
-          where: {
-            id: intern_process.intern_person_id,
-          },
-        })
+      // collaborators
+      let collaborators = await privateGetCollaborators(processId)
 
-        if (intern?.id == decoded.id) {
-          flag = true
-        }
+      // care takers
+      let careTakers = await privateGetCareTakers(processId)
 
-        internListing.push(intern!.name)
+      // patients, name and id
+      let patients = await privateGetPatients(processId)
+
+      // financial state (if every past appointments have been paid)
+      let paid = await privateGetFinancialState(processId)
+
+      // next appointment
+      let nextAppointment = await privateGetNextAppointment(processId)
+
+      // build info to return
+      let processInfo = {
+        mainTherapist: { id: mainTherapistPerson?.id, name: mainTherapistPerson?.name },
+        collaborators: collaborators,
+        careTakers: careTakers,
+        patients: patients,
+        paid: paid,
+        ref: process.ref,
+        remarks: process.remarks,
+        speciality: process.speciality_speciality,
+        active: process.active,
+        nextAppointment: nextAppointment,
+        processId: processId,
       }
 
-      var ref = process.ref
-
-      // get the patients of the process
-      let patient_process = await prisma.patient_process.findMany({
-        where: { process_id: process.id },
-      })
-      let patients = [] // store the names of the patients
-      for (let i = 0; i < patient_process.length; i++) {
-        let person = await prisma.person.findFirst({
-          where: { id: patient_process[i].patient_person_id },
-        })
-        patients.push(person?.name)
-      }
-
-      var appointments = await prisma.appointment_process.findMany({
-        where: {
-          process_id: process.id,
-        },
-      })
-
-      var nextAppointment = Date.now()
-      var dateChanged = false
-
-      for (var appointmentProcess of appointments) {
-        var apointment = await prisma.appointment.findUnique({
-          where: {
-            slot_id: appointmentProcess.appointment_slot_id,
-          },
-        })
-
-        if (apointment!.slot_start_date.getTime() > nextAppointment) {
-          nextAppointment = apointment!.slot_start_date.getTime()
-          dateChanged = true
-        }
-      }
-
-      var nextAppointmentString: string = ""
-      if (dateChanged) {
-        let date = apointment!.slot_start_date
-        nextAppointmentString = date?.toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })
-      } else {
-        nextAppointmentString = "No next Appointment"
-      }
-
-      let speciality = await prisma.speciality.findFirst({
-        where: {
-          speciality: process.speciality_speciality,
-        },
-      })
-
-      if (decoded.role === "admin" || flag === true) {
-        listing.push({
-          therapistListing: therapistListing,
-          internListing: internListing,
-          patients: patients,
-          refCode: ref,
-          processId: process.id,
-          active: process.active,
-          nextAppointment: nextAppointmentString,
-          speciality: speciality?.speciality,
-        })
-      }
+      infoToReturn.push(processInfo)
     }
+
     return res.status(StatusCodes.OK).json({
-      list: listing,
+      data: infoToReturn,
     })
   } catch (error) {
     console.log(error)
@@ -462,6 +357,7 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
   }
 }
 
+// se calhar já não é preciso
 export async function listTherapist(req: Request, res: Response) {
   try {
     var decoded = res.locals.token
@@ -1184,31 +1080,7 @@ export async function getCollaborators(req: Request<{}, {}, GetCollaboratorsBody
     }
 
     // get the process collaborators
-    let collaborators_permissions = await prisma.permissions.findMany({
-      where: { process_id: processId, isMain: false },
-    })
-    let therapistsInfo = []
-    let internsInfo = []
-    for (let collaborator_permissions of collaborators_permissions) {
-      let intern = await prisma.intern.findFirst({
-        where: { person_id: collaborator_permissions.person_id },
-      })
-      let person = await prisma.person.findFirst({
-        where: { id: collaborator_permissions.person_id },
-      })
-      if (intern != null) {
-        // is intern
-        internsInfo.push({ id: person?.id, name: person?.name })
-      } else {
-        // is therapist
-        therapistsInfo.push({ id: person?.id, name: person?.name })
-      }
-    }
-
-    let infoToReturn = {
-      therapists: therapistsInfo,
-      interns: internsInfo,
-    }
+    let infoToReturn = await privateGetCollaborators(processId)
 
     res.status(StatusCodes.OK).json({
       data: infoToReturn,
@@ -1501,6 +1373,170 @@ async function updateNote(req: Request<ProcessIDPrams, {}, UpdateNoteBody>, res:
       message: "Ups... Something went wrong",
     })
   }
+}
+
+async function privateGetCollaborators(processId: number) {
+  /**
+   * Return the collaborators names and ids
+   */
+
+  // get the process collaborators
+  let collaborators_permissions = await prisma.permissions.findMany({
+    where: { process_id: processId, isMain: false },
+  })
+  let therapistsInfo = []
+  let internsInfo = []
+  for (let collaborator_permissions of collaborators_permissions) {
+    let intern = await prisma.intern.findFirst({
+      where: { person_id: collaborator_permissions.person_id },
+    })
+    let therapist = await prisma.therapist.findFirst({
+      where: { person_id: collaborator_permissions.person_id },
+    })
+    let person = await prisma.person.findFirst({
+      where: { id: collaborator_permissions.person_id },
+    })
+
+    let collaboratorInfoBase = {
+      name: person?.name,
+      id: person?.id,
+      email: person?.email,
+      address: person?.address,
+      birthDate: person?.birth_date,
+      photo: person?.photo,
+      phoneNumber: person?.phone_number,
+      verified: person?.verified,
+      active: person?.active,
+      approved: person?.approved,
+      taxNumber: person?.tax_number,
+    }
+
+    if (intern != null) {
+      // is intern
+      internsInfo.push(collaboratorInfoBase)
+    } else if (therapist != null) {
+      // is therapist
+      let collaboratorInfoTherapist = {
+        ...collaboratorInfoBase,
+        extern: therapist.extern,
+        license: therapist.license,
+        health_system: therapist.health_system,
+      }
+      therapistsInfo.push(collaboratorInfoTherapist)
+    }
+  }
+
+  let infoToReturn = {
+    therapists: therapistsInfo,
+    interns: internsInfo,
+  }
+  return infoToReturn
+}
+
+async function privateGetCareTakers(processId: number) {
+  /**
+   * Return the care takers info
+   */
+
+  //obtain information about the care takers
+  let careTakers = await prisma.process_liable.findMany({ where: { process_id: processId } })
+
+  // for each care taker
+  let careTakersInfo = []
+  for (let i = 0; i < careTakers.length; i++) {
+    let careTaker = await prisma.liable.findFirst({ where: { id: careTakers[i].liable_id } })
+    careTakersInfo.push({
+      name: careTaker?.name,
+      email: careTaker?.email,
+      phoneNumber: careTaker?.phonenumber,
+      type: careTaker?.type,
+      remarks: careTaker?.remarks,
+      careTakerId: careTaker?.id,
+    })
+  }
+
+  return careTakersInfo
+}
+
+async function privateGetPatients(processId: number) {
+  /**
+   * Return the patient names and ids
+   */
+
+  // obtain the patients ids
+  let patients = await prisma.patient_process.findMany({ where: { process_id: processId } })
+
+  // for each patient
+  let patientsInfo = []
+  for (let i = 0; i < patients.length; i++) {
+    let patient = await prisma.person.findFirst({ where: { id: patients[i].patient_person_id } })
+    patientsInfo.push({ id: patient?.id, name: patient?.name })
+  }
+
+  return patientsInfo
+}
+
+async function privateGetFinancialState(processId: number) {
+  /**
+   * Returns true if all the appointments that were archived have been paid, else, false
+   */
+
+  // get all the appointments of the process
+  let appointments = await prisma.appointment_process.findMany({ where: { process_id: processId } })
+
+  // check if all that were archived, aka, have a receipt have been paid
+  let paid = true
+  for (let appointment of appointments) {
+    let receipt = await prisma.receipt.findFirst({
+      where: { appointment_slot_id: appointment.appointment_slot_id },
+    })
+    if (!receipt?.payed) {
+      paid = false
+    }
+  }
+  return paid
+}
+
+async function privateGetNextAppointment(processId: number) {
+  /**
+   * Returns the nex appointment in the process.
+   * If it does not exist, returns null
+   */
+
+  // get the appointments of the process
+  let appointment_process = await prisma.appointment_process.findMany({
+    where: { process_id: processId },
+  })
+
+  // check if there is any future appointment
+  let now = Date.now()
+  let appointmentToReturn = null
+  for (let i = 0; i < appointment_process.length; i++) {
+    let appointment = await prisma.appointment.findFirst({
+      where: { slot_id: appointment_process[i].appointment_slot_id },
+    })
+    // check if the appointment is active
+    if (appointment?.active) {
+      // check date (is the appointment in the future?)
+      let appointmentStartDate = new Date(appointment.slot_start_date)
+      let appointmentStartTime = appointmentStartDate.getTime()
+      if (appointmentStartTime > now) {
+        // in the future
+        if (appointmentToReturn == null) {
+          appointmentToReturn = appointment
+        } else {
+          // check if the new is earlier than the already found
+          let appointmentToReturnStartDate = new Date(appointment.slot_start_date)
+          let appointmentToReturnTime = appointmentToReturnStartDate.getTime()
+          if (appointmentStartTime < appointmentToReturnTime) {
+            // the new is in the future and is earlier than the one previously found.
+            appointmentToReturn = appointment
+          }
+        }
+      }
+    }
+  }
+  return appointmentToReturn
 }
 
 export default {
