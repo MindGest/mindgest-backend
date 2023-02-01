@@ -30,6 +30,55 @@ async function seed() {
   await prisma.room.deleteMany({})
   await prisma.liable.deleteMany()
 
+  // specialities
+  let specialityCouple = await prisma.speciality.create({
+    data: {
+      code: "TCasal",
+      description: "Terapia de casal",
+      speciality: "terapia_casal",
+    },
+  })
+
+  let specialityFamily = await prisma.speciality.create({
+    data: {
+      code: "TFamília",
+      description: "Terapia de família",
+      speciality: "terapia_família",
+    },
+  })
+
+  let specialityAdult = await prisma.speciality.create({
+    data: {
+      code: "TAdulto",
+      description: "Terapia de adulto",
+      speciality: "terapia_adulto",
+    },
+  })
+
+  let specialityTeen = await prisma.speciality.create({
+    data: {
+      code: "TAdolescente",
+      description: "Terapia de adolescente",
+      speciality: "terapia_adolescente",
+    },
+  })
+
+  let specialityChild = await prisma.speciality.create({
+    data: {
+      code: "TCriança",
+      description: "Terapia de criança",
+      speciality: "terapia_criança",
+    },
+  })
+
+  let specialityElder = await prisma.speciality.create({
+    data: {
+      code: "TIdoso",
+      description: "Terapia de idoso",
+      speciality: "terapia_idoso",
+    },
+  })
+
   // therapists
   let person1 = await prisma.person.create({
     data: {
@@ -51,6 +100,19 @@ async function seed() {
       license: "2417",
       health_system: "public",
       person_id: person1.id,
+    },
+  })
+  // add specialities to therapist
+  await prisma.therapist_speciality.create({
+    data: {
+      therapist_person_id: therapist1.person_id,
+      speciality_speciality: specialityChild.speciality,
+    },
+  })
+  await prisma.therapist_speciality.create({
+    data: {
+      therapist_person_id: therapist1.person_id,
+      speciality_speciality: specialityElder.speciality,
     },
   })
 
@@ -76,6 +138,19 @@ async function seed() {
       person_id: person2.id,
     },
   })
+  // add specialities to therapist
+  await prisma.therapist_speciality.create({
+    data: {
+      therapist_person_id: therapist2.person_id,
+      speciality_speciality: specialityTeen.speciality,
+    },
+  })
+  await prisma.therapist_speciality.create({
+    data: {
+      therapist_person_id: therapist2.person_id,
+      speciality_speciality: specialityFamily.speciality,
+    },
+  })
 
   let person11 = await prisma.person.create({
     data: {
@@ -98,6 +173,19 @@ async function seed() {
       license: "5368",
       health_system: "private",
       person_id: person11.id,
+    },
+  })
+  // add specialities to therapist
+  await prisma.therapist_speciality.create({
+    data: {
+      therapist_person_id: therapist3.person_id,
+      speciality_speciality: specialityAdult.speciality,
+    },
+  })
+  await prisma.therapist_speciality.create({
+    data: {
+      therapist_person_id: therapist3.person_id,
+      speciality_speciality: specialityCouple.speciality,
     },
   })
   // make him admin
@@ -547,55 +635,6 @@ async function seed() {
     },
   })
 
-  // specialities
-  let specialityCouple = await prisma.speciality.create({
-    data: {
-      code: "TCasal",
-      description: "Terapia de casal",
-      speciality: "terapia_casal",
-    },
-  })
-
-  let specialityFamily = await prisma.speciality.create({
-    data: {
-      code: "TFamília",
-      description: "Terapia de família",
-      speciality: "terapia_família",
-    },
-  })
-
-  let specialityAdult = await prisma.speciality.create({
-    data: {
-      code: "TAdulto",
-      description: "Terapia de adulto",
-      speciality: "terapia_adulto",
-    },
-  })
-
-  let specialityTeen = await prisma.speciality.create({
-    data: {
-      code: "TAdolescente",
-      description: "Terapia de adolescente",
-      speciality: "terapia_adolescente",
-    },
-  })
-
-  let specialityChild = await prisma.speciality.create({
-    data: {
-      code: "TCriança",
-      description: "Terapia de criança",
-      speciality: "terapia_criança",
-    },
-  })
-
-  let specialityElder = await prisma.speciality.create({
-    data: {
-      code: "TIdoso",
-      description: "Terapia de idoso",
-      speciality: "terapia_idoso",
-    },
-  })
-
   // prices
   let priceChild = await prisma.pricetable.create({
     data: {
@@ -773,6 +812,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processChild1.id, appointment_slot_id: appointment1ProcessChild1.slot_id },
+  })
 
   let appointment2ProcessChild1 = await prisma.appointment.create({
     data: {
@@ -783,6 +825,9 @@ async function seed() {
       slot_end_date: new Date("2023-02-01T11:00:00.000Z"),
       active: true,
     },
+  })
+  await prisma.appointment_process.create({
+    data: { process_id: processChild1.id, appointment_slot_id: appointment2ProcessChild1.slot_id },
   })
 
   let appointment3ProcessChild1 = await prisma.appointment.create({
@@ -795,6 +840,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processChild1.id, appointment_slot_id: appointment3ProcessChild1.slot_id },
+  })
 
   let appointment4ProcessChild1 = await prisma.appointment.create({
     data: {
@@ -806,6 +854,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processChild1.id, appointment_slot_id: appointment4ProcessChild1.slot_id },
+  })
 
   let appointment5ProcessChild1 = await prisma.appointment.create({
     data: {
@@ -816,6 +867,9 @@ async function seed() {
       slot_end_date: new Date("2023-02-04T11:00:00.000Z"),
       active: true,
     },
+  })
+  await prisma.appointment_process.create({
+    data: { process_id: processChild1.id, appointment_slot_id: appointment5ProcessChild1.slot_id },
   })
 
   // archive appointment
@@ -945,6 +999,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processTeen1.id, appointment_slot_id: appointment1ProcessTeen1.slot_id },
+  })
 
   let appointment2ProcessTeen1 = await prisma.appointment.create({
     data: {
@@ -955,6 +1012,9 @@ async function seed() {
       slot_end_date: new Date("2023-02-01T11:00:00.000Z"),
       active: true,
     },
+  })
+  await prisma.appointment_process.create({
+    data: { process_id: processTeen1.id, appointment_slot_id: appointment2ProcessTeen1.slot_id },
   })
 
   let appointment3ProcessTeen1 = await prisma.appointment.create({
@@ -967,6 +1027,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processTeen1.id, appointment_slot_id: appointment3ProcessTeen1.slot_id },
+  })
 
   let appointment4ProcessTeen1 = await prisma.appointment.create({
     data: {
@@ -978,6 +1041,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processTeen1.id, appointment_slot_id: appointment4ProcessTeen1.slot_id },
+  })
 
   let appointment5ProcessTeen1 = await prisma.appointment.create({
     data: {
@@ -988,6 +1054,9 @@ async function seed() {
       slot_end_date: new Date("2023-02-04T11:00:00.000Z"),
       active: true,
     },
+  })
+  await prisma.appointment_process.create({
+    data: { process_id: processTeen1.id, appointment_slot_id: appointment5ProcessTeen1.slot_id },
   })
 
   // archive appointment
@@ -1117,6 +1186,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processAdult1.id, appointment_slot_id: appointment1ProcessAdult1.slot_id },
+  })
 
   let appointment2ProcessAdult1 = await prisma.appointment.create({
     data: {
@@ -1127,6 +1199,9 @@ async function seed() {
       slot_end_date: new Date("2023-02-01T11:00:00.000Z"),
       active: true,
     },
+  })
+  await prisma.appointment_process.create({
+    data: { process_id: processAdult1.id, appointment_slot_id: appointment2ProcessAdult1.slot_id },
   })
 
   let appointment3ProcessAdult1 = await prisma.appointment.create({
@@ -1139,6 +1214,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processAdult1.id, appointment_slot_id: appointment3ProcessAdult1.slot_id },
+  })
 
   let appointment4ProcessAdult1 = await prisma.appointment.create({
     data: {
@@ -1150,6 +1228,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processAdult1.id, appointment_slot_id: appointment4ProcessAdult1.slot_id },
+  })
 
   let appointment5ProcessAdult1 = await prisma.appointment.create({
     data: {
@@ -1160,6 +1241,9 @@ async function seed() {
       slot_end_date: new Date("2023-02-04T11:00:00.000Z"),
       active: true,
     },
+  })
+  await prisma.appointment_process.create({
+    data: { process_id: processAdult1.id, appointment_slot_id: appointment5ProcessAdult1.slot_id },
   })
 
   // archive appointment
@@ -1285,6 +1369,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processElder1.id, appointment_slot_id: appointment1ProcessElder1.slot_id },
+  })
 
   let appointment2ProcessElder1 = await prisma.appointment.create({
     data: {
@@ -1295,6 +1382,9 @@ async function seed() {
       slot_end_date: new Date("2023-02-01T12:00:00.000Z"),
       active: true,
     },
+  })
+  await prisma.appointment_process.create({
+    data: { process_id: processElder1.id, appointment_slot_id: appointment2ProcessElder1.slot_id },
   })
 
   let appointment3ProcessElder1 = await prisma.appointment.create({
@@ -1307,6 +1397,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processElder1.id, appointment_slot_id: appointment3ProcessElder1.slot_id },
+  })
 
   let appointment4ProcessElder1 = await prisma.appointment.create({
     data: {
@@ -1318,6 +1411,9 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: { process_id: processElder1.id, appointment_slot_id: appointment4ProcessElder1.slot_id },
+  })
 
   let appointment5ProcessElder1 = await prisma.appointment.create({
     data: {
@@ -1328,6 +1424,9 @@ async function seed() {
       slot_end_date: new Date("2023-02-04T12:00:00.000Z"),
       active: true,
     },
+  })
+  await prisma.appointment_process.create({
+    data: { process_id: processElder1.id, appointment_slot_id: appointment5ProcessElder1.slot_id },
   })
 
   // archive appointment
@@ -1457,6 +1556,12 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processFamily1.id,
+      appointment_slot_id: appointment1ProcessFamily1.slot_id,
+    },
+  })
 
   let appointment2ProcessFamily1 = await prisma.appointment.create({
     data: {
@@ -1466,6 +1571,12 @@ async function seed() {
       slot_start_date: new Date("2023-02-01T11:00:00.000Z"),
       slot_end_date: new Date("2023-02-01T12:00:00.000Z"),
       active: true,
+    },
+  })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processFamily1.id,
+      appointment_slot_id: appointment2ProcessFamily1.slot_id,
     },
   })
 
@@ -1479,6 +1590,12 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processFamily1.id,
+      appointment_slot_id: appointment3ProcessFamily1.slot_id,
+    },
+  })
 
   let appointment4ProcessFamily1 = await prisma.appointment.create({
     data: {
@@ -1490,6 +1607,12 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processFamily1.id,
+      appointment_slot_id: appointment4ProcessFamily1.slot_id,
+    },
+  })
 
   let appointment5ProcessFamily1 = await prisma.appointment.create({
     data: {
@@ -1499,6 +1622,12 @@ async function seed() {
       slot_start_date: new Date("2023-02-04T11:00:00.000Z"),
       slot_end_date: new Date("2023-02-04T12:00:00.000Z"),
       active: true,
+    },
+  })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processFamily1.id,
+      appointment_slot_id: appointment5ProcessFamily1.slot_id,
     },
   })
 
@@ -1625,6 +1754,12 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processCouple1.id,
+      appointment_slot_id: appointment1ProcessCouple1.slot_id,
+    },
+  })
 
   let appointment2ProcessCouple1 = await prisma.appointment.create({
     data: {
@@ -1634,6 +1769,12 @@ async function seed() {
       slot_start_date: new Date("2023-02-01T11:00:00.000Z"),
       slot_end_date: new Date("2023-02-01T12:00:00.000Z"),
       active: true,
+    },
+  })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processCouple1.id,
+      appointment_slot_id: appointment2ProcessCouple1.slot_id,
     },
   })
 
@@ -1647,6 +1788,12 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processCouple1.id,
+      appointment_slot_id: appointment3ProcessCouple1.slot_id,
+    },
+  })
 
   let appointment4ProcessCouple1 = await prisma.appointment.create({
     data: {
@@ -1658,6 +1805,12 @@ async function seed() {
       active: true,
     },
   })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processCouple1.id,
+      appointment_slot_id: appointment4ProcessCouple1.slot_id,
+    },
+  })
 
   let appointment5ProcessCouple1 = await prisma.appointment.create({
     data: {
@@ -1667,6 +1820,12 @@ async function seed() {
       slot_start_date: new Date("2023-02-04T11:00:00.000Z"),
       slot_end_date: new Date("2023-02-04T12:00:00.000Z"),
       active: true,
+    },
+  })
+  await prisma.appointment_process.create({
+    data: {
+      process_id: processCouple1.id,
+      appointment_slot_id: appointment5ProcessCouple1.slot_id,
     },
   })
 
