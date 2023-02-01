@@ -14,11 +14,10 @@ RUN npm install --silent
 COPY . .
 
 RUN npx prisma generate
-RUN npm run prisma:seed 
 RUN npm run build
 
 EXPOSE 8080 
 
-ENTRYPOINT ["/bin/sh", "-c" , "npx prisma db push --skip-generate && npm start"]
+ENTRYPOINT ["/bin/sh", "-c" , "npm run prisma:seed && npm run prisma:push --skip-generate && npm start"]
 
 
