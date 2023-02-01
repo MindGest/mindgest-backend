@@ -12,12 +12,6 @@ export async function getUsers(req: Request, res: Response) {
       let users = await prisma.person.findMany({
         where: { id: { not: id } },
         include: {
-          patient: {
-            include: {
-              school: true,
-              profession: true,
-            },
-          },
           intern: true,
           therapist: true,
           accountant: true,
