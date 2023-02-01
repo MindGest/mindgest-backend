@@ -36,11 +36,7 @@ export async function getUsers(req: Request, res: Response) {
 }
 
 export async function getAllTherapists(req: Request, res: Response) {
-  /**
-   * Returns the name and id of every therapist.
-   */
   try {
-    // TODO: check authorization
 
     let infoToReturn = []
 
@@ -67,12 +63,7 @@ export async function getAllTherapists(req: Request, res: Response) {
 }
 
 export async function getAllInterns(req: Request, res: Response) {
-  /**
-   * Returns the name and id of every intern.
-   */
   try {
-    // TODO: check authorization
-
     let infoToReturn = []
 
     // obtain the ids of the therapists

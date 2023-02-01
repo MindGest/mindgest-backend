@@ -98,8 +98,9 @@ patient.put(
   controller.editCoupleOrFamilyPatient
 )
 
+
 patient.put(
-  "/archive-patient",
+  "/archive",
   middleware.requestValidator(schemas.ArchivePatientSchema),
   controller.archivePatient
 )
