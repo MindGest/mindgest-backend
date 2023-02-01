@@ -17,7 +17,6 @@ receipt.get("/list", controller.list)
 
 receipt.get("/:processId/list", controller.listProcess)
 
-
 receipt.get("/:receiptId/info", controller.info)
 
 // receipt.get("/:appointmentId", controller.fetch)
