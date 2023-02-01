@@ -219,7 +219,7 @@ export async function createChildPatient(
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (!callerIsAdmin) {
+    if (!callerIsAdmin && !(callerRole == "therapist") && !(callerRole == "intern")) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You are not allowed to sail in these waters.",
       })
@@ -285,7 +285,7 @@ export async function createTeenPatient(
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (!callerIsAdmin) {
+    if (!callerIsAdmin && !(callerRole == "therapist") && !(callerRole == "intern")) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "Your ship is not built for these seas.",
       })
@@ -351,7 +351,7 @@ export async function createAdultOrElderOrCoupleOrFamilyPatient(
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    if (!callerIsAdmin) {
+    if (!callerIsAdmin && !(callerRole == "therapist") && !(callerRole == "intern")) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "You shall not PASSS!",
       })

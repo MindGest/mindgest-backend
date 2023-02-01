@@ -22,6 +22,7 @@ export async function getUsers(req: Request, res: Response) {
           therapist: true,
           accountant: true,
           guard: true,
+          admin: true,
         },
       })
       return res.status(StatusCodes.OK).json({
