@@ -1,4 +1,3 @@
-import cookieParser from "cookie-parser"
 import { Router } from "express"
 
 import controller from "../controllers/notification.controller"
@@ -14,7 +13,8 @@ notification.use(authMiddleware.authorize())
 
 notification.get("/list", controller.list)
 
-notification.post("/:id/mark", controller.mark)
+notification.get("/:id/info", controller.info)
+notification.put("/:id/mark", controller.mark)
 notification.put("/:id/settle", controller.settle)
 
 notification.post(

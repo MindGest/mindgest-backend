@@ -50,8 +50,7 @@ export async function listPatients(req: Request, res: Response) {
     let processes = []
     if (callerRole == "admin") {
       processes = await prisma.process.findMany()
-    }
-    else if (callerRole == "therapist") {
+    } else if (callerRole == "therapist") {
       let therapist_process = await prisma.therapist_process.findMany({
         where: { therapist_person_id: callerId },
       })
@@ -72,13 +71,17 @@ export async function listPatients(req: Request, res: Response) {
     }
 
     // obtain the set of unique patient ids from the processes
-    let patientIdsSet = new Set<number>();
-    for (let process of processes){
-      if (process == null){continue;}
+    let patientIdsSet = new Set<number>()
+    for (let process of processes) {
+      if (process == null) {
+        continue
+      }
       // get the patients
-      let patient_process = await prisma.patient_process.findMany({where: {process_id: process.id}});
-      for (let patientId of patient_process){
-        patientIdsSet.add(Number(patientId.patient_person_id));
+      let patient_process = await prisma.patient_process.findMany({
+        where: { process_id: process.id },
+      })
+      for (let patientId of patient_process) {
+        patientIdsSet.add(Number(patientId.patient_person_id))
       }
     }
 
@@ -885,10 +888,7 @@ async function privateGetPatientType(patientId: number) {
   return patientType?.type
 }
 
-async function buildInfoChildOrTeenPatient(
-  patientId: number,
-  patientTypeName: string
-) {
+async function buildInfoChildOrTeenPatient(patientId: number, patientTypeName: string) {
   /**
    * build a json with the information of the teen or child patient of the given id.
    */
@@ -965,10 +965,7 @@ async function buildInfoChildOrTeenPatient(
   return patientInfo
 }
 
-async function buildInfoAdultOrElderPatient(
-  patientId: number,
-  patientTypeName: string
-) {
+async function buildInfoAdultOrElderPatient(patientId: number, patientTypeName: string) {
   /**
    * build a json with the information of the adult or elder patient of the given id.
    */

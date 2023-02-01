@@ -12,7 +12,6 @@ import {
 
 import logger from "../utils/logger"
 import { randomUUID } from "crypto"
-import notification from "../routes/notification.route"
 
 export async function mark(req: Request<MarkNotificationQueryParams>, res: Response) {
   // Authorizing User
@@ -62,7 +61,7 @@ export async function mark(req: Request<MarkNotificationQueryParams>, res: Respo
   }
 }
 
-export async function settle(req: Request, res: Response) {
+export async function settle(req: Request<MarkNotificationQueryParams>, res: Response) {
   // Authorizing User
   const { id, role, admin } = res.locals.token
   logger.info(
@@ -140,6 +139,45 @@ export async function list(req: Request<{}, {}, {}, NotificationListQueryParams>
   }
 }
 
+export async function info(req: Request<MarkNotificationQueryParams>, res: Response) {
+  // Authorizing User
+  const { id, role, admin } = res.locals.token
+  logger.info(`NOTIFICATION [user-id: ${id}] => Authorization to fetch notification granted...`)
+  try {
+    // Fetch Notification
+    const notification = await prisma.notifications.findUnique({
+      where: { id: Number(req.params.id) },
+    })
+
+    if (notification === null || notification === undefined) {
+      logger.info(`NOTIFICATION [user-id: ${id}] => Notification not found!`)
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Notification with id '${req.params.id}' not found.`,
+      })
+    }
+
+    if (notification.person_id !== id) {
+      logger.info(`NOTIFICATION [user-id: ${id}] => Notification does not belong to this user!`)
+      return res.status(StatusCodes.FORBIDDEN).json({
+        message: `Notification with id '${req.params.id}' does not belong to user '${id}'`,
+      })
+    }
+
+    logger.info(
+      `NOTIFICATION [user-id: ${id}] => Successfully retrieved notification ${req.params.id}!`
+    )
+    res.status(StatusCodes.OK).json({
+      message: "Notification Retrieved Successfully",
+      data: notification,
+    })
+  } catch (error) {
+    logger.error(`LIST NOTIFICATIONS => Server Error: ${error}`)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 export async function create(req: Request<{}, {}, NotificationBody>, res: Response) {
   // Authorizing User
   const { id, role, admin } = res.locals.token
@@ -177,4 +215,4 @@ export async function create(req: Request<{}, {}, NotificationBody>, res: Respon
   }
 }
 
-export default { mark, list, create, settle }
+export default { mark, list, create, settle, info }
