@@ -80,6 +80,7 @@ export async function infoLiable(req: Request<{liableId: string}, {}, {}>, res: 
                 email: liable?.email,
                 remarks: liable?.remarks,
                 phoneNumber: liable?.phonenumber,
+                liableId: liable?.id,
             },
         })
 
@@ -120,6 +121,7 @@ export async function listLiables(req: Request, res: Response){
                 email: liable?.email,
                 remarks: liable?.remarks,
                 phoneNumber: liable?.phonenumber,
+                liableId: liable?.id,
             })
         }
 
