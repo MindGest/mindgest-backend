@@ -871,6 +871,41 @@ export async function getPatientType(req: Request<{}, {}, GetPatientTypeBody>, r
   }
 }
 
+// retornar todos os tipos de pacientes
+export async function getPatientTypes(req: Request, res: Response){
+  try {
+    var decodedToken = res.locals.token
+
+    // obtain the caller properties
+    var callerId = decodedToken.id
+    var callerRole = decodedToken.role
+    var callerIsAdmin = decodedToken.admin
+
+    let isAnAuthorizedIntern = false
+    let patientId = req.body.patientId
+
+    // if admin, therapist, or an authorized intern, let them retrieve this information
+    if (!callerIsAdmin && !(callerRole == "therapist") && !(callerRole == "intern")) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "You are not allowed to access this information.",
+      })
+    }
+
+    // get all the types
+    let patientTypes = await prisma.patienttype.findMany({});
+
+    res.status(StatusCodes.OK).json({
+      data: {
+        patientTypes: patientTypes,
+      },
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 async function privateGetPatientType(patientId: number) {
   // get some of the patient info
   let patient = await prisma.patient.findFirst({ where: { person_id: patientId } })
@@ -1097,4 +1132,5 @@ export default {
   editCoupleOrFamilyPatient,
   archivePatient,
   listNamePatients,
+  getPatientTypes,
 }

@@ -104,4 +104,6 @@ patient.put(
   controller.archivePatient
 )
 
+patient.get("/types", controller.getPatientTypes)
+
 export default patient
