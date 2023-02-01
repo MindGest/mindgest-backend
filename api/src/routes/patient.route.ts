@@ -18,25 +18,16 @@ patient.get("/list", controller.listPatients)
 patient.get("/types", controller.getPatientTypes)
 
 /// Patient Specific Endpoints
-patient.post(
-  "/:patientId/info",
-  controller.getPatientInfo
-)
+patient.post("/:patientId/info", controller.getPatientInfo)
 
 patient
   .route("/:patientId/picture")
   .get(controller.downloadProfilePicture)
   .put(controller.uploadProfilePicture)
 
-patient.put(
-  "/:patientId/archive",
-  controller.archivePatient
-)
+patient.put("/:patientId/archive", controller.archivePatient)
 
-patient.post(
-  "/:patientId/type",
-  controller.getPatientType
-)
+patient.post("/:patientId/type", controller.getPatientType)
 
 // Create/Edit Patients
 

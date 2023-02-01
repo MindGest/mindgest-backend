@@ -843,7 +843,7 @@ export async function getPatientType(req: Request<{ patientId: number }>, res: R
 }
 
 // retornar todos os tipos de pacientes
-export async function getPatientTypes(req: Request<{patientId: number}>, res: Response) {
+export async function getPatientTypes(req: Request<{ patientId: number }>, res: Response) {
   try {
     var decodedToken = res.locals.token
 
