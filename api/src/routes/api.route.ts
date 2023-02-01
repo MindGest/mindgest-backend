@@ -17,7 +17,8 @@ import SpecialityRouter from "./speciality.route"
 import EmailRouter from "./email.route"
 import PatientRouter from "./patient.route"
 import PermissionRouter from "./permission.route"
-import NotificationRouter from "./notification.route"
+import Notification from "./notification.route"
+import Liable from "./liable.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
@@ -65,7 +66,8 @@ api.use("/statistics", StatisticsRouter)
 api.use("/speciality", SpecialityRouter)
 api.use("/patient", PatientRouter)
 api.use("/permissions", PermissionRouter)
-api.use("/notification", NotificationRouter)
+api.use("/notification", Notification)
+api.use("/liable", Liable)
 
 // Healthcheck
 api.get("/healthcheck", controller.healthCheck)

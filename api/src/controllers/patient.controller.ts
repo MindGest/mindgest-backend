@@ -803,7 +803,6 @@ async function buildInfoChildOrTeenPatient(patientId: number, patientTypeName: s
 
   let school = await prisma.school.findFirst({ where: { patient_person_id: patientId } })
 
-
   let patientInfo = null
   if (patientTypeName == TEEN_PATIENT) {
     patientInfo = {
@@ -863,7 +862,6 @@ async function buildInfoAdultOrElderPatient(patientId: number, patientTypeName: 
   let patient = await prisma.patient.findFirst({ where: { person_id: patientId } })
 
   let profession = await prisma.profession.findFirst({ where: { patient_person_id: patientId } })
-
 
   let patientInfo = {
     name: person?.name,

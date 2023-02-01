@@ -94,3 +94,5 @@ export type GetCollaboratorsBody = z.TypeOf<typeof schemas.GetCollaboratorsSchem
 export type ProcessMigrationSchemaBody = z.TypeOf<typeof schemas.ProcessMigrationSchema>["body"]
 
 export type UpdateNoteBody = z.TypeOf<typeof schemas.NotesUpdate>["body"]
+
+export type CreateLiableBody = z.TypeOf<typeof schemas.CreateLiableSchema>["body"]
