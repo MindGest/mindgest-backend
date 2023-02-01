@@ -405,7 +405,6 @@ export const GetPatientTypeSchema = z.object({
 export const GetPatientInfoSchema = z.object({
   body: z.object({
     patientId: z.number(),
-    processId: z.number(),
   }),
 })
 
@@ -498,7 +497,7 @@ export const EditChildPatientSchema = z.object({
 
     grade: z.number(),
     school: z.string(),
-    careTakers: z.array(EditCareTakerSchema),
+    // careTakers: z.array(EditCareTakerSchema),
   }),
 })
 
@@ -523,7 +522,7 @@ export const EditTeenPatientSchema = z.object({
     grade: z.number(),
     school: z.string(),
     course: z.string(),
-    careTakers: z.array(EditCareTakerSchema),
+    // careTakers: z.array(EditCareTakerSchema),
   }),
 })
 
@@ -546,7 +545,7 @@ export const EditAdultPatientSchema = z.object({
     patientTypeId: z.number(),
 
     profession: z.string(),
-    careTakers: z.array(EditCareTakerSchema),
+    // careTakers: z.array(EditCareTakerSchema),
   }),
 })
 

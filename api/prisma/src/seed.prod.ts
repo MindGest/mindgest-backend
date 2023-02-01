@@ -384,18 +384,6 @@ async function seed() {
     },
   })
 
-  let patientTypeFamily = await prisma.patienttype.create({
-    data: {
-      type: "family",
-    },
-  })
-
-  let patientTypeCouple = await prisma.patienttype.create({
-    data: {
-      type: "couple",
-    },
-  })
-
   // patients
   // child
   let personChild1 = await prisma.person.create({
@@ -515,7 +503,7 @@ async function seed() {
       health_number: 123456787,
       request: "Problemas com o filho",
       remarks: "Os pais dizem que o filho não os respeita e quando chamado à atenção faz birra.",
-      patienttype_id: patientTypeFamily.id,
+      patienttype_id: patientTypeAdult.id,
     },
   })
   // 2
@@ -539,7 +527,7 @@ async function seed() {
       health_number: 123456787,
       request: "Problemas com o filho",
       remarks: "Os pais dizem que o filho não os respeita e quando chamado à atenção faz birra.",
-      patienttype_id: patientTypeFamily.id,
+      patienttype_id: patientTypeAdult.id,
     },
   })
   // 3
@@ -563,7 +551,7 @@ async function seed() {
       health_number: 123456787,
       request: "Problemas com o filho",
       remarks: "Os pais dizem que o filho não os respeita e quando chamado à atenção faz birra.",
-      patienttype_id: patientTypeFamily.id,
+      patienttype_id: patientTypeChild.id,
     },
   })
   // couple
@@ -588,7 +576,7 @@ async function seed() {
       health_number: 123456787,
       request: "Problemas no relacionamento",
       remarks: "Os membros do casal dizem estar a perder a ligação.",
-      patienttype_id: patientTypeCouple.id,
+      patienttype_id: patientTypeAdult.id,
     },
   })
   // 2
@@ -612,7 +600,7 @@ async function seed() {
       health_number: 123456787,
       request: "Problemas no relacionamento",
       remarks: "Os membros do casal dizem estar a perder a ligação.",
-      patienttype_id: patientTypeCouple.id,
+      patienttype_id: patientTypeAdult.id,
     },
   })
 

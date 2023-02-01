@@ -51,7 +51,6 @@ export async function listPatients(req: Request, res: Response) {
     if (callerRole == "admin") {
       processes = await prisma.process.findMany()
     }
-    // código repetido, mas já não quero saber ahhaha
     else if (callerRole == "therapist") {
       let therapist_process = await prisma.therapist_process.findMany({
         where: { therapist_person_id: callerId },
@@ -72,38 +71,30 @@ export async function listPatients(req: Request, res: Response) {
       }
     }
 
-    // for each process
-    let infoToReturn = []
-    for (let i = 0; i < processes.length; i++) {
-      // get the main therapist name
-      let permission = await prisma.permissions.findFirst({
-        where: { process_id: processes[i]?.id, isMain: true },
-      })
-      let mainTherapist = await prisma.person.findFirst({
-        where: { id: permission?.person_id },
-      })
-      // get the patient names
-      let patient_process = await prisma.patient_process.findMany({
-        where: { process_id: processes[i]?.id },
-      })
-
-      // get the info of each patient in the process
-      for (let e = 0; e < patient_process.length; e++) {
-        let patientId = Number(patient_process[e].patient_person_id)
-        let processId = Number(patient_process[e].process_id)
-        // get the type of patient, because the info  of each type may differ.
-        let patientTypeName = await privateGetPatientType(patientId)
-        let data = null
-
-        if (patientTypeName == CHILD_PATIENT || patientTypeName == TEEN_PATIENT) {
-          data = await buildInfoChildOrTeenPatient(patientId, processId, patientTypeName)
-        } else if (patientTypeName == ELDER_PATIENT || patientTypeName == ADULT_PATIENT) {
-          data = await buildInfoAdultOrElderPatient(patientId, processId, patientTypeName)
-        } else if (patientTypeName == COUPLE_PATIENT || patientTypeName == FAMILY_PATIENT) {
-          data = buildInfoCoupleOrFamilyPatient(patientId, processId, patientTypeName)
-        }
-        infoToReturn.push(data)
+    // obtain the set of unique patient ids from the processes
+    let patientIdsSet = new Set<number>();
+    for (let process of processes){
+      if (process == null){continue;}
+      // get the patients
+      let patient_process = await prisma.patient_process.findMany({where: {process_id: process.id}});
+      for (let patientId of patient_process){
+        patientIdsSet.add(Number(patientId.patient_person_id));
       }
+    }
+
+    // for each patient
+    let infoToReturn = []
+    for (let patientId of patientIdsSet) {
+      // get the type of patient, because the info  of each type may differ.
+      let patientTypeName = await privateGetPatientType(patientId)
+      let data = null
+
+      if (patientTypeName == CHILD_PATIENT || patientTypeName == TEEN_PATIENT) {
+        data = await buildInfoChildOrTeenPatient(patientId, patientTypeName)
+      } else if (patientTypeName == ELDER_PATIENT || patientTypeName == ADULT_PATIENT) {
+        data = await buildInfoAdultOrElderPatient(patientId, patientTypeName)
+      }
+      infoToReturn.push(data)
     }
 
     res.status(StatusCodes.OK).json({
@@ -116,29 +107,10 @@ export async function listPatients(req: Request, res: Response) {
   }
 }
 
-export async function listNamePatients(req: Request, res: Response) {
-  let names = []
-
-  let allPatitentsIds = await prisma.patient.findMany({})
-  for (let id of allPatitentsIds) {
-    let name = await prisma.person.findUnique({
-      where: {
-        id: id.person_id,
-      },
-    })
-    names.push({ name: name?.name, id: name?.id })
-  }
-
-  return res.status(StatusCodes.OK).json({
-    message: names,
-  })
-}
-
 // retornar info de um paciente dado o seu id.
 export async function getPatientInfo(req: Request<{}, {}, GetPatientInfoBody>, res: Response) {
   /**
    * return the information of the patient associated with the given id.
-   * The specific process must be specified, given that care takers are associated with the process and not the patient.
    */
   try {
     var decodedToken = res.locals.token
@@ -150,7 +122,6 @@ export async function getPatientInfo(req: Request<{}, {}, GetPatientInfoBody>, r
 
     let isAnAuthorizedIntern = false
     let patientId = req.body.patientId
-    let processId = req.body.processId
 
     // if intern, verify if he is in a process with this patient
     if (callerRole == "intern") {
@@ -189,11 +160,9 @@ export async function getPatientInfo(req: Request<{}, {}, GetPatientInfoBody>, r
     let data = null
 
     if (patientTypeName == CHILD_PATIENT || patientTypeName == TEEN_PATIENT) {
-      data = await buildInfoChildOrTeenPatient(patientId, processId, patientTypeName)
+      data = await buildInfoChildOrTeenPatient(patientId, patientTypeName)
     } else if (patientTypeName == ELDER_PATIENT || patientTypeName == ADULT_PATIENT) {
-      data = await buildInfoAdultOrElderPatient(patientId, processId, patientTypeName)
-    } else if (patientTypeName == COUPLE_PATIENT || patientTypeName == FAMILY_PATIENT) {
-      data = buildInfoCoupleOrFamilyPatient(patientId, processId, patientTypeName)
+      data = await buildInfoAdultOrElderPatient(patientId, patientTypeName)
     }
 
     res.status(StatusCodes.OK).json({
@@ -339,7 +308,7 @@ export async function createTeenPatient(
 }
 
 // criar paciente (adulto, idoso, casal, familia)
-export async function createAdultOrElderOrCoupleOrFamilyPatient(
+export async function createAdultOrElderPatient(
   req: Request<{}, {}, CreateAdultPatientBody>,
   res: Response
 ) {
@@ -482,7 +451,7 @@ export async function editChildPatient(req: Request<{}, {}, EditChildPatientBody
     })
 
     // update care takers
-    updateCareTakers(req.body.careTakers)
+    // updateCareTakers(req.body.careTakers)
 
     res.status(StatusCodes.OK).json({
       message: "Patient updated with success.",
@@ -575,7 +544,7 @@ export async function editTeenPatient(req: Request<{}, {}, EditTeenPatientBody>,
     })
 
     // update care takers
-    updateCareTakers(req.body.careTakers)
+    // updateCareTakers(req.body.careTakers)
 
     res.status(StatusCodes.OK).json({
       message: "Patient updated with success.",
@@ -669,7 +638,7 @@ export async function editAdultOrElderPatient(
     })
 
     // update care takers
-    updateCareTakers(req.body.careTakers)
+    // updateCareTakers(req.body.careTakers)
 
     res.status(StatusCodes.OK).json({
       message: "Patient updated with success.",
@@ -682,95 +651,95 @@ export async function editAdultOrElderPatient(
 }
 
 // update couple and family
-export async function editCoupleOrFamilyPatient(
-  req: Request<{}, {}, EditCoupleOrFamilyPatientBody>,
-  res: Response
-) {
-  try {
-    var decodedToken = res.locals.token
+// export async function editCoupleOrFamilyPatient(
+//   req: Request<{}, {}, EditCoupleOrFamilyPatientBody>,
+//   res: Response
+// ) {
+//   try {
+//     var decodedToken = res.locals.token
 
-    // obtain the caller properties
-    var callerId = decodedToken.id
-    var callerRole = decodedToken.role
-    var callerIsAdmin = decodedToken.admin
+//     // obtain the caller properties
+//     var callerId = decodedToken.id
+//     var callerRole = decodedToken.role
+//     var callerIsAdmin = decodedToken.admin
 
-    // check authorizations
-    // allow admins, therapist and intern (that have edit permissions) associated in the given process.
+//     // check authorizations
+//     // allow admins, therapist and intern (that have edit permissions) associated in the given process.
 
-    let canEdit = false
-    let processId = req.body.processId
+//     let canEdit = false
+//     let processId = req.body.processId
 
-    // check permission therapist
-    if (callerRole == "therapist") {
-      let therapist_process = await prisma.therapist_process.findFirst({
-        where: { therapist_person_id: callerId, process_id: processId },
-      })
-      if (therapist_process != null) {
-        canEdit = true
-      }
-    }
-    // check permission intern
-    else if (callerRole == "intern") {
-      let permission = await prisma.permissions.findFirst({
-        where: { person_id: callerId, process_id: processId },
-      })
-      if (permission != null && permission.editpatitent) {
-        canEdit = true
-      }
-    }
+//     // check permission therapist
+//     if (callerRole == "therapist") {
+//       let therapist_process = await prisma.therapist_process.findFirst({
+//         where: { therapist_person_id: callerId, process_id: processId },
+//       })
+//       if (therapist_process != null) {
+//         canEdit = true
+//       }
+//     }
+//     // check permission intern
+//     else if (callerRole == "intern") {
+//       let permission = await prisma.permissions.findFirst({
+//         where: { person_id: callerId, process_id: processId },
+//       })
+//       if (permission != null && permission.editpatitent) {
+//         canEdit = true
+//       }
+//     }
 
-    if (!callerIsAdmin && !canEdit) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You don't have what it takes to wield this power!",
-      })
-    }
+//     if (!callerIsAdmin && !canEdit) {
+//       return res.status(StatusCodes.UNAUTHORIZED).json({
+//         message: "You don't have what it takes to wield this power!",
+//       })
+//     }
 
-    // update person
-    await prisma.person.update({
-      where: { id: req.body.patientId },
-      data: {
-        name: req.body.name,
-        email: req.body.email,
-        address: req.body.address,
-        birth_date: req.body.birthDate,
-        photo: req.body.photo,
-        phone_number: req.body.phoneNumber,
-        tax_number: req.body.taxNumber,
-      },
-    })
+//     // update person
+//     await prisma.person.update({
+//       where: { id: req.body.patientId },
+//       data: {
+//         name: req.body.name,
+//         email: req.body.email,
+//         address: req.body.address,
+//         birth_date: req.body.birthDate,
+//         photo: req.body.photo,
+//         phone_number: req.body.phoneNumber,
+//         tax_number: req.body.taxNumber,
+//       },
+//     })
 
-    // update the patient
-    await prisma.patient.update({
-      where: { person_id: req.body.patientId },
-      data: {
-        health_number: req.body.healthNumber,
-        request: req.body.request,
-        remarks: req.body.remarks,
-        patienttype_id: req.body.patientTypeId,
-      },
-    })
+//     // update the patient
+//     await prisma.patient.update({
+//       where: { person_id: req.body.patientId },
+//       data: {
+//         health_number: req.body.healthNumber,
+//         request: req.body.request,
+//         remarks: req.body.remarks,
+//         patienttype_id: req.body.patientTypeId,
+//       },
+//     })
 
-    // update profession
-    let profession = await prisma.profession.findFirst({
-      where: { patient_person_id: req.body.patientId },
-    })
+//     // update profession
+//     let profession = await prisma.profession.findFirst({
+//       where: { patient_person_id: req.body.patientId },
+//     })
 
-    await prisma.profession.update({
-      where: { id: profession?.id },
-      data: {
-        name: req.body.profession,
-      },
-    })
+//     await prisma.profession.update({
+//       where: { id: profession?.id },
+//       data: {
+//         name: req.body.profession,
+//       },
+//     })
 
-    res.status(StatusCodes.OK).json({
-      message: "Patient updated with success.",
-    })
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "Ups... Something went wrong",
-    })
-  }
-}
+//     res.status(StatusCodes.OK).json({
+//       message: "Patient updated with success.",
+//     })
+//   } catch (error) {
+//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+//       message: "Ups... Something went wrong",
+//     })
+//   }
+// }
 
 // archive patient
 // lets archive and activate a patient
@@ -918,7 +887,6 @@ async function privateGetPatientType(patientId: number) {
 
 async function buildInfoChildOrTeenPatient(
   patientId: number,
-  processId: number,
   patientTypeName: string
 ) {
   /**
@@ -932,21 +900,21 @@ async function buildInfoChildOrTeenPatient(
   let school = await prisma.school.findFirst({ where: { patient_person_id: patientId } })
 
   // obtain information about the care takers
-  let careTakers = await prisma.process_liable.findMany({ where: { process_id: processId } })
+  // let careTakers = await prisma.process_liable.findMany({ where: { process_id: processId } })
 
-  // for each care taker
-  let careTakersInfo = []
-  for (let i = 0; i < careTakers.length; i++) {
-    let careTaker = await prisma.liable.findFirst({ where: { id: careTakers[i].liable_id } })
-    careTakersInfo.push({
-      name: careTaker?.name,
-      email: careTaker?.email,
-      phoneNumber: careTaker?.phonenumber,
-      type: careTaker?.type,
-      remarks: careTaker?.remarks,
-      careTakerId: careTaker?.id,
-    })
-  }
+  // // for each care taker
+  // let careTakersInfo = []
+  // for (let i = 0; i < careTakers.length; i++) {
+  //   let careTaker = await prisma.liable.findFirst({ where: { id: careTakers[i].liable_id } })
+  //   careTakersInfo.push({
+  //     name: careTaker?.name,
+  //     email: careTaker?.email,
+  //     phoneNumber: careTaker?.phonenumber,
+  //     type: careTaker?.type,
+  //     remarks: careTaker?.remarks,
+  //     careTakerId: careTaker?.id,
+  //   })
+  // }
 
   let patientInfo = null
   if (patientTypeName == TEEN_PATIENT) {
@@ -969,7 +937,7 @@ async function buildInfoChildOrTeenPatient(
       grade: school?.grade,
       school: school?.name,
       course: school?.course,
-      careTakers: careTakersInfo,
+      // careTakers: careTakersInfo,
     }
   } else if (patientTypeName == CHILD_PATIENT) {
     patientInfo = {
@@ -990,7 +958,7 @@ async function buildInfoChildOrTeenPatient(
       patientTypeName: patientTypeName,
       grade: school?.grade,
       school: school?.name,
-      careTakers: careTakersInfo,
+      // careTakers: careTakersInfo,
     }
   }
 
@@ -999,7 +967,6 @@ async function buildInfoChildOrTeenPatient(
 
 async function buildInfoAdultOrElderPatient(
   patientId: number,
-  processId: number,
   patientTypeName: string
 ) {
   /**
@@ -1013,21 +980,21 @@ async function buildInfoAdultOrElderPatient(
   let profession = await prisma.profession.findFirst({ where: { patient_person_id: patientId } })
 
   // obtain information about the care takers
-  let careTakers = await prisma.process_liable.findMany({ where: { process_id: processId } })
+  // let careTakers = await prisma.process_liable.findMany({ where: { process_id: processId } })
 
   // for each care taker
-  let careTakersInfo = []
-  for (let i = 0; i < careTakers.length; i++) {
-    let careTaker = await prisma.liable.findFirst({ where: { id: careTakers[i].liable_id } })
-    careTakersInfo.push({
-      name: careTaker?.name,
-      email: careTaker?.email,
-      phoneNumber: careTaker?.phonenumber,
-      type: careTaker?.type,
-      remarks: careTaker?.remarks,
-      careTakerId: careTaker?.id,
-    })
-  }
+  // let careTakersInfo = []
+  // for (let i = 0; i < careTakers.length; i++) {
+  //   let careTaker = await prisma.liable.findFirst({ where: { id: careTakers[i].liable_id } })
+  //   careTakersInfo.push({
+  //     name: careTaker?.name,
+  //     email: careTaker?.email,
+  //     phoneNumber: careTaker?.phonenumber,
+  //     type: careTaker?.type,
+  //     remarks: careTaker?.remarks,
+  //     careTakerId: careTaker?.id,
+  //   })
+  // }
 
   let patientInfo = {
     name: person?.name,
@@ -1046,7 +1013,7 @@ async function buildInfoAdultOrElderPatient(
     remarks: patient?.remarks,
     patientTypeName: patientTypeName,
     profession: profession?.name,
-    careTakers: careTakersInfo,
+    // careTakers: careTakersInfo,
   }
 
   return patientInfo
@@ -1125,12 +1092,11 @@ export default {
   getPatientType,
   createChildPatient,
   createTeenPatient,
-  createAdultOrElderOrCoupleOrFamilyPatient,
+  createAdultOrElderPatient,
   editChildPatient,
   editTeenPatient,
   editAdultOrElderPatient,
-  editCoupleOrFamilyPatient,
+  //editCoupleOrFamilyPatient,
   archivePatient,
-  listNamePatients,
   getPatientTypes,
 }
