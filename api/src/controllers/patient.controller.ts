@@ -3,16 +3,12 @@ import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
 
 import {
-  GetPatientTypeBody,
-  GetPatientInfoBody,
   CreateChildPatientBody,
   CreateTeenPatientBody,
   CreateAdultPatientBody,
   EditChildPatientBody,
   EditTeenPatientBody,
   EditAdultPatientBody,
-  ArchivePatientBody,
-  EditCoupleOrFamilyPatientBody,
   EditCareTaker,
 } from "../utils/types"
 import logger from "../utils/logger"
@@ -114,7 +110,7 @@ export async function listPatients(req: Request, res: Response) {
 }
 
 // retornar info de um paciente dado o seu id.
-export async function getPatientInfo(req: Request<{}, {}, GetPatientInfoBody>, res: Response) {
+export async function getPatientInfo(req: Request<{ patientId: number }>, res: Response) {
   /**
    * return the information of the patient associated with the given id.
    */
@@ -127,7 +123,7 @@ export async function getPatientInfo(req: Request<{}, {}, GetPatientInfoBody>, r
     var callerIsAdmin = decodedToken.admin
 
     let isAnAuthorizedIntern = false
-    let patientId = req.body.patientId
+    let patientId = req.params.patientId
 
     // if intern, verify if he is in a process with this patient
     if (callerRole == "intern") {
@@ -749,7 +745,7 @@ export async function editAdultOrElderPatient(
 
 // archive patient
 // lets archive and activate a patient
-export async function archivePatient(req: Request<{}, {}, ArchivePatientBody>, res: Response) {
+export async function archivePatient(req: Request<{ patientId: number }>, res: Response) {
   try {
     var decodedToken = res.locals.token
 
@@ -768,7 +764,7 @@ export async function archivePatient(req: Request<{}, {}, ArchivePatientBody>, r
     }
 
     // flip the state of the patient
-    let person = await prisma.person.findFirst({ where: { id: req.body.patientId } })
+    let person = await prisma.person.findFirst({ where: { id: req.params.patientId } })
 
     await prisma.person.update({
       where: { id: req.body.patientId },
@@ -788,7 +784,7 @@ export async function archivePatient(req: Request<{}, {}, ArchivePatientBody>, r
 }
 
 // retornar o tipo de um paciente (pode dar jeito)
-export async function getPatientType(req: Request<{}, {}, GetPatientTypeBody>, res: Response) {
+export async function getPatientType(req: Request<{ patientId: number }>, res: Response) {
   try {
     var decodedToken = res.locals.token
 
@@ -798,7 +794,7 @@ export async function getPatientType(req: Request<{}, {}, GetPatientTypeBody>, r
     var callerIsAdmin = decodedToken.admin
 
     let isAnAuthorizedIntern = false
-    let patientId = req.body.patientId
+    let patientId = req.params.patientId
 
     // if intern, verify if he is in a process with this patient
     if (callerRole == "intern") {
@@ -847,7 +843,7 @@ export async function getPatientType(req: Request<{}, {}, GetPatientTypeBody>, r
 }
 
 // retornar todos os tipos de pacientes
-export async function getPatientTypes(req: Request, res: Response) {
+export async function getPatientTypes(req: Request<{patientId: number}>, res: Response) {
   try {
     var decodedToken = res.locals.token
 
@@ -857,7 +853,7 @@ export async function getPatientTypes(req: Request, res: Response) {
     var callerIsAdmin = decodedToken.admin
 
     let isAnAuthorizedIntern = false
-    let patientId = req.body.patientId
+    let patientId = req.params.patientId
 
     // if admin, therapist, or an authorized intern, let them retrieve this information
     if (!callerIsAdmin && !(callerRole == "therapist") && !(callerRole == "intern")) {

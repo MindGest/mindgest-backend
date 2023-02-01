@@ -84,16 +84,12 @@ export type EmailSchema = z.TypeOf<typeof schemas.EmailSchema>["body"]
 export type GetPermissionsBody = z.TypeOf<typeof schemas.GetPermissionsSchema>["body"]
 export type EditPermissionsBody = z.TypeOf<typeof schemas.EditPermissionsSchema>["body"]
 
-export type GetPatientTypeBody = z.TypeOf<typeof schemas.GetPatientTypeSchema>["body"]
-export type GetPatientInfoBody = z.TypeOf<typeof schemas.GetPatientInfoSchema>["body"]
 export type CreateChildPatientBody = z.TypeOf<typeof schemas.CreateChildPatientSchema>["body"]
-
 export type CreateTeenPatientBody = z.TypeOf<typeof schemas.CreateTeenPatientSchema>["body"]
 export type CreateAdultPatientBody = z.TypeOf<typeof schemas.CreateAdultPatientSchema>["body"]
 export type EditChildPatientBody = z.TypeOf<typeof schemas.EditChildPatientSchema>["body"]
 export type EditTeenPatientBody = z.TypeOf<typeof schemas.EditTeenPatientSchema>["body"]
 export type EditAdultPatientBody = z.TypeOf<typeof schemas.EditAdultPatientSchema>["body"]
-export type ArchivePatientBody = z.TypeOf<typeof schemas.ArchivePatientSchema>["body"]
 export type EditCoupleOrFamilyPatientBody = z.TypeOf<
   typeof schemas.EditCoupleOrFamilyPatientSchema
 >["body"]

@@ -396,18 +396,6 @@ export const EditPermissionsSchema = z.object({
   }),
 })
 
-export const GetPatientTypeSchema = z.object({
-  body: z.object({
-    patientId: z.number(),
-  }),
-})
-
-export const GetPatientInfoSchema = z.object({
-  body: z.object({
-    patientId: z.number(),
-  }),
-})
-
 export const EditCareTakerSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -571,12 +559,6 @@ export const EditCoupleOrFamilyPatientSchema = z.object({
   }),
 })
 
-export const ArchivePatientSchema = z.object({
-  body: z.object({
-    patientId: z.number(),
-  }),
-})
-
 export const GetAvailableRoomsSchema = z.object({
   body: z.object({
     startDate: DateSchema,
@@ -632,15 +614,12 @@ export default {
   EmailSchema,
   GetPermissionsSchema,
   EditPermissionsSchema,
-  GetPatientTypeSchema,
-  GetPatientInfoSchema,
   CreateChildPatientSchema,
   CreateTeenPatientSchema,
   CreateAdultPatientSchema,
   EditChildPatientSchema,
   EditTeenPatientSchema,
   EditAdultPatientSchema,
-  ArchivePatientSchema,
   EditCareTakerSchema,
   EditCoupleOrFamilyPatientSchema,
   GetAvailableRoomsSchema,
