@@ -37,7 +37,6 @@ export async function getUsers(req: Request, res: Response) {
 
 export async function getAllTherapists(req: Request, res: Response) {
   try {
-
     let infoToReturn = []
 
     // obtain the ids of the therapists
