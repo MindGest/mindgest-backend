@@ -6,8 +6,6 @@ import logger from "../utils/logger"
 
 import { ReceiptFilterQuery } from "../utils/types"
 
-import { receipt } from "@prisma/client"
-
 export async function create(req: Request, res: Response) {
   // Authorizing User
   const { id, role, admin } = res.locals.token

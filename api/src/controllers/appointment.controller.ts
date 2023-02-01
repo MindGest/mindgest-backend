@@ -10,7 +10,6 @@ import {
   AppointmentInfo,
   AppointmentEdit,
 } from "../utils/types"
-import { min } from "moment"
 
 export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>, res: Response) {
   /**

@@ -1,8 +1,7 @@
 import { Router, Request, Response } from "express"
 
 import ProfileEditRouter from "./profile.edit.route"
-import AdminEditRouter from "./admin.edit.route"
-
+import AdminEditRouter from "./admin.route"
 import NotificationRouter from "./notification.route"
 
 import authMiddleware from "../middleware/auth.middleware"
