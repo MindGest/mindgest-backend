@@ -26,7 +26,7 @@ admin
 
 admin
   .route("/info")
-  .put(middleware.requestValidator(schemas.EditProfileSchema), controller.editUserProfileInfo)
+  .put(middleware.requestValidator(schemas.EditProfileParamsSchema), controller.editUserProfileInfo)
   .get(
     middleware.requestValidator(schemas.EditProfileParamsSchema),
     controller.fetchUserProfileInfo

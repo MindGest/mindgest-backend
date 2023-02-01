@@ -150,7 +150,7 @@ export const GuardUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: 
 export const AccountantUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: z.number() }))
 export const InternUpdateSchema = PersonUpdateSchema
 
-export const SelfEditProfileSchema = z.object({
+export const EditProfileSchema = z.object({
   body: z.union([
     AdminSchema.strict(),
     GuardSchema.strict(),
@@ -187,24 +187,6 @@ export const EditProfileParamsSchema = z.object({
         .transform((s) => Number(s)),
     })
     .strict(),
-})
-
-export const EditProfileSchema = z.object({
-  params: z
-    .object({
-      user: z
-        .string()
-        .min(1)
-        .transform((s) => Number(s)),
-    })
-    .strict(),
-  body: z.union([
-    AdminUpdateSchema.strict(),
-    GuardUpdateSchema.strict(),
-    TherapistUpdateSchema.strict(),
-    InternUpdateSchema.strict(),
-    AccountantUpdateSchema.strict(),
-  ]),
 })
 
 export const ProcessIDSchema = z.object({
@@ -601,7 +583,6 @@ export default {
   GuardSchema,
   AdminSchema,
   InternSchema,
-  SelfEditProfileSchema,
   EditProfileParamsSchema,
   ProcessIDSchema,
   QueryListProcess,

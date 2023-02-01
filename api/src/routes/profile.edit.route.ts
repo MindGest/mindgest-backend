@@ -14,7 +14,7 @@ profile
 
 profile
   .route("/info")
-  .put(middleware.requestValidator(schemas.SelfEditProfileSchema), controller.editProfileInfo)
+  .put(middleware.requestValidator(schemas.EditProfileSchema), controller.editProfileInfo)
   .get(controller.fetchProfileInfo)
 
 export default profile

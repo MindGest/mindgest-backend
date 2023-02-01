@@ -1,5 +1,5 @@
-import z, { TypeOf } from "zod"
-import schemas, { SelfEditProfileSchema } from "./schemas"
+import z from "zod"
+import schemas from "./schemas"
 
 export type DateSchema = z.infer<typeof schemas.DateSchema>
 
@@ -48,21 +48,12 @@ export type ProcessEditPermissionsBody = z.TypeOf<
 export type AppointmentEdit = z.TypeOf<typeof schemas.AppointmentEditSchema>["body"]
 
 export type EditProfileBody = z.TypeOf<typeof schemas.EditProfileSchema>["body"]
-export type EditProfileParams = z.TypeOf<typeof schemas.EditProfileSchema>["params"]
 
-export type TherapistUpdateBody = z.TypeOf<typeof schemas.TherapistUpdateSchema>
-export type InternUpdateBody = z.TypeOf<typeof schemas.InternUpdateSchema>
-export type GuardUpdateBody = z.TypeOf<typeof schemas.GuardUpdateSchema>
-export type AccountantUpdateBody = z.TypeOf<typeof schemas.AccountantUpdateSchema>
-export type AdminUpdateBody = z.TypeOf<typeof schemas.AdminUpdateSchema>
-
-export type SelfEditProfileBody = z.TypeOf<typeof schemas.SelfEditProfileSchema>["body"]
-
-export type SelfTherapistUpdateBody = z.TypeOf<typeof schemas.TherapistSchema>
-export type SelfInternUpdateBody = z.TypeOf<typeof schemas.InternSchema>
-export type SelfGuardUpdateBody = z.TypeOf<typeof schemas.GuardSchema>
-export type SelfAccountantUpdateBody = z.TypeOf<typeof schemas.AccountantSchema>
-export type SelfAdminUpdateBody = z.TypeOf<typeof schemas.AdminSchema>
+export type TherapistUpdateBody = z.TypeOf<typeof schemas.TherapistSchema>
+export type InternUpdateBody = z.TypeOf<typeof schemas.InternSchema>
+export type GuardUpdateBody = z.TypeOf<typeof schemas.GuardSchema>
+export type AccountantUpdateBody = z.TypeOf<typeof schemas.AccountantSchema>
+export type AdminUpdateBody = z.TypeOf<typeof schemas.AdminSchema>
 
 export type MarkNotificationQueryParams = { id: Number }
 
