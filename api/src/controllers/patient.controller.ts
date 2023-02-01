@@ -841,7 +841,7 @@ export async function getPatientType(req: Request<{}, {}, GetPatientTypeBody>, r
 }
 
 // retornar todos os tipos de pacientes
-export async function getPatientTypes(req: Request, res: Response){
+export async function getPatientTypes(req: Request, res: Response) {
   try {
     var decodedToken = res.locals.token
 
@@ -861,7 +861,7 @@ export async function getPatientTypes(req: Request, res: Response){
     }
 
     // get all the types
-    let patientTypes = await prisma.patienttype.findMany({});
+    let patientTypes = await prisma.patienttype.findMany({})
 
     res.status(StatusCodes.OK).json({
       data: {

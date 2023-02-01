@@ -38,11 +38,7 @@ const NODE_ENV = String(process.env.NODE_ENV)
 const api = Router()
 
 // Middleware
-api.use(
-  helmet({
-    crossOriginResourcePolicy: false,
-  })
-)
+api.use(helmet())
 api.use(express.json())
 api.use(
   cors({

@@ -12,12 +12,7 @@ export async function getUsers(req: Request, res: Response) {
       let users = await prisma.person.findMany({
         where: { id: { not: id } },
         include: {
-          patient: {
-            include: {
-              school: true,
-              profession: true,
-            },
-          },
+          patient: true,
           intern: true,
           therapist: true,
           accountant: true,
@@ -27,7 +22,7 @@ export async function getUsers(req: Request, res: Response) {
       })
       return res.status(StatusCodes.OK).json({
         message: "Successfully retrieved a user list",
-        info: users,
+        info: users.filter((user) => !user.patient),
       })
     }
     res.status(StatusCodes.FORBIDDEN).json({
@@ -41,12 +36,7 @@ export async function getUsers(req: Request, res: Response) {
 }
 
 export async function getAllTherapists(req: Request, res: Response) {
-  /**
-   * Returns the name and id of every therapist.
-   */
   try {
-    // TODO: check authorization
-
     let infoToReturn = []
 
     // obtain the ids of the therapists
@@ -72,12 +62,7 @@ export async function getAllTherapists(req: Request, res: Response) {
 }
 
 export async function getAllInterns(req: Request, res: Response) {
-  /**
-   * Returns the name and id of every intern.
-   */
   try {
-    // TODO: check authorization
-
     let infoToReturn = []
 
     // obtain the ids of the therapists

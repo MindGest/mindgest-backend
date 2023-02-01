@@ -40,9 +40,6 @@ function start(app: express.Application) {
 // Express Application
 const app = express()
 
-// Security
-app.disable("x-powered-by")
-
 // Routes
 
 /// MindGest API Route
