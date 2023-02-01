@@ -201,26 +201,25 @@ export async function editUserProfileInfo(
 ) {
   try {
     // Authenticate / Authorize User
-    logger.info(
-      `EDIT-PROFILE [user-id: ${req.params.user}] => Access granted to Admin User. Editing profile...`
-    )
+    const { id, role, isAdmin } = res.locals.token
+    logger.info(`EDIT-PROFILE [user-id: ${id}] => Access granted to Admin User. Editing profile...`)
 
     // Fetch User
     const user = await prisma.person.findUnique({
-      where: { id: Number(req.params.user) },
+      where: { id: req.params.user },
     })
 
     // Check if user exists
     if (!user) {
       logger.debug(
-        `EDIT-PROFILE[user-id: ${req.params.user}] => User with id ${req.params.user} does not exist!`
+        `EDIT-PROFILE[user-id: ${id}] => User with id ${req.params.user} does not exist!`
       )
       return res.status(StatusCodes.NOT_FOUND).json({
         message: "The user you wish to edit does not exist.",
       })
     }
-    const userProps = await fetchPersonProperties(user.id)
 
+    const userProps = await fetchPersonProperties(user.id)
     if (userProps.isAdmin) {
       return res.status(StatusCodes.FORBIDDEN).json({
         message: "This user may not be edited since it has admin privileges too!",
