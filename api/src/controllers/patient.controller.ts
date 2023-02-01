@@ -767,7 +767,7 @@ export async function archivePatient(req: Request<{ patientId: number }>, res: R
     let person = await prisma.person.findFirst({ where: { id: req.params.patientId } })
 
     await prisma.person.update({
-      where: { id: req.body.patientId },
+      where: { id: req.params.patientId },
       data: {
         active: !person?.active,
       },
@@ -843,7 +843,7 @@ export async function getPatientType(req: Request<{ patientId: number }>, res: R
 }
 
 // retornar todos os tipos de pacientes
-export async function getPatientTypes(req: Request<{patientId: number}>, res: Response) {
+export async function getPatientTypes(req: Request<{ patientId: number }>, res: Response) {
   try {
     var decodedToken = res.locals.token
 
