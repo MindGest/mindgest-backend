@@ -12,6 +12,7 @@ export async function getUsers(req: Request, res: Response) {
       let users = await prisma.person.findMany({
         where: { id: { not: id } },
         include: {
+          patient: true,
           intern: true,
           therapist: true,
           accountant: true,
@@ -21,7 +22,7 @@ export async function getUsers(req: Request, res: Response) {
       })
       return res.status(StatusCodes.OK).json({
         message: "Successfully retrieved a user list",
-        info: users,
+        info: users.filter((user) => !user.patient),
       })
     }
     res.status(StatusCodes.FORBIDDEN).json({
