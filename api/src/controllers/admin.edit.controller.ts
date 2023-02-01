@@ -177,7 +177,7 @@ export async function fetchUserProfileInfo(req: Request, res: Response) {
     } else {
       data = base
     }
-    const person = { role: userProps.userRole, ...usr }
+    const person = { role: userProps.userRole, ...data }
 
     // Return information
     assert(person != null)

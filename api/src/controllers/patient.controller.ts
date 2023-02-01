@@ -80,28 +80,30 @@ export async function listPatients(req: Request, res: Response) {
         where: { process_id: processes[i]?.id, isMain: true },
       })
       let mainTherapist = await prisma.person.findFirst({
-        where: { id: permission?.person_id },
-        select: { name: true },
+        where: { id: permission?.person_id }
       })
       // get the patient names
       let patient_process = await prisma.patient_process.findMany({
         where: { process_id: processes[i]?.id },
       })
-      let patientNames = []
+
+      // get the info of each patient in the process
       for (let e = 0; e < patient_process.length; e++) {
-        let patient = await prisma.person.findFirst({
-          where: { id: patient_process[e].patient_person_id },
-          select: { name: true },
-        })
-        patientNames.push(patient?.name)
+        let patientId = Number(patient_process[e].patient_person_id);
+        let processId = Number(patient_process[e].process_id);
+        // get the type of patient, because the info  of each type may differ.
+        let patientTypeName = await privateGetPatientType(patientId)
+        let data = null
+
+        if (patientTypeName == CHILD_PATIENT || patientTypeName == TEEN_PATIENT) {
+          data = await buildInfoChildOrTeenPatient(patientId, processId, patientTypeName)
+        } else if (patientTypeName == ELDER_PATIENT || patientTypeName == ADULT_PATIENT) {
+          data = await buildInfoAdultOrElderPatient(patientId, processId, patientTypeName)
+        } else if (patientTypeName == COUPLE_PATIENT || patientTypeName == FAMILY_PATIENT) {
+          data = buildInfoCoupleOrFamilyPatient(patientId, processId, patientTypeName)
+        }
+        infoToReturn.push(data)
       }
-      // assemble the json of this process
-      infoToReturn.push({
-        mainTherapistName: mainTherapist?.name,
-        patientNames: patientNames,
-        processRefCode: processes[i]?.ref,
-        processId: processes[i]?.id,
-      })
     }
 
     res.status(StatusCodes.OK).json({
@@ -915,6 +917,7 @@ async function buildInfoChildOrTeenPatient(
   if (patientTypeName == TEEN_PATIENT) {
     patientInfo = {
       name: person?.name,
+      id: person?.id,
       email: person?.email,
       address: person?.address,
       birthDate: person?.birth_date,
@@ -936,6 +939,7 @@ async function buildInfoChildOrTeenPatient(
   } else if (patientTypeName == CHILD_PATIENT) {
     patientInfo = {
       name: person?.name,
+      id: person?.id,
       email: person?.email,
       address: person?.address,
       birthDate: person?.birth_date,
@@ -992,6 +996,7 @@ async function buildInfoAdultOrElderPatient(
 
   let patientInfo = {
     name: person?.name,
+    id: person?.id,
     email: person?.email,
     address: person?.address,
     birthDate: person?.birth_date,
@@ -1037,6 +1042,7 @@ async function buildInfoCoupleOrFamilyPatient(
 
     let patientInfo = {
       name: person?.name,
+      id: person?.id,
       email: person?.email,
       address: person?.address,
       birthDate: person?.birth_date,
