@@ -24,6 +24,7 @@ import assert from "assert"
 import { getProfilePicture, saveProfilePicture } from "../services/profile.service"
 import uploadPicture from "../utils/upload"
 
+// FIXME: Fix This
 export async function uploadUserProfilePicture(req: Request, res: Response) {
   try {
     // Upload Profile picture
