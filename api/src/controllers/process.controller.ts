@@ -60,7 +60,11 @@ export async function migrate(
       })
 
       // check if the new therapist is associated with the process already
-      if (await prisma.therapist_process.findFirst({where: {therapist_person_id: newId, process_id: processId}})){
+      if (
+        await prisma.therapist_process.findFirst({
+          where: { therapist_person_id: newId, process_id: processId },
+        })
+      ) {
         // if already associated with the process, simply change the permission to isMain = true
         await prisma.permissions.updateMany({
           where: { person_id: newId, process_id: processId },
@@ -68,20 +72,24 @@ export async function migrate(
         })
       } else {
         // add the therapist to the process
-        await prisma.therapist_process.create({data: {therapist_person_id: newId, process_id: processId}});
+        await prisma.therapist_process.create({
+          data: { therapist_person_id: newId, process_id: processId },
+        })
         // create the permissions in the process for this therapist
-        await prisma.permissions.create({data: {
-          person_id: newId,
-          process_id: processId,
+        await prisma.permissions.create({
+          data: {
+            person_id: newId,
+            process_id: processId,
 
-          editprocess: true,
-          see: true,
-          appoint: true,
-          statitics: true,
-          editpatitent: true,
-          archive: true,
-          isMain: true, // make him the main therapist
-        }})
+            editprocess: true,
+            see: true,
+            appoint: true,
+            statitics: true,
+            editpatitent: true,
+            archive: true,
+            isMain: true, // make him the main therapist
+          },
+        })
       }
 
       // Migration Successful
