@@ -580,7 +580,7 @@ export const CreateLiableSchema = z.object({
     phoneNumber: z.number(),
     type: z.string(),
     remarks: z.string(),
-  })
+  }),
 })
 
 export default {
