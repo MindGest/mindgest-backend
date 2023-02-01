@@ -1,8 +1,9 @@
 import { Router, Request, Response } from "express"
 
-import ProfileRouter from "./profile.route"
-import NotificationRouter from "./notification.route"
+import ProfileEditRouter from "./profile.edit.route"
 import AdminEditRouter from "./admin.edit.route"
+
+import NotificationRouter from "./notification.route"
 
 import authMiddleware from "../middleware/auth.middleware"
 
@@ -14,7 +15,7 @@ const user = Router()
 user.use(authMiddleware.authorize())
 
 // Routes
-user.use("/profile", ProfileRouter)
+user.use("/profile", ProfileEditRouter)
 user.use("/:user/profile", AdminEditRouter)
 user.use("/notifications", NotificationRouter)
 

@@ -24,53 +24,50 @@ import assert from "assert"
 import { getProfilePicture, saveProfilePicture } from "../services/profile.service"
 import uploadPicture from "../utils/upload"
 
-// FIXME: Fix This
 export async function uploadUserProfilePicture(req: Request, res: Response) {
   try {
+    // Authenticate / Authorize User
+    const { id } = res.locals.token
+    logger.info(`UPLOAD [user-id: ${id}] => User's profile picture upload by admin authorized.`)
+
     // Upload Profile picture
-    uploadPicture(req, res, (err) => {
+    uploadPicture(req, res, async (err) => {
       if (err) {
         logger.debug(`UPLOAD [user-id: ${id}] => Upload Failed. Invalid file format!`)
         return res.status(StatusCodes.FORBIDDEN).json({
           message: "Invalid picture format (must be jpg, png, jpeg)",
         })
       }
-    })
 
-    // Authenticate / Authorize User
-    const { id } = res.locals.token
-    logger.info(`UPLOAD [user-id: ${id}] => User's profile picture upload by admin authorized.`)
+      // Fetch user
+      const user = await prisma.person.findUnique({
+        where: { id: Number(req.params.user) },
+      })
 
-    // Fetch user
-    const user = await prisma.person.findUnique({
-      where: { id: Number(req.params.user) },
-    })
+      // Check if user exists
+      if (!user) {
+        logger.debug(`UPLOAD [user-id: ${id}] => User with id ${req.params.user} does not exist!`)
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "The user you wish to edit does not exist.",
+        })
+      }
 
-    // Check if user exists
-    if (!user) {
+      // Save File, Update Database
       logger.debug(
-        `UPLOAD [user-id: ${req.params.user}] => User with id ${req.params.user} does not exist!`
+        `UPLOAD [user-id: ${id}] => Saving user's [user-id: ${user.id}] profile picture & updating database`
       )
-      return res.status(StatusCodes.NOT_FOUND).json({
-        message: "The user you wish to edit does not exist.",
-      })
-    }
+      const picture = req.file
+      if (picture === null || picture === undefined) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Picture is missing in the request",
+        })
+      }
+      saveProfilePicture(Number(user.id), picture)
 
-    // Save File, Update Database
-    logger.debug(
-      `UPLOAD [user-id: ${id}] => Saving user's [user-id: ${user.id}] profile picture & updating database`
-    )
-    const picture = req.file
-    if (picture === null || picture === undefined) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Picture is missing in the request",
+      logger.info(`UPLOAD [user-id: ${id}] => Upload successful!`)
+      return res.status(StatusCodes.CREATED).json({
+        message: "Profile picture uploaded successfully",
       })
-    }
-    saveProfilePicture(Number(user.id), picture)
-
-    logger.info(`UPLOAD [user-id: ${id}] => Upload successful!`)
-    return res.status(StatusCodes.CREATED).json({
-      message: "Profile picture uploaded successfully",
     })
   } catch (error) {
     logger.error(error)

@@ -1,50 +1,41 @@
-import { Router, Request, Response } from "express"
+import { Router } from "express"
 import controller from "../controllers/patient.controller"
 import authMiddleware from "../middleware/auth.middleware"
 import middleware from "../middleware/api.middleware"
 import schemas from "../utils/schemas"
 
+// Router
 const patient = Router()
 
+// Middleware
 patient.use(authMiddleware.authorize())
 
+// Endpoints
+
+/// General Endpoints
 patient.get("/list", controller.listPatients)
 
-patient.post(
-  "/info",
-  middleware.requestValidator(schemas.GetPatientInfoSchema),
-  controller.getPatientInfo
-)
-
-patient.post(
-  "/type",
-  middleware.requestValidator(schemas.GetPatientTypeSchema),
-  controller.getPatientType
-)
 patient.get("/types", controller.getPatientTypes)
 
+/// Patient Specific Endpoints
+patient.post("/:patientId/info", controller.getPatientInfo)
+
+patient
+  .route("/:patientId/picture")
+  .get(controller.downloadProfilePicture)
+  .put(controller.uploadProfilePicture)
+
+patient.put("/:patientId/archive", controller.archivePatient)
+
+patient.post("/:patientId/type", controller.getPatientType)
+
+// Create/Edit Patients
+
+/// Children
 patient.post(
   "/child/create",
   middleware.requestValidator(schemas.CreateChildPatientSchema),
   controller.createChildPatient
-)
-
-patient.post(
-  "/teen/create",
-  middleware.requestValidator(schemas.CreateTeenPatientSchema),
-  controller.createTeenPatient
-)
-
-patient.post(
-  "/adult/create",
-  middleware.requestValidator(schemas.CreateAdultPatientSchema),
-  controller.createAdultOrElderPatient
-)
-
-patient.post(
-  "/elder/create",
-  middleware.requestValidator(schemas.CreateAdultPatientSchema),
-  controller.createAdultOrElderPatient
 )
 
 patient.put(
@@ -53,10 +44,24 @@ patient.put(
   controller.editChildPatient
 )
 
+/// Teens
+patient.post(
+  "/teen/create",
+  middleware.requestValidator(schemas.CreateTeenPatientSchema),
+  controller.createTeenPatient
+)
+
 patient.put(
   "/teen/edit",
   middleware.requestValidator(schemas.EditTeenPatientSchema),
   controller.editTeenPatient
+)
+
+/// Adults
+patient.post(
+  "/adult/create",
+  middleware.requestValidator(schemas.CreateAdultPatientSchema),
+  controller.createAdultOrElderPatient
 )
 
 patient.put(
@@ -65,16 +70,17 @@ patient.put(
   controller.editAdultOrElderPatient
 )
 
-patient.put(
-  "/elder/elder",
-  middleware.requestValidator(schemas.EditAdultPatientSchema),
-  controller.editAdultOrElderPatient
+/// Elderly
+patient.post(
+  "/elder/create",
+  middleware.requestValidator(schemas.CreateAdultPatientSchema),
+  controller.createAdultOrElderPatient
 )
 
 patient.put(
-  "/archive",
-  middleware.requestValidator(schemas.ArchivePatientSchema),
-  controller.archivePatient
+  "/elder/edit",
+  middleware.requestValidator(schemas.EditAdultPatientSchema),
+  controller.editAdultOrElderPatient
 )
 
 export default patient
