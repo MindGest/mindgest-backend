@@ -908,7 +908,7 @@ async function seed() {
         // 1
         await prisma.process_liable.create({data: {liable_id: liableFather.id, process_id: processTeen1.id}});
         // 2
-        await prisma.process_liable.create({data: {liable_id: liableFather.id, process_id: processTeen1.id}});
+        await prisma.process_liable.create({data: {liable_id: liableMother.id, process_id: processTeen1.id}});
     // add appointments
     let appointment1ProcessTeen1 = await prisma.appointment.create({
         data: {
@@ -1226,7 +1226,7 @@ async function seed() {
             })
     // add liable
         // 1
-        await prisma.process_liable.create({data: {liable_id: liableOther.id, process_id: processChild1.id}});
+        await prisma.process_liable.create({data: {liable_id: liableOther.id, process_id: processElder1.id}});
     // add appointments
     let appointment1ProcessElder1 = await prisma.appointment.create({
         data: {
