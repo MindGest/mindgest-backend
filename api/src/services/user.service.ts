@@ -5,11 +5,6 @@ import {
   AdminUpdateBody,
   GuardUpdateBody,
   InternUpdateBody,
-  SelfAccountantUpdateBody,
-  SelfAdminUpdateBody,
-  SelfGuardUpdateBody,
-  SelfInternUpdateBody,
-  SelfTherapistUpdateBody,
   TherapistUpdateBody,
 } from "../utils/types"
 
@@ -57,44 +52,6 @@ export async function fetchPersonProperties(personId: bigint) {
 export async function updateInfoTherapist(id: number, body: TherapistUpdateBody) {
   await prisma.therapist.update({
     data: {
-      extern: body.extern,
-      license: body.license,
-      health_system: body.healthSystem,
-      person: {
-        update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
-        },
-      },
-    },
-    where: { person_id: id },
-  })
-
-  // Find Speciality
-  const speciality = await prisma.speciality.findUnique({
-    where: {
-      speciality: body.speciality,
-    },
-  })
-
-  // Attach Speciality
-  if (speciality !== null || speciality !== undefined) {
-    await prisma.therapist_speciality.updateMany({
-      where: { therapist_person_id: id },
-      data: { speciality_speciality: body.speciality },
-    })
-  }
-}
-
-export async function selfUpdateInfoTherapist(id: number, body: SelfTherapistUpdateBody) {
-  await prisma.therapist.update({
-    data: {
       license: body.license,
       extern: body.extern,
       health_system: body.healthSystem,
@@ -133,25 +90,6 @@ export async function updateInfoIntern(id: number, body: InternUpdateBody) {
     data: {
       person: {
         update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          phone_number: body.phoneNumber,
-        },
-      },
-    },
-    where: { person_id: id },
-  })
-}
-
-export async function selfUpdateInfoIntern(id: number, body: SelfInternUpdateBody) {
-  await prisma.intern.update({
-    data: {
-      person: {
-        update: {
           address: body.address,
           name: body.name,
           email: body.email,
@@ -166,26 +104,6 @@ export async function selfUpdateInfoIntern(id: number, body: SelfInternUpdateBod
 }
 
 export async function updateInfoAdmin(id: number, body: AdminUpdateBody) {
-  await prisma.admin.update({
-    data: {
-      person: {
-        update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
-        },
-      },
-    },
-    where: { person_id: id },
-  })
-}
-
-export async function selfUpdateInfoAdmin(id: number, body: SelfAdminUpdateBody) {
   await prisma.admin.update({
     data: {
       person: {
@@ -208,26 +126,6 @@ export async function updateInfoGuard(id: number, body: GuardUpdateBody) {
     data: {
       person: {
         update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
-        },
-      },
-    },
-    where: { person_id: id },
-  })
-}
-
-export async function selfUpdateInfoGuard(id: number, body: SelfGuardUpdateBody) {
-  await prisma.guard.update({
-    data: {
-      person: {
-        update: {
           address: body.address,
           name: body.name,
           email: body.email,
@@ -242,27 +140,6 @@ export async function selfUpdateInfoGuard(id: number, body: SelfGuardUpdateBody)
 }
 
 export async function updateInfoAccountant(id: number, body: AccountantUpdateBody) {
-  await prisma.accountant.update({
-    data: {
-      person: {
-        update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
-        },
-      },
-    },
-    where: { person_id: id },
-  })
-}
-
-export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantUpdateBody) {
-  console.log(body.password)
   if (body.password !== UNDEFINED) {
     await prisma.accountant.update({
       data: {
@@ -358,14 +235,8 @@ export async function updateInfoPatient(id: number, body: any) {
 
 export default {
   updateInfoTherapist,
-  selfUpdateInfoTherapist,
   updateInfoGuard,
-  selfUpdateInfoGuard,
-  updateInfoAccountant,
-  selfUpdateInfoAccountant,
   updateInfoIntern,
-  selfUpdateInfoIntern,
   updateInfoAdmin,
-  selfUpdateInfoAdmin,
   updateInfoPatient,
 }

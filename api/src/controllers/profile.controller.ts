@@ -6,16 +6,16 @@ import prisma from "../utils/prisma"
 import logger from "../utils/logger"
 
 import {
-  selfUpdateInfoAccountant,
-  selfUpdateInfoAdmin,
-  selfUpdateInfoGuard,
-  selfUpdateInfoIntern,
-  selfUpdateInfoTherapist,
+  updateInfoAccountant,
+  updateInfoAdmin,
+  updateInfoGuard,
+  updateInfoIntern,
+  updateInfoTherapist,
 } from "../services/user.service"
 
 import { saveProfilePicture, getProfilePicture } from "../services/profile.service"
 
-import { SelfEditProfileBody } from "../utils/types"
+import { EditProfileBody } from "../utils/types"
 import {
   AccountantSchema,
   AdminSchema,
@@ -156,7 +156,7 @@ export async function fetchProfileInfo(req: Request, res: Response) {
   }
 }
 
-export async function editProfileInfo(req: Request<{}, {}, SelfEditProfileBody>, res: Response) {
+export async function editProfileInfo(req: Request<{}, {}, EditProfileBody>, res: Response) {
   try {
     // Authorize User
     const { id, role } = res.locals.token
@@ -165,19 +165,19 @@ export async function editProfileInfo(req: Request<{}, {}, SelfEditProfileBody>,
     // Edit User Profile depending on the user type.
     switch (role) {
       case User.THERAPIST:
-        selfUpdateInfoTherapist(id, TherapistSchema.parse(req.body))
+        updateInfoTherapist(id, TherapistSchema.parse(req.body))
         break
       case User.ACCOUNTANT:
-        selfUpdateInfoAccountant(id, AccountantSchema.parse(req.body))
+        updateInfoAccountant(id, AccountantSchema.parse(req.body))
         break
       case User.GUARD:
-        selfUpdateInfoGuard(id, GuardSchema.parse(req.body))
+        updateInfoGuard(id, GuardSchema.parse(req.body))
         break
       case User.INTERN:
-        selfUpdateInfoIntern(id, InternSchema.parse(req.body))
+        updateInfoIntern(id, InternSchema.parse(req.body))
         break
       case User.ADMIN:
-        selfUpdateInfoAdmin(id, AdminSchema.parse(req.body))
+        updateInfoAdmin(id, AdminSchema.parse(req.body))
         break
     }
 

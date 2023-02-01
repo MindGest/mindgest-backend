@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes"
 
 import prisma from "../utils/prisma"
 import logger from "../utils/logger"
-import { EditProfileBody, EditProfileParams } from "../utils/types"
+import { EditProfileBody } from "../utils/types"
 import {
   fetchPersonProperties,
   updateInfoAccountant,
@@ -13,11 +13,11 @@ import {
   updateInfoTherapist,
 } from "../services/user.service"
 import {
-  AccountantUpdateSchema,
-  AdminUpdateSchema,
-  GuardUpdateSchema,
-  InternUpdateSchema,
-  TherapistUpdateSchema,
+  AccountantSchema,
+  AdminSchema,
+  GuardSchema,
+  InternSchema,
+  TherapistSchema,
   User,
 } from "../utils/schemas"
 import assert from "assert"
@@ -77,7 +77,7 @@ export async function uploadUserProfilePicture(req: Request, res: Response) {
   }
 }
 
-export async function downloadUserProfilePicture(req: Request, res: Response) {
+export async function downloadUserProfilePicture(req: Request<{ user: string }>, res: Response) {
   try {
     // Authenticate / Authorize user
     logger.info(
@@ -111,7 +111,7 @@ export async function downloadUserProfilePicture(req: Request, res: Response) {
   }
 }
 
-export async function fetchUserProfileInfo(req: Request, res: Response) {
+export async function fetchUserProfileInfo(req: Request<{ user: string }>, res: Response) {
   try {
     // Authenticate / Authorized User
     logger.info(
@@ -193,7 +193,7 @@ export async function fetchUserProfileInfo(req: Request, res: Response) {
 }
 
 export async function editUserProfileInfo(
-  req: Request<EditProfileParams, {}, EditProfileBody>,
+  req: Request<{ user: string }, {}, EditProfileBody>,
   res: Response
 ) {
   try {
@@ -203,7 +203,7 @@ export async function editUserProfileInfo(
 
     // Fetch User
     const user = await prisma.person.findUnique({
-      where: { id: req.params.user },
+      where: { id: Number(req.params.user) },
     })
 
     // Check if user exists
@@ -217,7 +217,11 @@ export async function editUserProfileInfo(
     }
 
     const userProps = await fetchPersonProperties(user.id)
+    console.log(userProps)
     if (userProps.isAdmin) {
+      logger.debug(
+        `EDIT-PROFILE[user-id: ${id}] => This user may not be edited since it has admin privileges too!`
+      )
       return res.status(StatusCodes.FORBIDDEN).json({
         message: "This user may not be edited since it has admin privileges too!",
       })
@@ -226,25 +230,30 @@ export async function editUserProfileInfo(
     // Edit User Profile depending on the user type.
     switch (userProps.userRole) {
       case User.THERAPIST:
-        updateInfoTherapist(Number(user.id), TherapistUpdateSchema.parse(req.body))
+        updateInfoTherapist(Number(user.id), TherapistSchema.parse(req.body))
+        break
       case User.ADMIN:
-        updateInfoAdmin(Number(user.id), AdminUpdateSchema.parse(req.body))
+        updateInfoAdmin(Number(user.id), AdminSchema.parse(req.body))
+        break
       case User.ACCOUNTANT:
-        updateInfoAccountant(Number(user.id), AccountantUpdateSchema.parse(req.body))
+        updateInfoAccountant(Number(user.id), AccountantSchema.parse(req.body))
+        break
       case User.GUARD:
-        updateInfoGuard(Number(user.id), GuardUpdateSchema.parse(req.body))
+        updateInfoGuard(Number(user.id), GuardSchema.parse(req.body))
+        break
       case User.INTERN:
-        updateInfoIntern(Number(user.id), InternUpdateSchema.parse(req.body))
+        updateInfoIntern(Number(user.id), InternSchema.parse(req.body))
+        break
     }
 
     // Update complete!
     logger.info(`EDIT-PROFILE [user-id: ${user.id}] => Profile edited successfully!`)
-    return res.status(StatusCodes.OK).json({
+    res.status(StatusCodes.OK).json({
       message: "The user's profile was updated successfully",
     })
   } catch (error) {
     logger.error(error)
-    res.send(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
   }
