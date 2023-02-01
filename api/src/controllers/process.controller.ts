@@ -387,11 +387,15 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
       var ref = process.ref
 
       // get the patients of the process
-      let patient_process = await prisma.patient_process.findMany({where: {process_id: process.id}});
-      let patients = []; // store the names of the patients
-      for (let i = 0; patient_process.length; i++){
-        let person = await prisma.person.findFirst({where: {id: patient_process[i].patient_person_id}});
-        patients.push(person?.name);
+      let patient_process = await prisma.patient_process.findMany({
+        where: { process_id: process.id },
+      })
+      let patients = [] // store the names of the patients
+      for (let i = 0; patient_process.length; i++) {
+        let person = await prisma.person.findFirst({
+          where: { id: patient_process[i].patient_person_id },
+        })
+        patients.push(person?.name)
       }
 
       var appointments = await prisma.appointment_process.findMany({
