@@ -46,9 +46,7 @@ export async function uploadUserProfilePicture(req: Request, res: Response) {
 
       // Check if user exists
       if (!user) {
-        logger.debug(
-          `UPLOAD [user-id: ${id}] => User with id ${req.params.user} does not exist!`
-        )
+        logger.debug(`UPLOAD [user-id: ${id}] => User with id ${req.params.user} does not exist!`)
         return res.status(StatusCodes.NOT_FOUND).json({
           message: "The user you wish to edit does not exist.",
         })
