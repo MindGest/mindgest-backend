@@ -569,6 +569,16 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
       })
     }
 
+    // add liables
+    for (let liableId of req.body.liableIds) {
+      await prisma.process_liable.create({
+        data: {
+          liable_id: liableId,
+          process_id: process.id,
+        },
+      })
+    }
+
     return res.status(StatusCodes.OK).json({
       message: "Process Created!",
     })

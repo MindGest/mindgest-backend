@@ -226,6 +226,7 @@ export const QueryListProcess = z.object({
 export const ProcessCreateSchema = z.object({
   body: z.object({
     patientIds: z.array(z.number()),
+    liableIds: z.array(z.number()),
     therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
@@ -590,6 +591,16 @@ export const GetCollaboratorsSchema = z.object({
   }),
 })
 
+export const CreateLiableSchema = z.object({
+  body: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    phoneNumber: z.number(),
+    type: z.string(),
+    remarks: z.string(),
+  })
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -648,4 +659,5 @@ export default {
   NotificationSchema,
   ProcessMigrationSchema,
   NotesUpdate,
+  CreateLiableSchema,
 }
