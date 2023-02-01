@@ -80,7 +80,7 @@ export async function listPatients(req: Request, res: Response) {
         where: { process_id: processes[i]?.id, isMain: true },
       })
       let mainTherapist = await prisma.person.findFirst({
-        where: { id: permission?.person_id }
+        where: { id: permission?.person_id },
       })
       // get the patient names
       let patient_process = await prisma.patient_process.findMany({
@@ -89,8 +89,8 @@ export async function listPatients(req: Request, res: Response) {
 
       // get the info of each patient in the process
       for (let e = 0; e < patient_process.length; e++) {
-        let patientId = Number(patient_process[e].patient_person_id);
-        let processId = Number(patient_process[e].process_id);
+        let patientId = Number(patient_process[e].patient_person_id)
+        let processId = Number(patient_process[e].process_id)
         // get the type of patient, because the info  of each type may differ.
         let patientTypeName = await privateGetPatientType(patientId)
         let data = null
