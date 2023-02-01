@@ -19,8 +19,6 @@ const CHILD_PATIENT = "child"
 const TEEN_PATIENT = "teen"
 const ADULT_PATIENT = "adult"
 const ELDER_PATIENT = "elder"
-const FAMILY_PATIENT = "family"
-const COUPLE_PATIENT = "couple"
 const DUMMY_PASSWORD = "ImDummyDaBaDeeDaBaDi"
 
 // listar todos os pacientes (nome e tipo talvez idk, preciso para a criação do processo)
@@ -110,7 +108,7 @@ export async function listPatients(req: Request, res: Response) {
 }
 
 // retornar info de um paciente dado o seu id.
-export async function getPatientInfo(req: Request<{ patientId: number }>, res: Response) {
+export async function getPatientInfo(req: Request<{ patientId: string }>, res: Response) {
   /**
    * return the information of the patient associated with the given id.
    */
@@ -123,7 +121,7 @@ export async function getPatientInfo(req: Request<{ patientId: number }>, res: R
     var callerIsAdmin = decodedToken.admin
 
     let isAnAuthorizedIntern = false
-    let patientId = req.params.patientId
+    let patientId = Number(req.params.patientId)
 
     // if intern, verify if he is in a process with this patient
     if (callerRole == "intern") {
@@ -652,100 +650,9 @@ export async function editAdultOrElderPatient(
   }
 }
 
-// update couple and family
-// export async function editCoupleOrFamilyPatient(
-//   req: Request<{}, {}, EditCoupleOrFamilyPatientBody>,
-//   res: Response
-// ) {
-//   try {
-//     var decodedToken = res.locals.token
-
-//     // obtain the caller properties
-//     var callerId = decodedToken.id
-//     var callerRole = decodedToken.role
-//     var callerIsAdmin = decodedToken.admin
-
-//     // check authorizations
-//     // allow admins, therapist and intern (that have edit permissions) associated in the given process.
-
-//     let canEdit = false
-//     let processId = req.body.processId
-
-//     // check permission therapist
-//     if (callerRole == "therapist") {
-//       let therapist_process = await prisma.therapist_process.findFirst({
-//         where: { therapist_person_id: callerId, process_id: processId },
-//       })
-//       if (therapist_process != null) {
-//         canEdit = true
-//       }
-//     }
-//     // check permission intern
-//     else if (callerRole == "intern") {
-//       let permission = await prisma.permissions.findFirst({
-//         where: { person_id: callerId, process_id: processId },
-//       })
-//       if (permission != null && permission.editpatitent) {
-//         canEdit = true
-//       }
-//     }
-
-//     if (!callerIsAdmin && !canEdit) {
-//       return res.status(StatusCodes.UNAUTHORIZED).json({
-//         message: "You don't have what it takes to wield this power!",
-//       })
-//     }
-
-//     // update person
-//     await prisma.person.update({
-//       where: { id: req.body.patientId },
-//       data: {
-//         name: req.body.name,
-//         email: req.body.email,
-//         address: req.body.address,
-//         birth_date: req.body.birthDate,
-//         photo: req.body.photo,
-//         phone_number: req.body.phoneNumber,
-//         tax_number: req.body.taxNumber,
-//       },
-//     })
-
-//     // update the patient
-//     await prisma.patient.update({
-//       where: { person_id: req.body.patientId },
-//       data: {
-//         health_number: req.body.healthNumber,
-//         request: req.body.request,
-//         remarks: req.body.remarks,
-//         patienttype_id: req.body.patientTypeId,
-//       },
-//     })
-
-//     // update profession
-//     let profession = await prisma.profession.findFirst({
-//       where: { patient_person_id: req.body.patientId },
-//     })
-
-//     await prisma.profession.update({
-//       where: { id: profession?.id },
-//       data: {
-//         name: req.body.profession,
-//       },
-//     })
-
-//     res.status(StatusCodes.OK).json({
-//       message: "Patient updated with success.",
-//     })
-//   } catch (error) {
-//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-//       message: "Ups... Something went wrong",
-//     })
-//   }
-// }
-
 // archive patient
 // lets archive and activate a patient
-export async function archivePatient(req: Request<{ patientId: number }>, res: Response) {
+export async function archivePatient(req: Request<{ patientId: string }>, res: Response) {
   try {
     var decodedToken = res.locals.token
 
@@ -753,6 +660,8 @@ export async function archivePatient(req: Request<{ patientId: number }>, res: R
     var callerId = decodedToken.id
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
+
+    let patientId = Number(req.params.patientId)
 
     // check authorizations
     // only admins can archive a patient (why, because I say so.)
@@ -764,10 +673,10 @@ export async function archivePatient(req: Request<{ patientId: number }>, res: R
     }
 
     // flip the state of the patient
-    let person = await prisma.person.findFirst({ where: { id: req.params.patientId } })
+    let person = await prisma.person.findFirst({ where: { id: patientId } })
 
     await prisma.person.update({
-      where: { id: req.params.patientId },
+      where: { id: patientId },
       data: {
         active: !person?.active,
       },
@@ -784,7 +693,7 @@ export async function archivePatient(req: Request<{ patientId: number }>, res: R
 }
 
 // retornar o tipo de um paciente (pode dar jeito)
-export async function getPatientType(req: Request<{ patientId: number }>, res: Response) {
+export async function getPatientType(req: Request<{ patientId: string }>, res: Response) {
   try {
     var decodedToken = res.locals.token
 
@@ -794,7 +703,7 @@ export async function getPatientType(req: Request<{ patientId: number }>, res: R
     var callerIsAdmin = decodedToken.admin
 
     let isAnAuthorizedIntern = false
-    let patientId = req.params.patientId
+    let patientId = Number(req.params.patientId)
 
     // if intern, verify if he is in a process with this patient
     if (callerRole == "intern") {
@@ -843,17 +752,13 @@ export async function getPatientType(req: Request<{ patientId: number }>, res: R
 }
 
 // retornar todos os tipos de pacientes
-export async function getPatientTypes(req: Request<{ patientId: number }>, res: Response) {
+export async function getPatientTypes(req: Request<{ patientId: string }>, res: Response) {
   try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
-    var callerId = decodedToken.id
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
-
-    let isAnAuthorizedIntern = false
-    let patientId = req.params.patientId
 
     // if admin, therapist, or an authorized intern, let them retrieve this information
     if (!callerIsAdmin && !(callerRole == "therapist") && !(callerRole == "intern")) {
@@ -898,22 +803,6 @@ async function buildInfoChildOrTeenPatient(patientId: number, patientTypeName: s
 
   let school = await prisma.school.findFirst({ where: { patient_person_id: patientId } })
 
-  // obtain information about the care takers
-  // let careTakers = await prisma.process_liable.findMany({ where: { process_id: processId } })
-
-  // // for each care taker
-  // let careTakersInfo = []
-  // for (let i = 0; i < careTakers.length; i++) {
-  //   let careTaker = await prisma.liable.findFirst({ where: { id: careTakers[i].liable_id } })
-  //   careTakersInfo.push({
-  //     name: careTaker?.name,
-  //     email: careTaker?.email,
-  //     phoneNumber: careTaker?.phonenumber,
-  //     type: careTaker?.type,
-  //     remarks: careTaker?.remarks,
-  //     careTakerId: careTaker?.id,
-  //   })
-  // }
 
   let patientInfo = null
   if (patientTypeName == TEEN_PATIENT) {
@@ -975,22 +864,6 @@ async function buildInfoAdultOrElderPatient(patientId: number, patientTypeName: 
 
   let profession = await prisma.profession.findFirst({ where: { patient_person_id: patientId } })
 
-  // obtain information about the care takers
-  // let careTakers = await prisma.process_liable.findMany({ where: { process_id: processId } })
-
-  // for each care taker
-  // let careTakersInfo = []
-  // for (let i = 0; i < careTakers.length; i++) {
-  //   let careTaker = await prisma.liable.findFirst({ where: { id: careTakers[i].liable_id } })
-  //   careTakersInfo.push({
-  //     name: careTaker?.name,
-  //     email: careTaker?.email,
-  //     phoneNumber: careTaker?.phonenumber,
-  //     type: careTaker?.type,
-  //     remarks: careTaker?.remarks,
-  //     careTakerId: careTaker?.id,
-  //   })
-  // }
 
   let patientInfo = {
     name: person?.name,
@@ -1156,7 +1029,6 @@ export default {
   editChildPatient,
   editTeenPatient,
   editAdultOrElderPatient,
-  //editCoupleOrFamilyPatient,
   archivePatient,
   getPatientTypes,
   uploadProfilePicture,
