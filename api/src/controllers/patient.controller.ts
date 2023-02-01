@@ -15,6 +15,9 @@ import {
   EditCoupleOrFamilyPatientBody,
   EditCareTaker,
 } from "../utils/types"
+import logger from "../utils/logger"
+import uploadPicture from "../utils/upload"
+import { getProfilePicture, saveProfilePicture } from "../services/profile.service"
 
 const CHILD_PATIENT = "child"
 const TEEN_PATIENT = "teen"
@@ -1083,6 +1086,70 @@ async function updateCareTakers(careTakers: Array<EditCareTaker>) {
   }
 }
 
+export async function uploadProfilePicture(req: Request, res: Response) {
+  try {
+    // Authorize user
+    const { id } = res.locals.token
+    logger.info(`UPLOAD [user-id: ${id}] => Profile Picture upload authorized...`)
+
+    // Upload Profile picture
+    uploadPicture(req, res, (err) => {
+      if (err) {
+        logger.debug(`UPLOAD [user-id: ${id}] => Upload Failed. Invalid file format!`)
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: "Invalid picture format (must be jpg, png, jpeg)",
+        })
+      }
+
+      // Save File, Update Database
+      logger.debug(`UPLOAD [user-id: ${id}] => Saving patient profile picture & updating database`)
+      const picture = req.file
+      if (picture === null || picture === undefined) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Picture is missing in the request",
+        })
+      }
+      saveProfilePicture(id, picture)
+
+      logger.info(`UPLOAD [user-id: ${id}] => Upload successful!`)
+      return res.status(StatusCodes.CREATED).json({
+        message: "Profile picture uploaded successfully",
+      })
+    })
+  } catch (error) {
+    logger.error(error)
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export async function downloadProfilePicture(req: Request, res: Response) {
+  try {
+    // Authorize user
+    const { id } = res.locals.token
+    logger.info(`DOWNLOAD [user-id: ${id}] => Profile picture download authorized...`)
+
+    // Retrieve profile picture path
+    const picture: string = await getProfilePicture(id)
+
+    if (!picture.length) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: "This user does not have a profile picture...",
+      })
+    }
+
+    // Return information
+    logger.info(`DOWNLOAD [user-id: ${id}] => User profile picture retrieved successfully!`)
+    res.status(StatusCodes.OK).download(picture)
+  } catch (error) {
+    logger.error(error)
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 export default {
   listPatients,
   getPatientInfo,
@@ -1096,4 +1163,6 @@ export default {
   //editCoupleOrFamilyPatient,
   archivePatient,
   getPatientTypes,
+  uploadProfilePicture,
+  downloadProfilePicture,
 }

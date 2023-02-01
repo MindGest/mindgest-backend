@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express"
+import { Router } from "express"
 import controller from "../controllers/patient.controller"
 import authMiddleware from "../middleware/auth.middleware"
 import middleware from "../middleware/api.middleware"
@@ -9,6 +9,11 @@ const patient = Router()
 patient.use(authMiddleware.authorize())
 
 patient.get("/list", controller.listPatients)
+
+patient
+  .route("/picture")
+  .get(controller.downloadProfilePicture)
+  .put(controller.uploadProfilePicture)
 
 patient.post(
   "/info",
