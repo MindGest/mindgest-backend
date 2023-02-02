@@ -70,7 +70,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
       name: person.name,
       email: person.email,
       address: person.address,
-      birthDate: person.birth_date,
+      birthDate: person.birth_date.toISOString().slice(0, 10),
       phoneNumber: person.phone_number,
       taxNumber: person.tax_number,
     }
