@@ -10,6 +10,7 @@ import {
   EditTeenPatientBody,
   EditAdultPatientBody,
   EditCareTaker,
+  PatientListQueryParams,
 } from "../utils/types"
 import logger from "../utils/logger"
 import uploadPicture from "../utils/upload"
@@ -22,7 +23,7 @@ const ELDER_PATIENT = "elder"
 const DUMMY_PASSWORD = "ImDummyDaBaDeeDaBaDi"
 
 // listar todos os pacientes (nome e tipo talvez idk, preciso para a criação do processo)
-export async function listPatients(req: Request, res: Response) {
+export async function listPatients(req: Request<{}, {}, {}, PatientListQueryParams>, res: Response) {
   /**
    * if admin, return all
    * if therapist or intern, return the associated patients
@@ -36,6 +37,9 @@ export async function listPatients(req: Request, res: Response) {
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
+    let associated = req.query.associated;
+    let patientIds: number[] = [];
+
     // check authorization for this endpoint
     if (callerRole == "accountant" || callerRole == "guard") {
       return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -43,48 +47,22 @@ export async function listPatients(req: Request, res: Response) {
       })
     }
 
-    // get the processes (the part that is different for the various allowed users in this endpoint)
-    let processes = []
-    if (callerRole == "admin") {
-      processes = await prisma.process.findMany()
-    } else if (callerRole == "therapist") {
-      let therapist_process = await prisma.therapist_process.findMany({
-        where: { therapist_person_id: callerId },
-      })
-      for (let i = 0; i < therapist_process.length; i++) {
-        processes.push(
-          await prisma.process.findFirst({ where: { id: therapist_process[i].process_id } })
-        )
+    // check the filter
+    // get the patient ids
+    if (associated == null || associated == "false"){ // no filter, meaning, return all patients
+      let patients = await prisma.patient.findMany({select: {person_id: true}});
+      for (let patient of patients){
+        patientIds.push(Number(patient.person_id));
       }
-    } else if (callerRole == "intern") {
-      let intern_process = await prisma.intern_process.findMany({
-        where: { intern_person_id: callerId },
-      })
-      for (let i = 0; i < intern_process.length; i++) {
-        processes.push(
-          await prisma.process.findFirst({ where: { id: intern_process[i].process_id } })
-        )
-      }
+    }
+    else if (associated == "true"){ // return only the associated with the caller
+      patientIds = await filterAssociatedPatients(callerId, callerRole);
     }
 
-    // obtain the set of unique patient ids from the processes
-    let patientIdsSet = new Set<number>()
-    for (let process of processes) {
-      if (process == null) {
-        continue
-      }
-      // get the patients
-      let patient_process = await prisma.patient_process.findMany({
-        where: { process_id: process.id },
-      })
-      for (let patientId of patient_process) {
-        patientIdsSet.add(Number(patientId.patient_person_id))
-      }
-    }
 
     // for each patient
     let infoToReturn = []
-    for (let patientId of patientIdsSet) {
+    for (let patientId of patientIds) {
       // get the type of patient, because the info  of each type may differ.
       let patientTypeName = await privateGetPatientType(patientId)
       let data = null
@@ -1015,6 +993,51 @@ export async function downloadProfilePicture(req: Request, res: Response) {
       message: "Ups... Something went wrong",
     })
   }
+}
+
+async function filterAssociatedPatients(callerId: number, callerRole: string){
+  /**
+   * Returns the ids of the patients associated with the userId (therapist, or intern)
+   */
+
+  let processes = [];
+  // get the processes of the caller
+  if (callerRole == "therapist") {
+    let therapist_process = await prisma.therapist_process.findMany({
+      where: { therapist_person_id: callerId },
+    })
+    for (let i = 0; i < therapist_process.length; i++) {
+      processes.push(
+        await prisma.process.findFirst({ where: { id: therapist_process[i].process_id } })
+      )
+    }
+  } else if (callerRole == "intern") {
+    let intern_process = await prisma.intern_process.findMany({
+      where: { intern_person_id: callerId },
+    })
+    for (let i = 0; i < intern_process.length; i++) {
+      processes.push(
+        await prisma.process.findFirst({ where: { id: intern_process[i].process_id } })
+      )
+    }
+  }
+
+  // obtain the set of unique patient ids from the processes
+  let patientIdsSet = new Set<number>()
+  for (let process of processes) {
+    if (process == null) {
+      continue
+    }
+    // get the patients
+    let patient_process = await prisma.patient_process.findMany({
+      where: { process_id: process.id },
+    })
+    for (let patientId of patient_process) {
+      patientIdsSet.add(Number(patientId.patient_person_id))
+    }
+  }
+
+  return Array.from(patientIdsSet);
 }
 
 export default {

@@ -565,6 +565,10 @@ export const CreateLiableSchema = z.object({
   }),
 })
 
+export const PatientFilterSchema = z.object({
+  associated: z.enum(["true", "false"]).optional(),
+})
+
 export default {
   RegistrationSchema,
   LoginSchema,
@@ -620,4 +624,5 @@ export default {
   ProcessMigrationSchema,
   NotesUpdate,
   CreateLiableSchema,
+  PatientFilterSchema,
 }

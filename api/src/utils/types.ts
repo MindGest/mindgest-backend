@@ -96,3 +96,4 @@ export type ProcessMigrationSchemaBody = z.TypeOf<typeof schemas.ProcessMigratio
 export type UpdateNoteBody = z.TypeOf<typeof schemas.NotesUpdate>["body"]
 
 export type CreateLiableBody = z.TypeOf<typeof schemas.CreateLiableSchema>["body"]
+export type PatientListQueryParams = z.TypeOf<typeof schemas.PatientFilterSchema>
