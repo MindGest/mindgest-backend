@@ -289,7 +289,7 @@ export async function approve(req: Request, res: Response) {
     }
 
     // Approve User Account
-    prisma.person.update({
+    await prisma.person.update({
       where: { id: user.id },
       data: {
         approved: true,
