@@ -66,13 +66,20 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
     })
 
     // Build Response Payload
-    let body = {
+    let b = {
       name: person.name,
       email: person.email,
       address: person.address,
       birthDate: person.birth_date.toISOString().slice(0, 10),
       phoneNumber: person.phone_number,
-      taxNumber: person.tax_number,
+    }
+
+    // Jarvardisus Maximus
+    let body = null
+    if (req.body.role !== "intern") {
+      body = { ...b, taxNumber: person.tax_number }
+    } else {
+      body = b
     }
 
     // Create entry in the table, associated with the user's role
