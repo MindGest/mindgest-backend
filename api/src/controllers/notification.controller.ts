@@ -127,7 +127,7 @@ export async function list(req: Request<{}, {}, {}, NotificationListQueryParams>
       return res.status(StatusCodes.OK).json({
         message: "Successfully retrieved all notifications",
         data: await prisma.notifications.findMany({
-          where: {person_id: id}
+          where: { person_id: id },
         }),
       })
     }
