@@ -884,7 +884,7 @@ async function seed() {
   // add receipts
   let receiptAppointment1ProcessChild1 = await prisma.receipt.create({
     data: {
-      ref: `${processChild1.ref}_${appointment1ProcessChild1.archived_date}`,
+      // ref: `${processChild1.ref}_${appointment1ProcessChild1.archived_date}`,
       datetime: new Date(),
       payed: true,
       appointment_slot_id: appointment1ProcessChild1.slot_id,
@@ -1067,7 +1067,7 @@ async function seed() {
   // add receipts
   let receiptAppointment1ProcessTeen1 = await prisma.receipt.create({
     data: {
-      ref: `${processTeen1.ref}_${appointment1ProcessTeen1.archived_date}`,
+      // ref: `${processTeen1.ref}_${appointment1ProcessTeen1.archived_date}`,
       datetime: new Date(),
       payed: true,
       appointment_slot_id: appointment1ProcessTeen1.slot_id,
@@ -1250,7 +1250,7 @@ async function seed() {
   // add receipts
   let receiptAppointment1ProcessAdult1 = await prisma.receipt.create({
     data: {
-      ref: `${processAdult1.ref}_${appointment1ProcessAdult1.archived_date}`,
+      // ref: `${processAdult1.ref}_${appointment1ProcessAdult1.archived_date}`,
       datetime: new Date(),
       payed: true,
       appointment_slot_id: appointment1ProcessAdult1.slot_id,
@@ -1429,7 +1429,7 @@ async function seed() {
   // add receipts
   let receiptAppointment1ProcessElder1 = await prisma.receipt.create({
     data: {
-      ref: `${processElder1.ref}_${appointment1ProcessElder1.archived_date}`,
+      // ref: `${processElder1.ref}_${appointment1ProcessElder1.archived_date}`,
       datetime: new Date(),
       payed: true,
       appointment_slot_id: appointment1ProcessElder1.slot_id,
@@ -1627,7 +1627,7 @@ async function seed() {
   // add receipts
   let receiptAppointment1ProcessFamily1 = await prisma.receipt.create({
     data: {
-      ref: `${processFamily1.ref}_${appointment1ProcessFamily1.archived_date}`,
+      //ref: `${processFamily1.ref}_${appointment1ProcessFamily1.archived_date}`,
       datetime: new Date(),
       payed: true,
       appointment_slot_id: appointment1ProcessFamily1.slot_id,
@@ -1821,7 +1821,7 @@ async function seed() {
   // add receipts
   let receiptAppointment1ProcessCouple1 = await prisma.receipt.create({
     data: {
-      ref: `${processCouple1.ref}_${appointment1ProcessCouple1.archived_date}`,
+      // ref: `${processCouple1.ref}_${appointment1ProcessCouple1.archived_date}`,
       datetime: new Date(),
       payed: true,
       appointment_slot_id: appointment1ProcessCouple1.slot_id,
