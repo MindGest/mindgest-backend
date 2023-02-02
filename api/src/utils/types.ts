@@ -1,5 +1,5 @@
-import z, { TypeOf } from "zod"
-import schemas, { SelfEditProfileSchema } from "./schemas"
+import z from "zod"
+import schemas from "./schemas"
 
 export type DateSchema = z.infer<typeof schemas.DateSchema>
 
@@ -27,11 +27,7 @@ export type AccountVerificationSchema = z.TypeOf<typeof schemas.AccountVerificat
 
 export type ResetPasswordBody = z.TypeOf<typeof schemas.ResetPasswordSchema>["body"]
 
-export type ArchiveProcessBody = z.TypeOf<typeof schemas.ArchiveProcessSchema>["body"]
-
-export type ProcessListBody = z.TypeOf<typeof schemas.ProcessListSchema>["body"]
-
-export type ProcessInfoBody = z.TypeOf<typeof schemas.ProcessInfoSchema>["body"]
+export type ProcessIDPrams = z.TypeOf<typeof schemas.ProcessIDSchema>["params"]
 
 export type ProcessCreateBody = z.TypeOf<typeof schemas.ProcessCreateSchema>["body"]
 
@@ -52,22 +48,52 @@ export type ProcessEditPermissionsBody = z.TypeOf<
 export type AppointmentEdit = z.TypeOf<typeof schemas.AppointmentEditSchema>["body"]
 
 export type EditProfileBody = z.TypeOf<typeof schemas.EditProfileSchema>["body"]
-export type EditProfileParams = z.TypeOf<typeof schemas.EditProfileSchema>["params"]
 
-export type TherapistUpdateBody = z.TypeOf<typeof schemas.TherapistUpdateSchema>
-export type InternUpdateBody = z.TypeOf<typeof schemas.InternUpdateSchema>
-export type GuardUpdateBody = z.TypeOf<typeof schemas.GuardUpdateSchema>
-export type AccountantUpdateBody = z.TypeOf<typeof schemas.AccountantUpdateSchema>
-export type AdminUpdateBody = z.TypeOf<typeof schemas.AdminUpdateSchema>
+export type TherapistUpdateBody = z.TypeOf<typeof schemas.TherapistSchema>
+export type InternUpdateBody = z.TypeOf<typeof schemas.InternSchema>
+export type GuardUpdateBody = z.TypeOf<typeof schemas.GuardSchema>
+export type AccountantUpdateBody = z.TypeOf<typeof schemas.AccountantSchema>
+export type AdminUpdateBody = z.TypeOf<typeof schemas.AdminSchema>
 
-export type SelfEditProfileBody = z.TypeOf<typeof schemas.SelfEditProfileSchema>["body"]
-
-export type SelfTherapistUpdateBody = z.TypeOf<typeof schemas.TherapistSchema>
-export type SelfInternUpdateBody = z.TypeOf<typeof schemas.InternSchema>
-export type SelfGuardUpdateBody = z.TypeOf<typeof schemas.GuardSchema>
-export type SelfAccountantUpdateBody = z.TypeOf<typeof schemas.AccountantSchema>
-export type SelfAdminUpdateBody = z.TypeOf<typeof schemas.AdminSchema>
-
-export type MarkNotificationQueryParams = { notification: Number }
+export type MarkNotificationQueryParams = { id: Number }
 
 export type NotificationListQueryParams = z.TypeOf<typeof schemas.NotificationFilterSchema>
+
+export type QueryListProcess = z.TypeOf<typeof schemas.QueryListProcess>["query"]
+export type ReceiptFilterQuery = z.TypeOf<typeof schemas.ReceiptListQuery>["query"]
+export type QueryListRooms = z.TypeOf<typeof schemas.QueryListRooms>["query"]
+export type StatisticsBody = z.TypeOf<typeof schemas.StatisticsSchema>["body"]
+
+export type NotesCreateBody = z.TypeOf<typeof schemas.NotesCreate>["body"]
+export type RoomCreateBody = z.TypeOf<typeof schemas.RoomCreate>["body"]
+
+export type NotificationBody = z.TypeOf<typeof schemas.NotificationSchema>["body"]
+
+export type SpecialityCreateBody = z.TypeOf<typeof schemas.SpecialityCreateSchema>["body"]
+export type EmailSchema = z.TypeOf<typeof schemas.EmailSchema>["body"]
+
+export type GetPermissionsBody = z.TypeOf<typeof schemas.GetPermissionsSchema>["body"]
+export type EditPermissionsBody = z.TypeOf<typeof schemas.EditPermissionsSchema>["body"]
+
+export type CreateChildPatientBody = z.TypeOf<typeof schemas.CreateChildPatientSchema>["body"]
+export type CreateTeenPatientBody = z.TypeOf<typeof schemas.CreateTeenPatientSchema>["body"]
+export type CreateAdultPatientBody = z.TypeOf<typeof schemas.CreateAdultPatientSchema>["body"]
+export type EditChildPatientBody = z.TypeOf<typeof schemas.EditChildPatientSchema>["body"]
+export type EditTeenPatientBody = z.TypeOf<typeof schemas.EditTeenPatientSchema>["body"]
+export type EditAdultPatientBody = z.TypeOf<typeof schemas.EditAdultPatientSchema>["body"]
+export type EditCoupleOrFamilyPatientBody = z.TypeOf<
+  typeof schemas.EditCoupleOrFamilyPatientSchema
+>["body"]
+
+export type EditCareTaker = z.TypeOf<typeof schemas.EditCareTakerSchema>
+
+export type GetAvailableRoomsBody = z.TypeOf<typeof schemas.GetAvailableRoomsSchema>["body"]
+
+export type GetCollaboratorsBody = z.TypeOf<typeof schemas.GetCollaboratorsSchema>["body"]
+
+export type ProcessMigrationSchemaBody = z.TypeOf<typeof schemas.ProcessMigrationSchema>["body"]
+
+export type UpdateNoteBody = z.TypeOf<typeof schemas.NotesUpdate>["body"]
+
+export type CreateLiableBody = z.TypeOf<typeof schemas.CreateLiableSchema>["body"]
+export type PatientListQueryParams = z.TypeOf<typeof schemas.PatientFilterSchema>

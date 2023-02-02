@@ -5,16 +5,13 @@ import {
   AdminUpdateBody,
   GuardUpdateBody,
   InternUpdateBody,
-  SelfAccountantUpdateBody,
-  SelfAdminUpdateBody,
-  SelfGuardUpdateBody,
-  SelfInternUpdateBody,
-  SelfTherapistUpdateBody,
   TherapistUpdateBody,
 } from "../utils/types"
 
 import prisma from "../utils/prisma"
 import { User } from "../utils/schemas"
+
+let UNDEFINED = "OHMANINHOQUERESPORRADA??!!??!!??"
 
 export async function fetchPersonProperties(personId: bigint) {
   let therapist = await prisma.therapist.findUnique({
@@ -55,65 +52,40 @@ export async function fetchPersonProperties(personId: bigint) {
 export async function updateInfoTherapist(id: number, body: TherapistUpdateBody) {
   await prisma.therapist.update({
     data: {
+      license: body.license,
       extern: body.extern,
-      license: body.license,
+      health_system: body.healthSystem,
       person: {
         update: {
-          active: body.active,
           address: body.address,
           name: body.name,
           email: body.email,
-          approved: body.approved,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
+          tax_number: body.taxNumber,
         },
       },
     },
     where: { person_id: id },
   })
-}
 
-export async function selfUpdateInfoTherapist(id: number, body: SelfTherapistUpdateBody) {
-  await prisma.therapist.update({
-    data: {
-      license: body.license,
-      person: {
-        update: {
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
-          phone_number: body.phoneNumber,
-        },
-      },
+  // Find Speciality
+  const speciality = await prisma.speciality.findUnique({
+    where: {
+      speciality: body.speciality,
     },
-    where: { person_id: id },
   })
+
+  // Attach Speciality
+  if (speciality !== null || speciality !== undefined) {
+    await prisma.therapist_speciality.updateMany({
+      where: { therapist_person_id: id },
+      data: { speciality_speciality: body.speciality },
+    })
+  }
 }
 
 export async function updateInfoIntern(id: number, body: InternUpdateBody) {
-  await prisma.intern.update({
-    data: {
-      person: {
-        update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
-          phone_number: body.phoneNumber,
-        },
-      },
-    },
-    where: { person_id: id },
-  })
-}
-
-export async function selfUpdateInfoIntern(id: number, body: SelfInternUpdateBody) {
   await prisma.intern.update({
     data: {
       person: {
@@ -136,32 +108,10 @@ export async function updateInfoAdmin(id: number, body: AdminUpdateBody) {
     data: {
       person: {
         update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
-        },
-      },
-    },
-    where: { person_id: id },
-  })
-}
-
-export async function selfUpdateInfoAdmin(id: number, body: SelfAdminUpdateBody) {
-  await prisma.admin.update({
-    data: {
-      person: {
-        update: {
           address: body.address,
           name: body.name,
           email: body.email,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
@@ -176,32 +126,10 @@ export async function updateInfoGuard(id: number, body: GuardUpdateBody) {
     data: {
       person: {
         update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
-        },
-      },
-    },
-    where: { person_id: id },
-  })
-}
-
-export async function selfUpdateInfoGuard(id: number, body: SelfGuardUpdateBody) {
-  await prisma.guard.update({
-    data: {
-      person: {
-        update: {
           address: body.address,
           name: body.name,
           email: body.email,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.taxNumber,
         },
@@ -212,43 +140,39 @@ export async function selfUpdateInfoGuard(id: number, body: SelfGuardUpdateBody)
 }
 
 export async function updateInfoAccountant(id: number, body: AccountantUpdateBody) {
-  await prisma.accountant.update({
-    data: {
-      person: {
-        update: {
-          active: body.active,
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          approved: body.approved,
-          birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
+  if (body.password !== UNDEFINED) {
+    await prisma.accountant.update({
+      data: {
+        person: {
+          update: {
+            address: body.address,
+            name: body.name,
+            email: body.email,
+            birth_date: body.birthDate,
+            phone_number: body.phoneNumber,
+            tax_number: body.taxNumber,
+          },
         },
       },
-    },
-    where: { person_id: id },
-  })
-}
-
-export async function selfUpdateInfoAccountant(id: number, body: SelfAccountantUpdateBody) {
-  await prisma.accountant.update({
-    data: {
-      person: {
-        update: {
-          address: body.address,
-          name: body.name,
-          email: body.email,
-          birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
-          phone_number: body.phoneNumber,
-          tax_number: body.taxNumber,
+      where: { person_id: id },
+    })
+  } else {
+    await prisma.accountant.update({
+      data: {
+        person: {
+          update: {
+            address: body.address,
+            name: body.name,
+            email: body.email,
+            birth_date: body.birthDate,
+            phone_number: body.phoneNumber,
+            tax_number: body.taxNumber,
+          },
         },
       },
-    },
-    where: { person_id: id },
-  })
+      where: { person_id: id },
+    })
+  }
 }
 
 export async function updateInfoPatient(id: number, body: any) {
@@ -270,7 +194,6 @@ export async function updateInfoPatient(id: number, body: any) {
           email: body.email,
           approved: body.approved,
           birth_date: body.birthDate,
-          password: await argon2.hash(body.password),
           phone_number: body.phoneNumber,
           tax_number: body.tax_number,
         },
@@ -312,14 +235,8 @@ export async function updateInfoPatient(id: number, body: any) {
 
 export default {
   updateInfoTherapist,
-  selfUpdateInfoTherapist,
   updateInfoGuard,
-  selfUpdateInfoGuard,
-  updateInfoAccountant,
-  selfUpdateInfoAccountant,
   updateInfoIntern,
-  selfUpdateInfoIntern,
   updateInfoAdmin,
-  selfUpdateInfoAdmin,
   updateInfoPatient,
 }

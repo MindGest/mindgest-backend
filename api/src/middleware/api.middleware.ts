@@ -1,8 +1,9 @@
+import { NextFunction, Request, Response } from "express"
 import { AnyZodObject, ZodError } from "zod"
 import { StatusCodes } from "http-status-codes"
 import compression from "compression"
 
-import type { NextFunction, Request, Response } from "express"
+import logger from "../utils/logger"
 
 export function requestValidator(schema: AnyZodObject) {
   return (req: Request<any, any, any>, res: Response, next: NextFunction) => {
@@ -13,6 +14,7 @@ export function requestValidator(schema: AnyZodObject) {
         query: req.query,
       })
     } catch (error) {
+      logger.debug(`BAD REQUEST => ${error}`)
       if (error instanceof ZodError) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           message: "Malformed Request",

@@ -1,12 +1,20 @@
-import { Request, Response } from "express"
 import { Router } from "express"
+
+import controller from "../controllers/receipt.controller"
+
+import authMiddleware from "../middleware/auth.middleware"
+
+//user/accountant/payments: lista de todos os pagamentos, com utente, responsáveis, código da consulta, dia da consulta, e status pago/por pagar
 
 const receipt = Router()
 
-receipt.get("/list", (req: Request, res: Response) => console.log("TODO"))
+// Middleware
+receipt.use(authMiddleware.authorize())
 
-receipt.post("/create", (req: Request, res: Response) => console.log("TODO"))
+// Endpoints
 
-receipt.put("/pay", (req: Request, res: Response) => console.log("TODO"))
+receipt.get("/list", controller.list)
+receipt.get("/:receiptId/info", controller.info)
+receipt.put("/:receiptId/pay", controller.pay)
 
 export default receipt

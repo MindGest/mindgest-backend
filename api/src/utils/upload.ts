@@ -1,4 +1,3 @@
-import { Request } from "express"
 import multer from "multer"
 import fs from "fs"
 import path from "path"
@@ -28,7 +27,7 @@ const uploadPicture = multer({
     callback(null, true)
   },
   limits: {
-    fileSize: 1024 * 1024,
+    fileSize: 10 * 1024 * 1024,
   },
 }).single("picture")
 

@@ -5,15 +5,15 @@ import dotenv from "dotenv"
 
 import { StatusCodes } from "http-status-codes"
 
-dotenv.config()
+dotenv.config({ path: ".env", debug: true })
 
 import api from "./routes/api.route"
 import logger from "./utils/logger"
 import middleware from "./middleware/api.middleware"
 
 // Environment Variables
-const HOST = String(process.env.HOST)
-const PORT = Number(process.env.PORT)
+const HOST = process.env.HOST !== undefined ? String(process.env.HOST) : "localhost"
+const PORT = Number(process.env.PORT) || 8080
 
 // Utilities
 function stop(server: Server) {
@@ -39,9 +39,6 @@ function start(app: express.Application) {
 
 // Express Application
 const app = express()
-
-// Security
-app.disable("x-powered-by")
 
 // Routes
 

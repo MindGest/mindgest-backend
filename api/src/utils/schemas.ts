@@ -8,9 +8,7 @@ export enum User {
   GUARD = "guard",
 }
 
-export const DateSchema = z.preprocess((arg) => {
-  if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
-}, z.date())
+export const DateSchema = z.coerce.date()
 
 export const PersonSchema = z.object({
   name: z.string(),
@@ -23,8 +21,10 @@ export const PersonSchema = z.object({
 
 export const TherapistSchema = z
   .object({
+    extern: z.boolean(),
     healthSystem: z.string().optional(),
     license: z.string(),
+    speciality: z.string(),
   })
   .merge(PersonSchema)
   .merge(z.object({ taxNumber: z.number() }))
@@ -76,8 +76,7 @@ export const RefreshSchema = z.object({
     .object({
       refreshToken: z.string().optional(),
     })
-    .strict()
-    .required(),
+    .strict(),
 })
 
 export const AuthToken = z.object({
@@ -141,7 +140,8 @@ export const TherapistUpdateSchema = z
     healthSystem: z.string().optional(),
     license: z.string(),
     extern: z.boolean(),
-    taxNumber: z.object({ taxNumber: z.number() }),
+    taxNumber: z.number(),
+    speciality: z.string(),
   })
   .merge(PersonUpdateSchema)
 
@@ -150,7 +150,7 @@ export const GuardUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: 
 export const AccountantUpdateSchema = PersonUpdateSchema.merge(z.object({ taxNumber: z.number() }))
 export const InternUpdateSchema = PersonUpdateSchema
 
-export const SelfEditProfileSchema = z.object({
+export const EditProfileSchema = z.object({
   body: z.union([
     AdminSchema.strict(),
     GuardSchema.strict(),
@@ -189,48 +189,26 @@ export const EditProfileParamsSchema = z.object({
     .strict(),
 })
 
-export const EditProfileSchema = z.object({
+export const ProcessIDSchema = z.object({
   params: z
     .object({
-      user: z
-        .string()
-        .min(1)
-        .transform((s) => Number(s)),
+      processId: z.string(),
+      noteId: z.string().optional(),
     })
     .strict(),
-  body: z.union([
-    AdminUpdateSchema.strict(),
-    GuardUpdateSchema.strict(),
-    TherapistUpdateSchema.strict(),
-    InternUpdateSchema.strict(),
-    AccountantUpdateSchema.strict(),
-  ]),
 })
 
-export const ArchiveProcessSchema = z.object({
-  body: z.object({
-    token: z.string(),
-    processId: z.number(),
-  }),
-})
-
-export const ProcessInfoSchema = z.object({
-  body: z.object({
-    token: z.string(),
-    processId: z.number(),
-  }),
-})
-
-export const ProcessListSchema = z.object({
-  body: z.object({
-    token: z.string(),
+export const QueryListProcess = z.object({
+  query: z.object({
+    active: z.string(),
+    speciality: z.string(),
   }),
 })
 
 export const ProcessCreateSchema = z.object({
   body: z.object({
-    token: z.string(),
-    patientId: z.number(),
+    patientIds: z.array(z.number()),
+    liableIds: z.array(z.number()),
     therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
@@ -239,19 +217,18 @@ export const ProcessCreateSchema = z.object({
 
 export const ProcessEditSchema = z.object({
   body: z.object({
-    token: z.string(),
-    therapistId: z.number(),
     speciality: z.string(),
     remarks: z.string(),
     colaborators: z.array(z.number()),
-    processId: z.number(),
   }),
+})
+
+export const ProcessMigrationSchema = z.object({
+  body: z.object({ therapistId: z.number() }).strict(),
 })
 
 export const ProcessEditPermissionsSchema = z.object({
   body: z.object({
-    token: z.string(),
-    processId: z.number(),
     collaboratorId: z.number(),
     appoint: z.boolean(),
     statitics: z.boolean(),
@@ -264,40 +241,36 @@ export const ProcessEditPermissionsSchema = z.object({
 
 export const AppointmentCreateSchema = z.object({
   body: z.object({
-    token: z.string(),
+    processId: z.number(),
     online: z.boolean(),
     roomId: z.number(),
     priceTableId: z.string(),
     startDate: DateSchema,
     endDate: DateSchema,
-    processId: z.number(),
   }),
 })
 
 export const AppointmentArchiveSchema = z.object({
   body: z.object({
-    token: z.string(),
     appointmentId: z.number(),
+    archiveDate: DateSchema,
   }),
 })
 
 export const AppointmentsListSchema = z.object({
   body: z.object({
-    token: z.string(),
     filterId: z.number(), //can either be -1 for all, an id of a therapist for their appointments or of an intern
   }),
 })
 
 export const AppointmentInfoSchema = z.object({
   body: z.object({
-    token: z.string(),
     appointmentId: z.number(),
   }),
 })
 
 export const AppointmentEditSchema = z.object({
   body: z.object({
-    token: z.string(),
     appointmentId: z.number(),
     appointmentStart: DateSchema,
     appointmentEnd: DateSchema,
@@ -306,12 +279,294 @@ export const AppointmentEditSchema = z.object({
 })
 
 export enum NotificationFilterType {
-  READ = "read",
-  UNREAD = "unread",
+  READ = "seen",
+  UNREAD = "unseen",
 }
 
 export const NotificationFilterSchema = z.object({
   filter: z.enum([NotificationFilterType.READ, NotificationFilterType.UNREAD]).optional(),
+})
+
+export const NotificationSchema = z.object({
+  body: z
+    .object({
+      data: z.string(),
+      type: z.string(),
+    })
+    .required(),
+})
+
+export enum ReceiptFilterType {
+  PAYED = "settled",
+  NOT_PAYED = "debt",
+}
+
+export const ReceiptListQuery = z.object({
+  query: z.object({
+    filter: z.enum([ReceiptFilterType.PAYED, ReceiptFilterType.NOT_PAYED]).optional(),
+  }),
+})
+
+export const NotesCreate = z.object({
+  body: z.object({
+    title: z.string(),
+    body: z.string(),
+  }),
+})
+
+export const NotesUpdate = z.object({
+  body: z.object({
+    title: z.string(),
+    body: z.string(),
+  }),
+})
+
+export const QueryListRooms = z.object({
+  query: z.object({
+    date: z.string(),
+    room: z.string(),
+  }),
+})
+
+export const RoomCreate = z.object({
+  body: z.object({
+    name: z.string(),
+  }),
+})
+
+export const StatisticsSchema = z.object({
+  body: z.object({
+    startDate: z.string(),
+    endDate: z.string(),
+    therapistId: z.number().optional(),
+    speciality: z.string().optional(),
+    processId: z.number().optional(),
+  }),
+})
+
+export const SpecialityCreateSchema = z.object({
+  body: z.object({
+    speciality: z.string(),
+    code: z.string(),
+    description: z.string(),
+  }),
+})
+
+export const EmailSchema = z.object({
+  body: z.object({
+    email: z.string(),
+    subject: z.string(),
+    body: z.string(),
+  }),
+})
+
+export const GetPermissionsSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+  }),
+})
+
+export const EditPermissionsSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    collaboratorId: z.number(),
+    appoint: z.boolean(),
+    statitics: z.boolean(),
+    editProcess: z.boolean(),
+    editPatient: z.boolean(),
+    archive: z.boolean(),
+    see: z.boolean(),
+  }),
+})
+
+export const EditCareTakerSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string().email(),
+  phoneNumber: z.number(),
+  type: z.string(),
+  remarks: z.string(),
+})
+
+export const CreateChildPatientSchema = z.object({
+  body: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    grade: z.number(),
+    school: z.string(),
+  }),
+})
+
+export const CreateTeenPatientSchema = z.object({
+  body: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    grade: z.number(),
+    school: z.string(),
+    course: z.string(),
+  }),
+})
+
+export const CreateAdultPatientSchema = z.object({
+  body: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    profession: z.string(),
+  }),
+})
+
+export const EditChildPatientSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    patientId: z.number(),
+
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    grade: z.number(),
+    school: z.string(),
+    // careTakers: z.array(EditCareTakerSchema),
+  }),
+})
+
+export const EditTeenPatientSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    patientId: z.number(),
+
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    grade: z.number(),
+    school: z.string(),
+    course: z.string(),
+    // careTakers: z.array(EditCareTakerSchema),
+  }),
+})
+
+export const EditAdultPatientSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    patientId: z.number(),
+
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    profession: z.string(),
+    // careTakers: z.array(EditCareTakerSchema),
+  }),
+})
+
+export const EditCoupleOrFamilyPatientSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+    patientId: z.number(),
+
+    name: z.string(),
+    email: z.string().email(),
+    address: z.string(),
+    birthDate: DateSchema,
+    photo: z.string(), // assumo que seja o path da imagem na db
+    phoneNumber: z.number(),
+    taxNumber: z.number(),
+
+    healthNumber: z.number(),
+    request: z.string(),
+    remarks: z.string(),
+    patientTypeId: z.number(),
+
+    profession: z.string(),
+  }),
+})
+
+export const GetAvailableRoomsSchema = z.object({
+  body: z.object({
+    startDate: DateSchema,
+    endDate: DateSchema,
+  }),
+})
+
+export const GetCollaboratorsSchema = z.object({
+  body: z.object({
+    processId: z.number(),
+  }),
+})
+
+export const CreateLiableSchema = z.object({
+  body: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    phoneNumber: z.number(),
+    type: z.string(),
+    remarks: z.string(),
+  }),
+})
+
+export const PatientFilterSchema = z.object({
+  associated: z.enum(["true", "false"]).optional(),
 })
 
 export default {
@@ -321,11 +576,8 @@ export default {
   ForgotPasswordSchema,
   ResetPasswordSchema,
   VerifyAccountSchema,
-  ArchiveProcessSchema,
   AccountVerificationSchema,
   DateSchema,
-  ProcessListSchema,
-  ProcessInfoSchema,
   ProcessCreateSchema,
   ProcessEditSchema,
   ProcessEditPermissionsSchema,
@@ -346,6 +598,31 @@ export default {
   GuardSchema,
   AdminSchema,
   InternSchema,
-  SelfEditProfileSchema,
   EditProfileParamsSchema,
+  ProcessIDSchema,
+  QueryListProcess,
+  ReceiptListQuery,
+  NotesCreate,
+  QueryListRooms,
+  RoomCreate,
+  StatisticsSchema,
+  SpecialityCreateSchema,
+  EmailSchema,
+  GetPermissionsSchema,
+  EditPermissionsSchema,
+  CreateChildPatientSchema,
+  CreateTeenPatientSchema,
+  CreateAdultPatientSchema,
+  EditChildPatientSchema,
+  EditTeenPatientSchema,
+  EditAdultPatientSchema,
+  EditCareTakerSchema,
+  EditCoupleOrFamilyPatientSchema,
+  GetAvailableRoomsSchema,
+  GetCollaboratorsSchema,
+  NotificationSchema,
+  ProcessMigrationSchema,
+  NotesUpdate,
+  CreateLiableSchema,
+  PatientFilterSchema,
 }

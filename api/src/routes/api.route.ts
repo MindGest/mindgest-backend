@@ -10,9 +10,21 @@ import UserRouter from "./user.route"
 import DocsRouter from "./docs.route"
 import ProcessRouter from "./process.route"
 import AppointmentRouter from "./appointment.route"
+import ReceiptRouter from "./receipt.route"
+import RoomsRouter from "./rooms.route"
+import StatisticsRouter from "./statistics.route"
+import SpecialityRouter from "./speciality.route"
+import EmailRouter from "./email.route"
+import PatientRouter from "./patient.route"
+import PermissionRouter from "./permission.route"
+import Notification from "./notification.route"
+import Liable from "./liable.route"
+import Receipt from "./receipt.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
+
+import cookieParser from "cookie-parser"
 
 // Util
 import bodyParser from "body-parser"
@@ -21,6 +33,8 @@ import bodyParser from "body-parser"
 }
 
 const FRONTEND_URL = String(process.env.FRONTEND_URL)
+const COOKIE_SECRET = String(process.env.COOKIE_SECRET)
+const NODE_ENV = String(process.env.NODE_ENV)
 
 // MindGest API Router
 const api = Router()
@@ -36,15 +50,28 @@ api.use(
   })
 )
 api.use(compression({ filter: middleware.shouldCompress }))
-api.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
+
+if (NODE_ENV === "production") api.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 60 }))
+
 api.use(middleware.bodyParserErrorValidator())
+api.use(cookieParser(COOKIE_SECRET))
 
 // Routes
 api.use("/auth", AuthRouter)
+api.use("/email", EmailRouter)
 api.use("/user", UserRouter)
 api.use("/docs", DocsRouter)
 api.use("/process", ProcessRouter)
 api.use("/appointment", AppointmentRouter)
+api.use("/receipts", ReceiptRouter)
+api.use("/rooms", RoomsRouter)
+api.use("/statistics", StatisticsRouter)
+api.use("/speciality", SpecialityRouter)
+api.use("/patient", PatientRouter)
+api.use("/permissions", PermissionRouter)
+api.use("/notification", Notification)
+api.use("/liable", Liable)
+api.use("/receipt", Receipt)
 
 // Healthcheck
 api.get("/healthcheck", controller.healthCheck)

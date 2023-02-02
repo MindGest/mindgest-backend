@@ -1,7 +1,8 @@
-import { Request, Response } from "express"
 import { Router } from "express"
 
 import controller from "../controllers/profile.controller"
+
+import authMiddleware from "../middleware/auth.middleware"
 import middleware from "../middleware/api.middleware"
 import schemas from "../utils/schemas"
 
@@ -15,7 +16,9 @@ profile
 
 profile
   .route("/info")
-  .put(middleware.requestValidator(schemas.SelfEditProfileSchema), controller.editProfileInfo)
+  .put(middleware.requestValidator(schemas.EditProfileSchema), controller.editProfileInfo)
   .get(controller.fetchProfileInfo)
+
+profile.put("/switch-view", authMiddleware.authorizeAdmin(), controller.switchView)
 
 export default profile

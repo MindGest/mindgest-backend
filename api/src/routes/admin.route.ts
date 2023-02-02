@@ -1,8 +1,10 @@
 import { Router } from "express"
 
-import controller from "../controllers/admin.edit.controller"
+import controller from "../controllers/admin.controller"
+
 import middleware from "../middleware/api.middleware"
 import authMiddleware from "../middleware/auth.middleware"
+
 import schemas from "../utils/schemas"
 
 const admin = Router({ mergeParams: true })
@@ -24,10 +26,12 @@ admin
 
 admin
   .route("/info")
-  .put(middleware.requestValidator(schemas.EditProfileSchema), controller.editUserProfileInfo)
+  .put(middleware.requestValidator(schemas.EditProfileParamsSchema), controller.editUserProfileInfo)
   .get(
     middleware.requestValidator(schemas.EditProfileParamsSchema),
     controller.fetchUserProfileInfo
   )
+
+admin.put("/approve", controller.approve)
 
 export default admin

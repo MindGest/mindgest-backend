@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  description: This is the Mindgest Rest API Documentation
-  title: Mindgest API Documentation
+  description: This is the MindGest Rest API Documentation
+  title: MindGest API Documentation
   contact:
     email: gp2223@gmail.com
   license:
@@ -9,7 +9,7 @@ info:
     url: https://mit-license.org/
   version: 0.1.0
 servers:
-  - url: http://mindgest.dei.uc.pt/api
+  - url: https://mindgest.dei.uc.pt/api
     description: Production Server
   - url: http://localhost:8080/api
     description: Development Server
@@ -27,28 +27,33 @@ tags:
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
+  - name: Email
+    description: Email Endpoints
+    externalDocs:
+      description: External Documentation
+      url: https://github.com/Mindgest/mindgest-backend
   - name: User
-    description: User Managment Endpoints
+    description: User Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
   - name: Appointment
-    description: Appointment Managment Endpoints
+    description: Appointment Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
   - name: Process
-    description: Process Managment Endpoints
+    description: Process Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
   - name: Room
-    description: Room Managment Endpoints
+    description: Room Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
   - name: Specialty
-    description: Specialty Managment Endpoints
+    description: Specialty Management Endpoints
     externalDocs:
       description: External Documentation
       url: https://github.com/Mindgest/mindgest-backend
@@ -62,7 +67,7 @@ paths:
     get:
       tags:
         - General
-      summary: Mindgest API Documentation Web Page
+      summary: MindGest API Documentation Web Page
       description: Fetch the Swagger UI version of the documentation (static website)
       operationId: docs
       responses:
@@ -76,7 +81,7 @@ paths:
     get:
       tags:
         - Documentation
-      summary: Mindgest API Documentation Web Page
+      summary: MindGest API Documentation Web Page
       description: Fetch the Swagger UI version of the documentation (static website)
       operationId: docs
       responses:
@@ -88,7 +93,7 @@ paths:
     get:
       tags:
         - Documentation
-      summary: Mindgest API Documentation in JSON Format
+      summary: MindGest API Documentation in JSON Format
       operationId: docs-json
       description: Fetch the Swagger UI JSON version of the documentation
       responses:
@@ -104,12 +109,12 @@ paths:
       summary: Register
       tags:
         - Authentication
-      description: User Eegistration Enpoint
+      description: User Registration Endpoint
       operationId: register
       requestBody:
         $ref: "#/components/requestBodies/Register"
       responses:
-        "200":
+        "201":
           $ref: "#/components/responses/RegistrationSuccessful"
         "409":
           $ref: "#/components/responses/UserAlreadyExists"
@@ -120,7 +125,7 @@ paths:
       summary: Login
       tags:
         - Authentication
-      description: User Authentication Enpoint
+      description: User Authentication Endpoint
       operationId: login
       requestBody:
         $ref: "#/components/requestBodies/Login"
@@ -167,40 +172,6 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /auth/account-verification:
-    post:
-      summary: Send Account Verification Email
-      tags:
-        - Authentication
-      description: |
-        Send the user's account verification token by email together with a 
-        callback to the frontend of the application, to which the user
-        should be redirected when the verification is successful, if 
-        such callback is provided.
-      operationId: account-verification-email
-      requestBody:
-        $ref: "#/components/requestBodies/AccountVerification"
-      responses:
-        "400":
-          $ref: "#/components/responses/UserNotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-  /auth/forgot-password:
-    post:
-      summary: Send Password Reset Email
-      tags:
-        - Authentication
-      description: |
-        Send the user's account password reset token by email together with a 
-        callback to the frontend of the application, to which the user should
-        be redirected for password reset, if such callback is provided.
-      requestBody:
-        $ref: "#/components/requestBodies/ForgotPassword"
-      responses:
-        "400":
-          $ref: "#/components/responses/UserNotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
   /auth/reset-password:
     post:
       summary: Reset Password
@@ -216,14 +187,62 @@ paths:
           $ref: "#/components/responses/PasswordResetTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/archive:
+  /email/account-verification:
+    post:
+      summary: Send Account Verification Email
+      tags:
+        - Email
+      description: |
+        Send the user's account verification token by email together with a 
+        callback to the frontend of the application, to which the user
+        should be redirected when the verification is successful, if 
+        such callback is provided.
+      operationId: account-verification-email
+      requestBody:
+        $ref: "#/components/requestBodies/AccountVerification"
+      responses:
+        "400":
+          $ref: "#/components/responses/UserNotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /email/forgot-password:
+    post:
+      summary: Send Password Reset Email
+      tags:
+        - Email
+      description: |
+        Send the user's account password reset token by email together with a 
+        callback to the frontend of the application, to which the user should
+        be redirected for password reset, if such callback is provided.
+      requestBody:
+        $ref: "#/components/requestBodies/ForgotPassword"
+      responses:
+        "400":
+          $ref: "#/components/responses/UserNotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /email/send-email:
+    post:
+      summary: Send Generic Email
+      tags:
+        - Email
+      description: Send a generic email to the user
+      responses:
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /process/archive:
     post:
       summary: Archives process
       tags:
         - Process
       description: Archives process
-      requestBody:
-        $ref: "#/components/requestBodies/ProcessIdToken"
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       responses:
         "200":
           $ref: "#/components/responses/ProcessArchived"
@@ -231,14 +250,18 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/info:
+  /process/info:
     get:
       summary: All the information of a process
       tags:
         - Process
       description: All the information of a process
-      requestBody:
-        $ref: "#/components/requestBodies/ProcessIdToken"
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       responses:
         "200":
           $ref: "#/components/responses/ProcessInfo"
@@ -248,14 +271,24 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/list:
+  /process/list:
     get:
       summary: Lists every process
       tags:
         - Process
       description: Lists every process
-      requestBody:
-        $ref: "#/components/requestBodies/Token"
+      parameters:
+        - in: query
+          name: active
+          schema:
+            type: string
+          description:
+            \"true\" or \"false\", any other will cause error, only lists active processes
+        - in: query
+          name: specialty
+          schema:
+            type: string
+          description: name of specialty, if specialty doesn't exist an error will occur
       responses:
         "200":
           $ref: "#/components/responses/ProcessList"
@@ -263,29 +296,18 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/list/active:
-    get:
-      summary: Lists every active process
-      tags:
-        - Process
-      description: Lists every active process
-      requestBody:
-        $ref: "#/components/requestBodies/Token"
-      responses:
-        "200":
-          $ref: "#/components/responses/ProcessList"
-        "403":
-          $ref: "#/components/responses/VerificationTokenInvalid"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-  /api/process/activate:
+  /process/activate:
     post:
       summary: Activates a process
       tags:
         - Process
       description: Activates a process
-      requestBody:
-        $ref: "#/components/requestBodies/ProcessIdToken"
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       responses:
         "200":
           $ref: "#/components/responses/ProcessActivated"
@@ -295,12 +317,13 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/create:
+  /process/create:
     post:
       summary: Creates new process
       tags:
         - Process
       description: Creates new process
+      # parameters:
       requestBody:
         $ref: "#/components/requestBodies/ProcessCreate"
       responses:
@@ -310,12 +333,18 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/edit:
+  /process/edit:
     post:
       summary: Edits process
       tags:
         - Process
       description: Edits process
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       requestBody:
         $ref: "#/components/requestBodies/ProcessEdit"
       responses:
@@ -327,14 +356,18 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/appointments:
+  /process/appointments:
     get:
       summary: Lists every appointment from process
       tags:
         - Process
       description: Lists every appointment from process
-      requestBody:
-        $ref: "#/components/requestBodies/ProcessIdToken"
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       responses:
         "200":
           $ref: "#/components/responses/ProcessAppointments"
@@ -344,12 +377,18 @@ paths:
           $ref: "#/components/responses/NoAuthorization"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/process/permissions:
+  /process/permissions:
     post:
       summary: Edits process permission for user
       tags:
         - Process
       description: Edits process permission for user
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
       requestBody:
         $ref: "#/components/requestBodies/ProcessEditPermissions"
       responses:
@@ -359,6 +398,477 @@ paths:
           $ref: "#/components/responses/VerificationTokenInvalid"
         "401":
           $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /process/{processId}/createNote:
+    post:
+      summary: Edits process permission for user
+      tags:
+        - Process
+      description: Edits process permission for user
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
+      requestBody:
+        $ref: "#/components/requestBodies/CreateNote"
+      responses:
+        "200":
+          $ref: "#/components/responses/CreatedNote"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /process/{processId}/listNotes:
+    post:
+      summary: Edits process permission for user
+      tags:
+        - Process
+      description: Edits process permission for user
+      parameters:
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: Id of Process
+      responses:
+        "200":
+          $ref: "#/components/responses/ListedNote"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /receipts/list:
+    get:
+      summary: Lists every receipt, all or by user (if is queried by user)
+      tags:
+        - Receipts
+      description: Lists every receipt, all or by user (if is queried by user)
+      parameters:
+        - in: query
+          name: payed
+          schema:
+            type: string
+          description: \"true\" to list payed receipts, \"false\" to not list them
+        - in: query
+          name: notPayed
+          schema:
+            type: string
+          description: \"true\" to list not payed receipts, \"false\" to not list them
+        - in: query
+          name: userId
+          schema:
+            type: string
+          description: if none is selected, lists every receipt, else only lists users receipts
+      responses:
+        "200":
+          $ref: "#/components/responses/ReceiptsListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /receipts/pay:
+    put:
+      summary: Puts receipt as paid
+      tags:
+        - Receipts
+      description: Puts receipt as paid
+      parameters:
+        - in: path
+          name: receiptId
+          schema:
+            type: string
+          description: ID of the receipt
+      responses:
+        "200":
+          $ref: "#/components/responses/ReceiptPayed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /receipts/create:
+    post:
+      summary: Creates new receipt
+      tags:
+        - Receipts
+      description: Creates new receipt
+      parameters:
+        - in: path
+          name: appointmentId
+          schema:
+            type: string
+          description: ID of appointment to create receipt
+      responses:
+        "200":
+          $ref: "#/components/responses/ReceiptCreated"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /rooms/create:
+    post:
+      summary: Creates new room
+      tags:
+        - Room
+      description: Creates new room
+      requestBody:
+        $ref: "#/components/requestBodies/CreateRoom"
+      responses:
+        "200":
+          $ref: "#/components/responses/RoomCreated"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /rooms/list:
+    get:
+      summary: Lists all rooms
+      tags:
+        - Room
+      description: Lists all rooms
+      responses:
+        "200":
+          $ref: "#/components/responses/RoomsListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /rooms/listAppointmentsRoom:
+    get:
+      summary: Lists all appointments of the rooms or a specific room on a specific date
+      tags:
+        - Room
+      description: Lists all appointments of the rooms or a specific room on a specific date
+      parameters:
+        - in: path
+          name: date
+          schema:
+            type: string
+          description: Date to get the appointments
+          example: YYYY/MM/DD
+        - in: path
+          name: room
+          schema:
+            type: string
+          description: ID of the specific room to get appointments
+      responses:
+        "200":
+          $ref: "#/components/responses/RoomsAppointmentListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /statistics/:
+    get:
+      summary:
+        Statistics information sent to email (not currently sending email only returning the info)
+      tags:
+        - Statistics
+      description:
+        Statistics information sent to email (not currently sending email only returning the info)
+      parameters:
+        - in: path
+          name: startDate
+          schema:
+            type: string
+          description: Date to get the appointments
+          example: YYYY/MM/DD
+        - in: path
+          name: endDate
+          schema:
+            type: string
+          description: Date to get the appointments
+          example: YYYY/MM/DD
+        - in: path
+          name: therapistId
+          schema:
+            type: string
+          description: id of therapist to filter
+        - in: path
+          name: specialityId
+          schema:
+            type: string
+          description: id of specialty to filter
+        - in: path
+          name: processId
+          schema:
+            type: string
+          description: id of processId to filter
+      responses:
+        "200":
+          $ref: "#/components/responses/Statistics"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /speciality/list:
+    get:
+      summary: Returns a list with all the specialties in the database.
+      tags:
+        - Speciality
+      description: Returns a list with all the specialties in the database.
+      responses:
+        "200":
+          $ref: "#/components/responses/SpecialitiesListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /speciality/create:
+    post:
+      summary: Creates a new specialty.
+      tags:
+        - Speciality
+      description: Creates a new specialty.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                speciality:
+                  type: string
+                  description: name of the specialty.
+                  example: Especialidade-A
+                code:
+                  type: string
+                  description: code of the speciality
+                  example: EspA
+                description:
+                  type: string
+                  description: description of the speciality
+                  example: Description of the Especialidade-A
+      responses:
+        "200":
+          $ref: "#/components/responses/SpecialitiesCreate"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/list:
+    post:
+      summary: Lists all of the appointments of the given user id, or all if the id = -1.
+      tags:
+        - Appointment
+      description: Lists all of the appointments of the given user id, or all if the id = -1.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filterId:
+                  type: number
+                  description: id of the user or -1 for all the users.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentsListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/list/active:
+    post:
+      summary: Lists all of the active appointments of the given user id, or all if the id = -1.
+      tags:
+        - Appointment
+      description: Lists all of the active appointments of the given user id, or all if the id = -1.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filterId:
+                  type: number
+                  description: id of the user or -1 for all the users.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentsActiveListed"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/info:
+    post:
+      summary: Returns the information of an appointment
+      tags:
+        - Appointment
+      description: Returns the information of an appointment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appointmentId:
+                  type: number
+                  description: id of the appointment.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentInfo"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/listLastTerminated:
+    post:
+      summary: Returns the list of finished appointments in the last 24h.
+      tags:
+        - Appointment
+      description: Returns the list of finished appointments in the last 24h.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentListLastTerminated"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/create:
+    post:
+      summary: Creates an appointment in the database.
+      tags:
+        - Appointment
+      description: Creates an appointment in the database.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processId:
+                  type: number
+                  description: id of the process.
+                online:
+                  type: boolean
+                  description: True if the appointment is going to be online, otherwise, false.
+                roomId:
+                  type: number
+                  description: The id of the room for the appointment.
+                priceTableId:
+                  type: number
+                  description: The id of the price in the table of prices.
+                startDate:
+                  type: string
+                  description: start-date of the appointment
+                  example: 2022-12-24T15:03:00.000Z
+                endDate:
+                  type: string
+                  description: end-date of the appointment
+                  example: 2022-12-24T15:03:00.000Z
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentCreate"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/archive:
+    put:
+      summary: Archives an appointment in the database.
+      tags:
+        - Appointment
+      description: Archives an appointment in the database.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appointmentId:
+                  type: number
+                  description: id of the appointment.
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentArchive"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /appointment/edit:
+    put:
+      summary: Edits an appointment in the database.
+      tags:
+        - Appointment
+      description: Edits an appointment in the database.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appointmentId:
+                  type: number
+                  description: id of the appointment.
+                appointmentRoomId:
+                  type: number
+                  description: The id of the room for the appointment.
+                appointmentStart:
+                  type: string
+                  description: start-date of the appointment
+                  example: 2022-12-24T15:03:00.000Z
+                appointmentEnd:
+                  type: string
+                  description: end-date of the appointment
+                  example: 2022-12-24T15:03:00.000Z
+      responses:
+        "200":
+          $ref: "#/components/responses/AppointmentEdit"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /therapist/listPatients:
+    get:
+      summary: Lists every patient from a therapist
+      tags:
+        - Therapist
+      description: Lists every patient from a therapist
+      responses:
+        "200":
+          $ref: "#/components/responses/PatientsListed"
+        "401":
+          $ref: "#/components/responses/NoAuthorization"
+        "403":
+          $ref: "#/components/responses/VerificationTokenInvalid"
         "500":
           $ref: "#/components/responses/InternalServerError"
 components:
@@ -641,18 +1151,6 @@ components:
                 type: string
                 description: The user's password reset token
                 example: eyJVCJ9OiJIUzI1NiIsInR5cCI6IeyJwkpXc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2.ZXJzb24iOjIsInNlhbGciNjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
-    ProcessIdToken:
-      description: Process ID and JWT
-      content:
-        application/json:
-          schema:
-            properties:
-              token:
-                type: string
-                summary: jwt from login
-              processId:
-                type: integer
-                summary: process to archive
     Token:
       description: JWT
       content:
@@ -668,30 +1166,11 @@ components:
         application/json:
           schema:
             properties:
-              token:
-                type: string
-                summary: jwt from login
-              patientId:
-                type: integer
-                summary: id of patient
-              therapistId:
-                type: integer
-                summary: Id of therapist in charge of the proccess
-              speciality:
-                type: string
-                summary: Type of process, types need to be already created beforehand
-              remarks:
-                type: string
-                summary: any extra info the therapeut creating the process might wanna add
-    ProcessEdit:
-      description: Edits process
-      content:
-        application/sjon:
-          schema:
-            properties:
-              token:
-                type: string
-                summary: jwt from login
+              patientIds:
+                type: array
+                items:
+                  type: integer
+                  summary: ids of patients (in case its a process for more than 1 patient)
               therapistId:
                 type: integer
                 summary: Id of therapist in charge of the proccess
@@ -705,22 +1184,33 @@ components:
                 type: array
                 items:
                   type: integer
-                  summary: ids of collaborates
-              processId:
+                  summary: ids of collaborators
+    ProcessEdit:
+      description: Edits process
+      content:
+        application/json:
+          schema:
+            properties:
+              therapistId:
+                type: integer
+                summary: Id of therapist in charge of the proccess
+              speciality:
                 type: string
-                summary: Id of process
+                summary: Type of process, types need to be already created beforehand
+              remarks:
+                type: string
+                summary: any extra info the therapeut creating the process might wanna add
+              colaborators:
+                type: array
+                items:
+                  type: integer
+                  summary: ids of collaborators
     ProcessEditPermissions:
       description: Edits process
       content:
-        application/sjon:
+        application/json:
           schema:
             properties:
-              token:
-                type: string
-                summary: jwt from login
-              processId:
-                type: integer
-                summary: id of process
               collaboratorId:
                 type: integer
                 summary: Id of the collaborator to change permissions
@@ -742,6 +1232,30 @@ components:
               see:
                 type: boolean
                 summary: True if user has permissions to see process info and False if not
+    CreateNote:
+      description: Creates new note in process
+      content:
+        application/json:
+          schema:
+            properties:
+              title:
+                type: string
+                summary: title of note
+              body:
+                type: string
+                summary: what's being written in the note
+    CreateRoom:
+      description: Create a new Room
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              name:
+                type: string
+                summary: name for room
   responses:
     LoginSuccessFull:
       description: Login Successful
@@ -890,7 +1404,7 @@ components:
                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiYWRtaW4iOmZhbHNlLCJyb2xlIjoiaW50ZXJuIiwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNjg5NjF9.xMacrxoiqpUg6frCEYCqNnSHedaI1QYiml6RgKmYeL4
               refreshToken:
                 type: string
-                description: The refresh token to be used for adquiring a new access token
+                description: The refresh token to be used for acquiring a new access token
                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwZXJzb24iOjIsInNlc3Npb24iOnsiaXAiOiI6OjEiLCJ1c2VyQWdlbnQiOiJQb3N0bWFuUnVudGltZS83LjI5LjIifSwiaWF0IjoxNjY5MDY4MDYxLCJleHAiOjE2NjkwNzE2NjF9.9ydDW20vY2gGc43q86gsfsyEQOiSQkabb8xkmI91QhQ
     UserLoggedOut:
       description: Refresh request unauthorized.
@@ -1035,24 +1549,26 @@ components:
           schema:
             properties:
               list:
-                type: object
-                properties:
-                  therapistListing:
-                    type: array
-                    items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    therapistListing:
+                      type: array
+                      items:
+                        type: string
+                        example: Marta Santos
+                    patientName:
                       type: string
-                      example: Marta Santos
-                  patientName:
-                    type: string
-                    example: Ricardo Maria
-                  refCode:
-                    type: string
-                    example: 23fdfd4e3
-                  nextAppointment:
-                    type: string
-                    summary: |
-                      No next Appointment if no appointment has been made or the date, in string
-                      format, of next date
+                      example: Ricardo Maria
+                    refCode:
+                      type: string
+                      example: 23fdfd4e3
+                    nextAppointment:
+                      type: string
+                      summary: |
+                        No next Appointment if no appointment has been made or the date, in string
+                        format, of next date
     ProcessActivated:
       description: Process Activated
       content:
@@ -1129,8 +1645,487 @@ components:
                 type: string
                 description: A message describing the request result
                 example: Permission updated
+    ReceiptsListed:
+      description: Item returned
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                description: array with receipts
+                items:
+                  type: object
+                  properties:
+                    patientName:
+                      type: string
+                      description: The patients's name
+                    mainTherapist:
+                      type: string
+                      description: Process responsable therapist
+                    ref:
+                      type: string
+                      description: reference of receipt
+                    date:
+                      type: string
+                      description: date of appointment
+    ReceiptPayed:
+      description: Receipt Payed
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Receipt Payed!
+    ReceiptCreated:
+      description: Receipt Payed
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Receipt Created
+    CreatedNote:
+      description: Note Created
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Note Created
+    ListedNote:
+      description: List of process notes
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: Title of Note
+                    body:
+                      type: string
+                      description: Body of the note
+                    date:
+                      type: string
+                      description: Date the note was created
+    RoomCreated:
+      description: Room Created
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: Room Created
+    RoomsListed:
+      description: List of Rooms
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: name of room
+                    id:
+                      type: number
+                      name: id of room
+    RoomsAppointmentListed:
+      description: List of Rooms
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    room:
+                      type: string
+                      description: name of the room
+                    roomId:
+                      type: number
+                      description: id of the room
+                    appointmentsRoom:
+                      type: array
+                      description: appointments of the room
+                      items:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            description: Title of the appointment
+                            example: Dr João Pedro Esp-A
+                          id:
+                            type: number
+                            description: if of appointment
+                          startDate:
+                            type: string
+                            description: start-date of appointment
+                            example: 2022-12-24T15:03:00.000Z
+                          endDate:
+                            type: string
+                            description: start-date of appointment
+                            example: 2022-12-24T15:03:00.000Z
+    Statistics:
+      description: Statistics information
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: object
+                properties:
+                  totalAppointments:
+                    type: number
+                    description: total number of appointments from active processes
+                  specialitiesAppointments:
+                    type: array
+                    description:
+                      total number of appointments from active processes from each speciality
+                    items:
+                      type: object
+                      properties:
+                        speciality:
+                          type: string
+                        total:
+                          type: number
+                  processAppointments:
+                    type: array
+                    description:
+                      total number of appointments from active processes from each process
+                    items:
+                      type: object
+                      properties:
+                        processId:
+                          type: string
+                        total:
+                          type: number
+                  therapistsApointments:
+                    type: array
+                    description:
+                      total number of appointments from active processes from each therapist
+                    items:
+                      type: object
+                      properties:
+                        therapist:
+                          type: string
+                        total:
+                          type: number
+    SpecialitiesListed:
+      description: List of Specialities
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    speciality:
+                      type: string
+                      description: name of the speciality
+                    code:
+                      type: string
+                      description: code of the speciality
+                    description:
+                      type: string
+                      description: description of the speciality
+    SpecialitiesCreate:
+      description: Create a speciality.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The speciality has been successfully created.
+    AppointmentsListed:
+      description: List of appointments
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    appointmentStartTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentEndTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentRoom:
+                      type: string
+                      description: The name of the room of the appoitment
+                    therapists:
+                      type: array
+                      description: list of the processe's therapists
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: name of the therapist
+                    speciality:
+                      type: string
+                      description: name of the speciality
+    AppointmentsActiveListed:
+      description: List of the active appointments
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    appointmentStartTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentEndTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentRoom:
+                      type: string
+                      description: The name of the room of the appoitment
+                    therapists:
+                      type: array
+                      description: list of the processe's therapists
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: name of the therapist
+                    speciality:
+                      type: string
+                      description: name of the speciality
+    AppointmentListLastTerminated:
+      description: List of the finished appointments in the last 24h.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    appointmentStartTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentEndTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    patients:
+                      type: array
+                      description: list of the patients of the process
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: name of the patient
+    AppointmentInfo:
+      description: Appointment's information
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    appointmentStartTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentEndTime:
+                      type: string
+                      description: start-date of the appointment
+                      example: 2022-12-24T15:03:00.000Z
+                    appointmentRoom:
+                      type: string
+                      description: The name of the room of the appoitment
+                    therapists:
+                      type: array
+                      description: list of the processe's therapists
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: name of the therapist
+                    interns:
+                      type: array
+                      description: list of the processe's interns
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: name of the intern
+                    patients:
+                      type: array
+                      description: list of the processe's patients
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: name of the patient
+                    speciality:
+                      type: string
+                      description: name of the speciality
+                    processRef:
+                      type: string
+                      description: Reference of the process.
+    AppointmentCreate:
+      description: Create an appointment.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The appointment has been successfully created.
+    AppointmentEdit:
+      description: Edits an appointment.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The appointment has been successfully updated.
+    AppointmentArchive:
+      description: Archive an appointment.
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              message:
+                type: string
+                description: A message describing the request result
+                example: The appointment has been successfully archived.
+    PatientsListed:
+      description: List of patients processes
+      content:
+        application/json:
+          encoding:
+            historyMetadata:
+              contentType: application/json; charset=utf-8
+          schema:
+            properties:
+              list:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    therapistListing:
+                      type: array
+                      items:
+                        type: string
+                        example: Marta Santos
+                    patientName:
+                      type: string
+                      example: Ricardo Maria
+                    ref:
+                      type: string
+                      example: 23fdfd4e3
+                    speciality:
+                      type: string
+                      summary: "algo aqui"
   securitySchemes:
-    Access Token:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    AccessToken:
+      type: apiKey
+      in: header
+      name: authorization
+security:
+  - AccessToken: []

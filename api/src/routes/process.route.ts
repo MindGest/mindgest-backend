@@ -1,50 +1,68 @@
-import { Router, Request, Response } from "express"
-import controller from "../controllers/process.controller"
-import middleware from "../middleware/api.middleware"
-import schemas from "../utils/schemas"
+import { Router } from "express"
 
-import PatientRouter from "./patient.route"
+import controller from "../controllers/process.controller"
+
+import middleware from "../middleware/api.middleware"
+import authMiddleware from "../middleware/auth.middleware"
+
+import schemas from "../utils/schemas"
 
 const process = Router()
 
-process.use("/:process", PatientRouter)
+// Middleware
+process.use(authMiddleware.authorize())
 
-process.post(
-  "/archive",
-  middleware.requestValidator(schemas.ArchiveProcessSchema),
-  controller.archive
-)
+// Endpoints
 
-process.get("/info", middleware.requestValidator(schemas.ProcessInfoSchema), controller.info)
-
-process.get("/list", middleware.requestValidator(schemas.ProcessListSchema), controller.list)
-
-process.get(
-  "/list/active",
-  middleware.requestValidator(schemas.ProcessListSchema),
-  controller.listActive
-)
-
-process.post(
-  "/activate",
-  middleware.requestValidator(schemas.ArchiveProcessSchema),
-  controller.activate
-)
-
+/// General
 process.post("/create", middleware.requestValidator(schemas.ProcessCreateSchema), controller.create)
 
-process.post("/edit", middleware.requestValidator(schemas.ProcessEditSchema), controller.edit)
+process.get("/list", controller.list)
+process.get("/processes", controller.getProcesses)
 
-process.get(
-  "/appointments",
-  middleware.requestValidator(schemas.ProcessInfoSchema),
-  controller.appointments
+process.get("/therapists", controller.listTherapist)
+process.post(
+  "/collaborators",
+  middleware.requestValidator(schemas.GetCollaboratorsSchema),
+  controller.getCollaborators
+)
+
+// Process Specific
+process.get("/:processId/info", controller.info)
+
+process.post("/:processId/archive", controller.archive)
+process.post("/:processId/activate", controller.activate)
+process.get("/:processId/receipts", controller.receiptList)
+
+process.post(
+  "/:processId/edit",
+  middleware.requestValidator(schemas.ProcessEditSchema),
+  controller.edit
 )
 
 process.post(
-  "/edit/permissions",
-  middleware.requestValidator(schemas.ProcessEditPermissionsSchema),
-  controller.editPermissions
+  "/:processId/migrate",
+  middleware.requestValidator(schemas.ProcessMigrationSchema),
+  controller.migrate
 )
+
+process.get("/:processId/appointments", controller.appointments)
+process
+  .route("/:processId/notes")
+  .get(controller.listNotes)
+  .post(middleware.requestValidator(schemas.NotesCreate), controller.createNote)
+
+process
+  .route("/:processId/notes/:noteId")
+  .get(controller.note)
+  .put(middleware.requestValidator(schemas.NotesUpdate), controller.updateNote)
+
+process
+  .route("/:processId/permissions")
+  .get(controller.getPermissions)
+  .post(
+    middleware.requestValidator(schemas.ProcessEditPermissionsSchema),
+    controller.editPermissions
+  )
 
 export default process
