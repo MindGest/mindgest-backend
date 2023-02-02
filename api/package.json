@@ -4,8 +4,8 @@
   "description": "Rest API for the MindGest Web Application",
   "main": "src/main.ts",
   "scripts": {
-    "install": "npm run env",
-    "env": "cp -n .env.example .env && cp -n prisma/.env.example prisma/.env",
+    "env": "npm run env",
+    "env:setup": "cp -n .env.example .env && cp -n prisma/.env.example prisma/.env",
     "start": "dotenv -v NODE_ENV=production -e prisma/.env -- node build/src/main.js",
     "dev": "dotenv -v NODE_ENV=development -e prisma/.env -- tsc-watch --onSuccess \"ts-node src/main.ts\"",
     "build": "rimraf ./build && tsc --build && copyfiles -a assets/**/* ./build",
