@@ -23,7 +23,10 @@ const ELDER_PATIENT = "elder"
 const DUMMY_PASSWORD = "ImDummyDaBaDeeDaBaDi"
 
 // listar todos os pacientes (nome e tipo talvez idk, preciso para a criação do processo)
-export async function listPatients(req: Request<{}, {}, {}, PatientListQueryParams>, res: Response) {
+export async function listPatients(
+  req: Request<{}, {}, {}, PatientListQueryParams>,
+  res: Response
+) {
   /**
    * if admin, return all
    * if therapist or intern, return the associated patients
@@ -37,8 +40,8 @@ export async function listPatients(req: Request<{}, {}, {}, PatientListQueryPara
     var callerRole = decodedToken.role
     var callerIsAdmin = decodedToken.admin
 
-    let associated = req.query.associated;
-    let patientIds: number[] = [];
+    let associated = req.query.associated
+    let patientIds: number[] = []
 
     // check authorization for this endpoint
     if (callerRole == "accountant" || callerRole == "guard") {
@@ -49,16 +52,16 @@ export async function listPatients(req: Request<{}, {}, {}, PatientListQueryPara
 
     // check the filter
     // get the patient ids
-    if (associated == null || associated == "false"){ // no filter, meaning, return all patients
-      let patients = await prisma.patient.findMany({select: {person_id: true}});
-      for (let patient of patients){
-        patientIds.push(Number(patient.person_id));
+    if (associated == null || associated == "false") {
+      // no filter, meaning, return all patients
+      let patients = await prisma.patient.findMany({ select: { person_id: true } })
+      for (let patient of patients) {
+        patientIds.push(Number(patient.person_id))
       }
+    } else if (associated == "true") {
+      // return only the associated with the caller
+      patientIds = await filterAssociatedPatients(callerId, callerRole)
     }
-    else if (associated == "true"){ // return only the associated with the caller
-      patientIds = await filterAssociatedPatients(callerId, callerRole);
-    }
-
 
     // for each patient
     let infoToReturn = []
@@ -995,12 +998,12 @@ export async function downloadProfilePicture(req: Request, res: Response) {
   }
 }
 
-async function filterAssociatedPatients(callerId: number, callerRole: string){
+async function filterAssociatedPatients(callerId: number, callerRole: string) {
   /**
    * Returns the ids of the patients associated with the userId (therapist, or intern)
    */
 
-  let processes = [];
+  let processes = []
   // get the processes of the caller
   if (callerRole == "therapist") {
     let therapist_process = await prisma.therapist_process.findMany({
@@ -1037,7 +1040,7 @@ async function filterAssociatedPatients(callerId: number, callerRole: string){
     }
   }
 
-  return Array.from(patientIdsSet);
+  return Array.from(patientIdsSet)
 }
 
 export default {
