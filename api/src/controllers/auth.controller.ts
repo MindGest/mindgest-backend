@@ -29,7 +29,6 @@ import {
 
 import { User } from "../utils/schemas"
 import { randomUUID } from "crypto"
-import processController from "./process.controller"
 
 export async function register(req: Request<{}, {}, RegistrationBody>, res: Response) {
   try {
@@ -67,11 +66,13 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
 
     // Build Response Payload
     let b = {
+      id: person.id,
       name: person.name,
       email: person.email,
       address: person.address,
       birthDate: person.birth_date.toISOString().slice(0, 10),
       phoneNumber: person.phone_number,
+      role: req.body.role,
     }
 
     // Jarvardisus Maximus
