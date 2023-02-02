@@ -50,6 +50,6 @@ export async function buildReceipt(appointmentId: number) {
     healthNumber: patient?.health_number,
     price: price?.price,
     therapist: therapist?.name,
-    payed: receipt.payed
+    payed: receipt.payed,
   }
 }
