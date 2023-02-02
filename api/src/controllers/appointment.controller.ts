@@ -202,6 +202,24 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
           },
         })
 
+        // get care takers
+        let process_liable = await prisma.process_liable.findMany({
+          where: {process_id: processes[i].id}
+        })
+        let careTakers = [];
+        for (let i = 0; i < process_liable.length; i++){
+          let careTaker = await prisma.liable.findFirst({where: {id: process_liable[i].liable_id}});
+          careTakers.push(careTaker?.name);
+        }
+
+        // if it is paid
+        // get the receipt (if null or not paid, it is not paid )
+        let receipt = await prisma.receipt.findFirst({where: {appointment_slot_id: appointment_process[e].appointment_slot_id}});
+        let paid = false;
+        if (receipt != null && receipt.payed){
+          paid = true;
+        }
+
         if (!appointmentInfo) {
           continue
         }
@@ -229,6 +247,8 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
             therapists: therapists,
             //interns: interns,
             patients: patients,
+            careTakers: careTakers,
+            paid: paid,
             processId: processes[i].id,
             speciality: processes[i].speciality_speciality,
           })
@@ -463,8 +483,9 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
       select: {
         slot_start_date: true,
         slot_end_date: true,
-        room: { select: { name: true } },
-      },
+        slot_id: true,
+        room: {select: {name: true}}
+      }
     })
     if (!appointment) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -539,6 +560,24 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
       patients.push(patient?.person.name)
     }
 
+    // get care takers
+    let process_liable = await prisma.process_liable.findMany({
+      where: {process_id: process.id}
+    })
+    let careTakers = [];
+    for (let i = 0; i < process_liable.length; i++){
+      let careTaker = await prisma.liable.findFirst({where: {id: process_liable[i].liable_id}});
+      careTakers.push(careTaker?.name);
+    }
+
+    // if it is paid
+    // get the receipt (if null or not paid, it is not paid )
+    let receipt = await prisma.receipt.findFirst({where: {appointment_slot_id: appointment.slot_id}});
+    let paid = false;
+    if (receipt != null && receipt.payed){
+      paid = true;
+    }
+
     res.status(StatusCodes.OK).json({
       data: {
         appointmentStartTime: appointment.slot_start_date,
@@ -548,6 +587,8 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         mainTherapist: mainTherapist?.name,
         collaborators: collaborators,
         patients: patients,
+        careTakers: careTakers,
+        paid: paid,
         //process: processes[i]
         speciality: process.speciality_speciality,
         processRef: process.ref,
