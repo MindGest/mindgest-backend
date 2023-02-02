@@ -113,8 +113,6 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
     }
 
     var allAppointmentsInfo: any = []
-    // get all the appointmentIds of every process
-    var appointmentIds: Array<number> = []
     for (let i = 0; i < processes.length; i++) {
       // get the appointments of the processes[i]
       var appointment_process = await prisma.appointment_process.findMany({
@@ -177,46 +175,18 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       })
       var patients: any = []
       for (let e = 0; e < patient_process.length; e++) {
-        patients.push(
-          await prisma.patient.findFirst({
-            where: { person_id: patient_process[e].patient_person_id },
-            select: {
-              health_number: true,
-              request: true,
-              remarks: true,
-              person: {
-                select: {
-                  name: true,
-                  email: true,
-                  address: true,
-                  birth_date: true,
-                  phone_number: true,
-                },
-              },
-              patienttype: {
-                select: { type: true },
-              },
-              profession: {
-                select: { name: true },
-              },
-              school: {
-                select: {
-                  grade: true,
-                  name: true,
-                  course: true,
-                },
-              },
-            },
-          })
-        )
+        let patient = await prisma.person.findFirst({
+          where: { id: patient_process[e].patient_person_id },
+        })
+        patients.push(patient?.name)
       }
 
       for (let e = 0; e < appointment_process.length; e++) {
-        appointmentIds.push(Number(appointment_process[e].appointment_slot_id))
         // obtain the appointment info
         var appointmentInfo = await prisma.appointment.findFirst({
-          where: { slot_id: appointmentIds[e] },
+          where: { slot_id: appointment_process[e].appointment_slot_id },
           select: {
+            slot_id: true,
             online: true,
             slot_start_date: true,
             slot_end_date: true,
@@ -238,6 +208,7 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
 
         if (callerRole == "guard") {
           allAppointmentsInfo.push({
+            appointmentId: appointmentInfo.slot_id,
             appointmentStartTime: appointmentInfo.slot_start_date,
             appointmentEndTime: appointmentInfo.slot_end_date,
             appointmentRoom: appointmentInfo.room.name,
@@ -245,19 +216,20 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
             therapists: therapists,
             //interns: interns,
             //patients: patients,
-            //process: processes[i]
+            processId: processes[i].id,
           })
         } else {
           // build data for the current appointment
           allAppointmentsInfo.push({
+            appointmentId: appointmentInfo.slot_id,
             appointmentStartTime: appointmentInfo.slot_start_date,
             appointmentEndTime: appointmentInfo.slot_end_date,
             appointmentRoom: appointmentInfo.room.name,
             //appointment: appointmentInfo,
             therapists: therapists,
             //interns: interns,
-            //patients: patients,
-            //process: processes[i]
+            patients: patients,
+            processId: processes[i].id,
             speciality: processes[i].speciality_speciality,
           })
         }

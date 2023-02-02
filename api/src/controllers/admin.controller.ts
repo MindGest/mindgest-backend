@@ -280,16 +280,9 @@ export async function approve(req: Request, res: Response) {
         message: "The user you wish to edit does not exist.",
       })
     }
-    const userProps = await fetchPersonProperties(user.id)
-
-    if (userProps.isAdmin) {
-      return res.status(StatusCodes.FORBIDDEN).json({
-        message: "This user may not be edited since it has admin privileges too!",
-      })
-    }
 
     // Approve User Account
-    prisma.person.update({
+    await prisma.person.update({
       where: { id: user.id },
       data: {
         approved: true,

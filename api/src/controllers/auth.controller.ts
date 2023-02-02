@@ -28,6 +28,7 @@ import {
 } from "../utils/types"
 
 import { User } from "../utils/schemas"
+import { randomUUID } from "crypto"
 
 export async function register(req: Request<{}, {}, RegistrationBody>, res: Response) {
   try {
@@ -63,7 +64,27 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
       },
     })
 
+    // Build Response Payload
+    let b = {
+      id: person.id,
+      name: person.name,
+      email: person.email,
+      address: person.address,
+      birthDate: person.birth_date.toISOString().slice(0, 10),
+      phoneNumber: person.phone_number,
+      role: req.body.role,
+    }
+
+    // Jarvardisus Maximus
+    let body = null
+    if (req.body.role !== "intern") {
+      body = { ...b, taxNumber: person.tax_number }
+    } else {
+      body = b
+    }
+
     // Create entry in the table, associated with the user's role
+    let payload = {}
     switch (req.body.role) {
       case User.ACCOUNTANT:
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (accountant)...`)
@@ -92,11 +113,11 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
             person: { connect: { id: person.id } },
           },
         })
+        payload = { admin: true }
         break
       case User.THERAPIST: {
         // Insert therapist in the therapist table
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (therapist)...`)
-
         const speciality = await prisma.speciality.findUnique({
           where: {
             speciality: req.body.speciality,
@@ -111,7 +132,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
         }
 
         // Create Therapist
-        await prisma.therapist.create({
+        const therapist = await prisma.therapist.create({
           data: {
             license: req.body.license,
             health_system: req.body.healthSystem,
@@ -128,6 +149,13 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
           },
         })
 
+        let tmp = {
+          license: therapist.license,
+          healthSystem: therapist.health_system,
+          extern: therapist.extern,
+          speciality: speciality.speciality,
+        }
+
         // Add therapist as an admin too
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (admin)...`)
         if ((await prisma.admin.count()) < 4) {
@@ -136,13 +164,36 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
               person: { connect: { id: person.id } },
             },
           })
+          payload = { ...tmp, admin: true }
+        } else {
+          payload = { ...tmp }
         }
         break
       }
     }
+
+    // Send Notification To Admins
+    let uuid = randomUUID()
+    for (let admin of await prisma.admin.findMany()) {
+      logger.debug(
+        `REGISTER [${req.body.email}] => Generating notification for admin user ${admin.person_id}`
+      )
+      await prisma.notifications.create({
+        data: {
+          person: { connect: { id: admin.person_id } },
+          data: JSON.stringify({ ...body, ...payload }),
+          type: "register",
+          settled: false,
+          seen: false,
+          ref: uuid,
+        },
+      })
+    }
+
     logger.info(`REGISTER [${req.body.email}] => Account Created!`)
     res.status(StatusCodes.CREATED).json({
       message: "The user account was created successfully",
+      data: { userId: person.id },
     })
   } catch (error) {
     logger.error(`REGISTER => Server Error: ${error}`)
@@ -166,6 +217,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.info(`LOGIN [${req.body.email}] => User does not exist!`)
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `The user with email ${req.body.email} does not exist.`,
+        code: "EEXIST",
       })
     }
 
@@ -177,6 +229,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.info(`LOGIN [${req.body.email}] => Login failed. Invalid Password!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: `Invalid password for user with email ${req.body.email}`,
+        code: "EPASS",
       })
     }
 
@@ -185,6 +238,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.info(`LOGIN [${req.body.email}] => Login failed. Account not verified!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "The account is not verified!",
+        code: "EVERIFY",
       })
     }
 
@@ -193,6 +247,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.info(`LOGIN [${req.body.email}] => Login failed. Account not approved!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "The account is not approved. Contact an admin to solve this issue!",
+        code: "EAPPROV",
       })
     }
 
@@ -201,6 +256,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.debug(`LOGIN [${req.body.email}] => Login failed. Account not active!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "The account is no longer active!",
+        code: "EARCH",
       })
     }
 
