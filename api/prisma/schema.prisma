@@ -8,6 +8,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator dbml {
+  provider            = "prisma-dbml-generator"
+  output              = "../../docs/db"
+  outputName          = "db.dbml"
+  projectName         = "MindGest"
+  projectDatabaseType = "PostgreSQL"
+  projectNote         = "MindGest Database"
+}
+
 model person {
   id            BigInt          @id @default(autoincrement())
   name          String
