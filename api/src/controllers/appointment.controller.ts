@@ -1335,7 +1335,7 @@ export async function createReceipt(req: Request<{ appointmentId: string }>, res
           where: { id: id },
         })
         assert(permissions !== null)
-        if (process !== null && process !== undefined) {
+        if (process !== null && process !== undefined && permissions.archive) {
           access = true
         }
       }
@@ -1389,7 +1389,7 @@ export async function getReceipt(req: Request<{ appointmentId: string }>, res: R
     }
 
     // Check Permissions (Admin and Accountant access is always granted)
-    if (!admin || role !== User.ACCOUNTANT) {
+    if (!admin && role !== User.ACCOUNTANT) {
       let access = false
       if (role == User.THERAPIST) {
         // Grant access if therapist belongs to the process
@@ -1418,7 +1418,7 @@ export async function getReceipt(req: Request<{ appointmentId: string }>, res: R
           where: { id: id },
         })
         assert(permissions !== null)
-        if (process !== null && process !== undefined) {
+        if (process !== null && process !== undefined && permissions.see) {
           access = true
         }
       }
@@ -1439,7 +1439,7 @@ export async function getReceipt(req: Request<{ appointmentId: string }>, res: R
     logger.debug(`RECEIPT [user-id: ${id}] => Retrieving Receipt...`)
 
     // Build Receipt
-    const payload = buildReceipt(Number(appointmentId))
+    const payload = await buildReceipt(Number(appointmentId))
     if (payload === null) {
       logger.info(`RECEIPT [user-id: ${id}] => Receipt does not exist.`)
       return res.status(StatusCodes.NOT_FOUND).json({

@@ -19,6 +19,7 @@ import PatientRouter from "./patient.route"
 import PermissionRouter from "./permission.route"
 import Notification from "./notification.route"
 import Liable from "./liable.route"
+import Receipt from "./receipt.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
@@ -68,6 +69,7 @@ api.use("/patient", PatientRouter)
 api.use("/permissions", PermissionRouter)
 api.use("/notification", Notification)
 api.use("/liable", Liable)
+api.use("/receipt", Receipt)
 
 // Healthcheck
 api.get("/healthcheck", controller.healthCheck)

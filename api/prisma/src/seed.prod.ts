@@ -872,28 +872,24 @@ async function seed() {
   })
 
   // add notes
-  if (appointment1ProcessChild1.archived_date != null) {
-    await prisma.notes.create({
-      data: {
-        title: "Primeira consulta",
-        body: "O paciente não se sentiu à vontade para falar comigo.",
-        datetime: new Date(appointment1ProcessChild1.archived_date),
-        process_id: processChild1.id,
-      },
-    })
-  }
+  await prisma.notes.create({
+    data: {
+      title: "Primeira consulta",
+      body: "O paciente não se sentiu à vontade para falar comigo.",
+      datetime: new Date(),
+      process_id: processChild1.id,
+    },
+  })
 
   // add receipts
-  if (appointment1ProcessChild1.archived_date != null) {
-    let receiptAppointment1ProcessChild1 = await prisma.receipt.create({
-      data: {
-        ref: `${processChild1.ref}_${appointment1ProcessChild1.archived_date}`,
-        datetime: new Date(appointment1ProcessChild1.archived_date),
-        payed: true,
-        appointment_slot_id: appointment1ProcessChild1.slot_id,
-      },
-    })
-  }
+  let receiptAppointment1ProcessChild1 = await prisma.receipt.create({
+    data: {
+      ref: `${processChild1.ref}_${appointment1ProcessChild1.archived_date}`,
+      datetime: new Date(),
+      payed: true,
+      appointment_slot_id: appointment1ProcessChild1.slot_id,
+    },
+  })
 
   // [ PROCESS TEEN ]
   // create process
@@ -1059,28 +1055,24 @@ async function seed() {
   })
 
   // add notes
-  if (appointment1ProcessTeen1.archived_date != null) {
-    await prisma.notes.create({
-      data: {
-        title: "Primeira consulta",
-        body: "O paciente demonstrou resistência em dialogar sobre o problema.",
-        datetime: new Date(appointment1ProcessTeen1.archived_date),
-        process_id: processTeen1.id,
-      },
-    })
-  }
+  await prisma.notes.create({
+    data: {
+      title: "Primeira consulta",
+      body: "O paciente demonstrou resistência em dialogar sobre o problema.",
+      datetime: new Date(),
+      process_id: processTeen1.id,
+    },
+  })
 
   // add receipts
-  if (appointment1ProcessTeen1.archived_date != null) {
-    let receiptAppointment1ProcessTeen1 = await prisma.receipt.create({
-      data: {
-        ref: `${processTeen1.ref}_${appointment1ProcessTeen1.archived_date}`,
-        datetime: new Date(appointment1ProcessTeen1.archived_date),
-        payed: true,
-        appointment_slot_id: appointment1ProcessTeen1.slot_id,
-      },
-    })
-  }
+  let receiptAppointment1ProcessTeen1 = await prisma.receipt.create({
+    data: {
+      ref: `${processTeen1.ref}_${appointment1ProcessTeen1.archived_date}`,
+      datetime: new Date(),
+      payed: true,
+      appointment_slot_id: appointment1ProcessTeen1.slot_id,
+    },
+  })
 
   // [ PROCESS ADULT ]
   // create process
@@ -1246,28 +1238,24 @@ async function seed() {
   })
 
   // add notes
-  if (appointment1ProcessAdult1.archived_date != null) {
-    await prisma.notes.create({
-      data: {
-        title: "Primeira consulta",
-        body: "O paciente conseguiu falar abertamente comigo sobre o problema.",
-        datetime: new Date(appointment1ProcessAdult1.archived_date),
-        process_id: processAdult1.id,
-      },
-    })
-  }
+  await prisma.notes.create({
+    data: {
+      title: "Primeira consulta",
+      body: "O paciente conseguiu falar abertamente comigo sobre o problema.",
+      datetime: new Date(),
+      process_id: processAdult1.id,
+    },
+  })
 
   // add receipts
-  if (appointment1ProcessAdult1.archived_date != null) {
-    let receiptAppointment1ProcessAdult1 = await prisma.receipt.create({
-      data: {
-        ref: `${processAdult1.ref}_${appointment1ProcessAdult1.archived_date}`,
-        datetime: new Date(appointment1ProcessAdult1.archived_date),
-        payed: true,
-        appointment_slot_id: appointment1ProcessAdult1.slot_id,
-      },
-    })
-  }
+  let receiptAppointment1ProcessAdult1 = await prisma.receipt.create({
+    data: {
+      ref: `${processAdult1.ref}_${appointment1ProcessAdult1.archived_date}`,
+      datetime: new Date(),
+      payed: true,
+      appointment_slot_id: appointment1ProcessAdult1.slot_id,
+    },
+  })
 
   // [ PROCESS ELDER ]
   // create process
@@ -1429,28 +1417,24 @@ async function seed() {
   })
 
   // add notes
-  if (appointment1ProcessElder1.archived_date != null) {
-    await prisma.notes.create({
-      data: {
-        title: "Primeira consulta",
-        body: "O paciente não se sentiu à vontade para falar comigo.",
-        datetime: new Date(appointment1ProcessElder1.archived_date),
-        process_id: processElder1.id,
-      },
-    })
-  }
+  await prisma.notes.create({
+    data: {
+      title: "Primeira consulta",
+      body: "O paciente não se sentiu à vontade para falar comigo.",
+      datetime: new Date(),
+      process_id: processElder1.id,
+    },
+  })
 
   // add receipts
-  if (appointment1ProcessElder1.archived_date != null) {
-    let receiptAppointment1ProcessElder1 = await prisma.receipt.create({
-      data: {
-        ref: `${processElder1.ref}_${appointment1ProcessElder1.archived_date}`,
-        datetime: new Date(appointment1ProcessElder1.archived_date),
-        payed: true,
-        appointment_slot_id: appointment1ProcessElder1.slot_id,
-      },
-    })
-  }
+  let receiptAppointment1ProcessElder1 = await prisma.receipt.create({
+    data: {
+      ref: `${processElder1.ref}_${appointment1ProcessElder1.archived_date}`,
+      datetime: new Date(),
+      payed: true,
+      appointment_slot_id: appointment1ProcessElder1.slot_id,
+    },
+  })
 
   // [ PROCESS Family ]
   // create process
@@ -1631,28 +1615,24 @@ async function seed() {
   })
 
   // add notes
-  if (appointment1ProcessFamily1.archived_date != null) {
-    await prisma.notes.create({
-      data: {
-        title: "Primeira consulta",
-        body: "Deu para perceber que os pais estão muito preocupados e que a criança é de facto irrequieta.",
-        datetime: new Date(appointment1ProcessFamily1.archived_date),
-        process_id: processFamily1.id,
-      },
-    })
-  }
+  await prisma.notes.create({
+    data: {
+      title: "Primeira consulta",
+      body: "Deu para perceber que os pais estão muito preocupados e que a criança é de facto irrequieta.",
+      datetime: new Date(),
+      process_id: processFamily1.id,
+    },
+  })
 
   // add receipts
-  if (appointment1ProcessFamily1.archived_date != null) {
-    let receiptAppointment1ProcessFamily1 = await prisma.receipt.create({
-      data: {
-        ref: `${processFamily1.ref}_${appointment1ProcessFamily1.archived_date}`,
-        datetime: new Date(appointment1ProcessFamily1.archived_date),
-        payed: true,
-        appointment_slot_id: appointment1ProcessFamily1.slot_id,
-      },
-    })
-  }
+  let receiptAppointment1ProcessFamily1 = await prisma.receipt.create({
+    data: {
+      ref: `${processFamily1.ref}_${appointment1ProcessFamily1.archived_date}`,
+      datetime: new Date(),
+      payed: true,
+      appointment_slot_id: appointment1ProcessFamily1.slot_id,
+    },
+  })
 
   // [ PROCESS  COUPLE ]
   // create process
@@ -1829,28 +1809,24 @@ async function seed() {
   })
 
   // add notes
-  if (appointment1ProcessCouple1.archived_date != null) {
-    await prisma.notes.create({
-      data: {
-        title: "Primeira consulta",
-        body: "Os membros do casal falam entre si com um certo grau de frieza.",
-        datetime: new Date(appointment1ProcessCouple1.archived_date),
-        process_id: processCouple1.id,
-      },
-    })
-  }
+  await prisma.notes.create({
+    data: {
+      title: "Primeira consulta",
+      body: "Os membros do casal falam entre si com um certo grau de frieza.",
+      datetime: new Date(),
+      process_id: processCouple1.id,
+    },
+  })
 
   // add receipts
-  if (appointment1ProcessCouple1.archived_date != null) {
-    let receiptAppointment1ProcessCouple1 = await prisma.receipt.create({
-      data: {
-        ref: `${processCouple1.ref}_${appointment1ProcessCouple1.archived_date}`,
-        datetime: new Date(appointment1ProcessCouple1.archived_date),
-        payed: true,
-        appointment_slot_id: appointment1ProcessCouple1.slot_id,
-      },
-    })
-  }
+  let receiptAppointment1ProcessCouple1 = await prisma.receipt.create({
+    data: {
+      ref: `${processCouple1.ref}_${appointment1ProcessCouple1.archived_date}`,
+      datetime: new Date(),
+      payed: true,
+      appointment_slot_id: appointment1ProcessCouple1.slot_id,
+    },
+  })
 
   // notifications
   let uuid = randomUUID()
