@@ -2,6 +2,12 @@
 
 ![Build](https://github.com/MindGest/mindgest-backend/actions/workflows/node.js.yml/badge.svg?brach=main)
 
+![Node](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![Postgres](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+
 A simple **nodejs** + **express** implementation of a REST API (backend server) for the MindGest Web Application.
 
 <p align="center"><img src="./docs/assets/mindgest.png"><p>
