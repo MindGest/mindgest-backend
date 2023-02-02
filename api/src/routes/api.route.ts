@@ -20,6 +20,7 @@ import PermissionRouter from "./permission.route"
 import Notification from "./notification.route"
 import Liable from "./liable.route"
 import Receipt from "./receipt.route"
+import Price from "./price.route"
 
 import controller from "../controllers/api.controller"
 import middleware from "../middleware/api.middleware"
@@ -70,6 +71,7 @@ api.use("/permissions", PermissionRouter)
 api.use("/notification", Notification)
 api.use("/liable", Liable)
 api.use("/receipt", Receipt)
+api.use("/price", Price)
 
 // Healthcheck
 api.get("/healthcheck", controller.healthCheck)
