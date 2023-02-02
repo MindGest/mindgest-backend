@@ -1834,7 +1834,10 @@ async function seed() {
     data: {
       ref: uuid,
       type: "migrate",
-      data: JSON.stringify({ processId: processChild1.id, therapistId: therapist3.person_id }),
+      data: JSON.stringify({
+        processId: Number(processChild1.id),
+        therapistId: Number(therapist3.person_id),
+      }),
       seen: false,
       settled: false,
       person_id: admin1.person_id,
@@ -1845,7 +1848,10 @@ async function seed() {
     data: {
       ref: uuid,
       type: "migrate",
-      data: JSON.stringify({ processId: processChild1.id, therapistId: therapist3.person_id }),
+      data: JSON.stringify({
+        processId: Number(processChild1.id),
+        therapistId: Number(therapist3.person_id),
+      }),
       seen: false,
       settled: false,
       person_id: admin2.person_id,
@@ -1857,7 +1863,10 @@ async function seed() {
     data: {
       ref: uuid,
       type: "migrate",
-      data: JSON.stringify({ processId: processChild1.id, therapistId: therapist3.person_id }),
+      data: JSON.stringify({
+        processId: Number(processChild1.id),
+        therapistId: Number(therapist3.person_id),
+      }),
       seen: false,
       settled: false,
       person_id: therapist3.person_id,
