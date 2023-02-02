@@ -106,7 +106,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
             person: { connect: { id: person.id } },
           },
         })
-        payload = { ...body, admin: true }
+        payload = { admin: true }
         break
       case User.THERAPIST: {
         // Insert therapist in the therapist table
@@ -143,7 +143,6 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
         })
 
         let tmp = {
-          ...body,
           license: therapist.license,
           healthSystem: therapist.health_system,
           extern: therapist.extern,
@@ -159,6 +158,8 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
             },
           })
           payload = { ...tmp, admin: true }
+        } else {
+          payload = { ...tmp }
         }
         break
       }
@@ -173,7 +174,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
       await prisma.notifications.create({
         data: {
           person: { connect: { id: admin.person_id } },
-          data: JSON.stringify(payload),
+          data: JSON.stringify({ ...body, ...payload }),
           type: "register",
           settled: false,
           seen: false,
