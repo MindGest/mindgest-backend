@@ -29,6 +29,7 @@ import {
 
 import { User } from "../utils/schemas"
 import { randomUUID } from "crypto"
+import processController from "./process.controller"
 
 export async function register(req: Request<{}, {}, RegistrationBody>, res: Response) {
   try {
@@ -184,6 +185,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
     logger.info(`REGISTER [${req.body.email}] => Account Created!`)
     res.status(StatusCodes.CREATED).json({
       message: "The user account was created successfully",
+      data: { userId: person.id },
     })
   } catch (error) {
     logger.error(`REGISTER => Server Error: ${error}`)
@@ -207,7 +209,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.info(`LOGIN [${req.body.email}] => User does not exist!`)
       return res.status(StatusCodes.NOT_FOUND).json({
         message: `The user with email ${req.body.email} does not exist.`,
-        code: 'EEXIST'
+        code: "EEXIST",
       })
     }
 
@@ -219,7 +221,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.info(`LOGIN [${req.body.email}] => Login failed. Invalid Password!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: `Invalid password for user with email ${req.body.email}`,
-        code: 'EPASS'
+        code: "EPASS",
       })
     }
 
@@ -228,7 +230,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.info(`LOGIN [${req.body.email}] => Login failed. Account not verified!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "The account is not verified!",
-        code: 'EVERIFY'
+        code: "EVERIFY",
       })
     }
 
@@ -237,7 +239,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.info(`LOGIN [${req.body.email}] => Login failed. Account not approved!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "The account is not approved. Contact an admin to solve this issue!",
-        code: 'EAPPROV'
+        code: "EAPPROV",
       })
     }
 
@@ -246,7 +248,7 @@ export async function login(req: Request<{}, {}, LoginBody>, res: Response) {
       logger.debug(`LOGIN [${req.body.email}] => Login failed. Account not active!`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "The account is no longer active!",
-        code: 'EARCH'
+        code: "EARCH",
       })
     }
 
