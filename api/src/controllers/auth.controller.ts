@@ -72,7 +72,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
       address: person.address,
       birthDate: person.birth_date.toISOString().slice(0, 10),
       phoneNumber: person.phone_number,
-      role: req.body.role
+      role: req.body.role,
     }
 
     // Jarvardisus Maximus
