@@ -109,12 +109,12 @@ async function seed() {
       speciality_speciality: specialityChild.speciality,
     },
   })
-  await prisma.therapist_speciality.create({
-    data: {
-      therapist_person_id: therapist1.person_id,
-      speciality_speciality: specialityElder.speciality,
-    },
-  })
+  // await prisma.therapist_speciality.create({
+  //   data: {
+  //     therapist_person_id: therapist1.person_id,
+  //     speciality_speciality: specialityElder.speciality,
+  //   },
+  // })
 
   let person2 = await prisma.person.create({
     data: {
@@ -145,12 +145,12 @@ async function seed() {
       speciality_speciality: specialityTeen.speciality,
     },
   })
-  await prisma.therapist_speciality.create({
-    data: {
-      therapist_person_id: therapist2.person_id,
-      speciality_speciality: specialityFamily.speciality,
-    },
-  })
+  // await prisma.therapist_speciality.create({
+  //   data: {
+  //     therapist_person_id: therapist2.person_id,
+  //     speciality_speciality: specialityFamily.speciality,
+  //   },
+  // })
 
   let person11 = await prisma.person.create({
     data: {
@@ -182,12 +182,12 @@ async function seed() {
       speciality_speciality: specialityAdult.speciality,
     },
   })
-  await prisma.therapist_speciality.create({
-    data: {
-      therapist_person_id: therapist3.person_id,
-      speciality_speciality: specialityCouple.speciality,
-    },
-  })
+  // await prisma.therapist_speciality.create({
+  //   data: {
+  //     therapist_person_id: therapist3.person_id,
+  //     speciality_speciality: specialityCouple.speciality,
+  //   },
+  // })
   // make him admin
   await prisma.admin.create({
     data: {
