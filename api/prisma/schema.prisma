@@ -10,12 +10,12 @@ datasource db {
 
 model person {
   id            BigInt          @id @default(autoincrement())
-  name          String          @db.VarChar(512)
-  email         String          @db.VarChar(512)
-  password      String          @db.VarChar(512)
-  address       String          @db.VarChar(512)
+  name          String
+  email         String
+  password      String
+  address       String
   birth_date    DateTime        @db.Date
-  photo         String?         @db.VarChar(512)
+  photo         String?
   phone_number  BigInt
   verified      Boolean
   active        Boolean
@@ -33,8 +33,8 @@ model person {
 
 model therapist {
   extern               Boolean
-  license              String?                @db.VarChar(512)
-  health_system        String?                @db.VarChar(512)
+  license              String?
+  health_system        String?
   person_id            BigInt                 @id
   person               person                 @relation(fields: [person_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_fk1")
   therapist_process    therapist_process[]
@@ -64,8 +64,8 @@ model accountant {
 
 model patient {
   health_number   BigInt
-  request         String            @db.VarChar(512)
-  remarks         String?           @db.VarChar(512)
+  request         String
+  remarks         String?
   patienttype_id  BigInt
   person_id       BigInt            @id
   patienttype     patienttype       @relation(fields: [patienttype_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_fk1")
@@ -77,8 +77,8 @@ model patient {
 
 model school {
   id                BigInt  @id @default(autoincrement())
-  name              String  @db.VarChar(512)
-  course            String  @db.VarChar(512)
+  name              String
+  course            String
   grade             BigInt? @unique
   patient_person_id BigInt
   patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "school_fk1")
@@ -92,7 +92,7 @@ model appointment {
   active              Boolean?
   online              Boolean?
   room_id             BigInt
-  pricetable_id       String                @db.VarChar(512)
+  pricetable_id       String
   room                room                  @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk1")
   pricetable          pricetable            @relation(fields: [pricetable_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "appointment_fk2")
   appointment_process appointment_process[]
@@ -119,11 +119,11 @@ model intern_process {
 
 model liable {
   id             BigInt           @id @default(autoincrement())
-  name           String           @db.VarChar(512)
-  email          String           @db.VarChar(512)
+  name           String
+  email          String
   phonenumber    BigInt
-  type           String           @db.VarChar(512)
-  remarks        String?          @db.VarChar(512)
+  type           String
+  remarks        String?
   process_liable process_liable[]
 }
 
@@ -150,7 +150,7 @@ model patient_process {
 
 model patienttype {
   id      BigInt    @id @default(autoincrement())
-  type    String    @db.VarChar(512)
+  type    String
   patient patient[]
 }
 
@@ -170,8 +170,8 @@ model permissions {
 }
 
 model pricetable {
-  id          String        @id @db.VarChar(512)
-  type        String        @db.VarChar(512)
+  id          String        @id
+  type        String
   price       Float         @db.Real
   appointment appointment[]
 }
@@ -180,8 +180,8 @@ model process {
   id                    BigInt                @id @default(autoincrement())
   ref                   String                @unique @db.VarChar(512)
   active                Boolean
-  remarks               String?               @db.VarChar(512)
-  speciality_speciality String                @db.VarChar(512)
+  remarks               String?
+  speciality_speciality String
   appointment_process   appointment_process[]
   intern_process        intern_process[]
   notes                 notes[]
@@ -194,8 +194,8 @@ model process {
 
 model notes {
   id         BigInt   @id @default(autoincrement())
-  title      String   @db.VarChar(512)
-  body       String   @db.VarChar(512)
+  title      String
+  body       String
   process_id BigInt
   datetime   DateTime @db.Date
   process    process  @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_notes_fk1")
@@ -212,7 +212,7 @@ model process_liable {
 
 model profession {
   id                BigInt  @id @default(autoincrement())
-  name              String  @unique @db.VarChar(512)
+  name              String  @unique
   patient_person_id BigInt
   patient           patient @relation(fields: [patient_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "profession_fk1")
 }
@@ -227,14 +227,14 @@ model receipt {
 
 model room {
   id          BigInt        @id @default(autoincrement())
-  name        String        @unique @db.VarChar(512)
+  name        String        @unique
   appointment appointment[]
 }
 
 model speciality {
-  speciality           String                 @id @db.VarChar(512)
-  code                 String                 @db.VarChar(512)
-  description          String                 @db.VarChar(512)
+  speciality           String                 @id
+  code                 String
+  description          String
   process              process[]
   therapist_speciality therapist_speciality[]
 }
@@ -250,7 +250,7 @@ model therapist_process {
 
 model therapist_speciality {
   therapist_person_id   BigInt
-  speciality_speciality String     @db.VarChar(512)
+  speciality_speciality String
   therapist             therapist  @relation(fields: [therapist_person_id], references: [person_id], onDelete: NoAction, onUpdate: NoAction, map: "therapist_speciality_fk1")
   speciality            speciality @relation(fields: [speciality_speciality], references: [speciality], onDelete: NoAction, onUpdate: NoAction, map: "therapist_speciality_fk2")
 
