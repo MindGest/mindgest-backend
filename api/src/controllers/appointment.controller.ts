@@ -204,20 +204,24 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
 
         // get care takers
         let process_liable = await prisma.process_liable.findMany({
-          where: {process_id: processes[i].id}
+          where: { process_id: processes[i].id },
         })
-        let careTakers = [];
-        for (let i = 0; i < process_liable.length; i++){
-          let careTaker = await prisma.liable.findFirst({where: {id: process_liable[i].liable_id}});
-          careTakers.push(careTaker?.name);
+        let careTakers = []
+        for (let i = 0; i < process_liable.length; i++) {
+          let careTaker = await prisma.liable.findFirst({
+            where: { id: process_liable[i].liable_id },
+          })
+          careTakers.push(careTaker?.name)
         }
 
         // if it is paid
         // get the receipt (if null or not paid, it is not paid )
-        let receipt = await prisma.receipt.findFirst({where: {appointment_slot_id: appointment_process[e].appointment_slot_id}});
-        let paid = false;
-        if (receipt != null && receipt.payed){
-          paid = true;
+        let receipt = await prisma.receipt.findFirst({
+          where: { appointment_slot_id: appointment_process[e].appointment_slot_id },
+        })
+        let paid = false
+        if (receipt != null && receipt.payed) {
+          paid = true
         }
 
         if (!appointmentInfo) {
@@ -484,8 +488,8 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         slot_start_date: true,
         slot_end_date: true,
         slot_id: true,
-        room: {select: {name: true}}
-      }
+        room: { select: { name: true } },
+      },
     })
     if (!appointment) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -562,20 +566,22 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
 
     // get care takers
     let process_liable = await prisma.process_liable.findMany({
-      where: {process_id: process.id}
+      where: { process_id: process.id },
     })
-    let careTakers = [];
-    for (let i = 0; i < process_liable.length; i++){
-      let careTaker = await prisma.liable.findFirst({where: {id: process_liable[i].liable_id}});
-      careTakers.push(careTaker?.name);
+    let careTakers = []
+    for (let i = 0; i < process_liable.length; i++) {
+      let careTaker = await prisma.liable.findFirst({ where: { id: process_liable[i].liable_id } })
+      careTakers.push(careTaker?.name)
     }
 
     // if it is paid
     // get the receipt (if null or not paid, it is not paid )
-    let receipt = await prisma.receipt.findFirst({where: {appointment_slot_id: appointment.slot_id}});
-    let paid = false;
-    if (receipt != null && receipt.payed){
-      paid = true;
+    let receipt = await prisma.receipt.findFirst({
+      where: { appointment_slot_id: appointment.slot_id },
+    })
+    let paid = false
+    if (receipt != null && receipt.payed) {
+      paid = true
     }
 
     res.status(StatusCodes.OK).json({
