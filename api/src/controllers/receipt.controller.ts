@@ -47,7 +47,7 @@ export async function pay(req: Request, res: Response) {
   }
 }
 
-export async function info(req: Request<{receiptId: string}>, res: Response) {
+export async function info(req: Request<{ receiptId: string }>, res: Response) {
   // Authorizing User
   const { id, role, admin } = res.locals.token
   const receiptId = Number(req.params.receiptId)
@@ -64,17 +64,17 @@ export async function info(req: Request<{receiptId: string}>, res: Response) {
       message: `Receipt with id '${receipt} does not exist...`,
     })
   }
-  
+
   try {
     let appointment_process = await prisma.appointment_process.findFirst({
-      where: {appointment_slot_id: receipt.appointment_slot_id}
+      where: { appointment_slot_id: receipt.appointment_slot_id },
     })
-    if (!appointment_process){
+    if (!appointment_process) {
       return res.status(StatusCodes.NOT_FOUND).json({
-        message: "It seems that the process and appointment do not exist."
+        message: "It seems that the process and appointment do not exist.",
       })
     }
-    let processId = appointment_process.process_id;
+    let processId = appointment_process.process_id
     // Check Permissions (Admin access is always granted)
     if (!admin && role !== User.ACCOUNTANT) {
       let access = false
@@ -121,7 +121,7 @@ export async function info(req: Request<{receiptId: string}>, res: Response) {
       }
     }
     // get receipt info
-    let receiptInfo = await buildReceipt(Number(receipt.appointment_slot_id));
+    let receiptInfo = await buildReceipt(Number(receipt.appointment_slot_id))
 
     res.status(StatusCodes.OK).json({
       data: receiptInfo,
@@ -133,31 +133,31 @@ export async function info(req: Request<{receiptId: string}>, res: Response) {
   }
 }
 
-export async function list(req: Request, res: Response){
+export async function list(req: Request, res: Response) {
   // Authorizing User
   const { id, role, admin } = res.locals.token
   const receiptId = Number(req.params.receiptId)
   try {
     // if guard, do not allow
-    if (role == User.GUARD){
+    if (role == User.GUARD) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You do not have access to this information."
+        message: "You do not have access to this information.",
       })
     }
     // get all receipts
-    let receipts = await prisma.receipt.findMany();
-    let receiptsInfo = [];
-    for (let receipt of receipts){
+    let receipts = await prisma.receipt.findMany()
+    let receiptsInfo = []
+    for (let receipt of receipts) {
       // verify that this information can be accessed
       let appointment_process = await prisma.appointment_process.findFirst({
-        where: {appointment_slot_id: receipt.appointment_slot_id}
+        where: { appointment_slot_id: receipt.appointment_slot_id },
       })
-      if (!appointment_process){
+      if (!appointment_process) {
         return res.status(StatusCodes.NOT_FOUND).json({
-          message: "It seems that the process and appointment do not exist."
+          message: "It seems that the process and appointment do not exist.",
         })
       }
-      let processId = appointment_process.process_id;
+      let processId = appointment_process.process_id
       // Check Permissions (Admin access is always granted)
       if (!admin && role !== User.ACCOUNTANT) {
         let access = false
@@ -192,19 +192,18 @@ export async function list(req: Request, res: Response){
             access = true
           }
         }
-  
+
         // Grant Access
         if (!access) {
-          continue;
+          continue
         }
       }
-      receiptsInfo.push(await buildReceipt(Number(receipt.appointment_slot_id)));
+      receiptsInfo.push(await buildReceipt(Number(receipt.appointment_slot_id)))
     }
 
     res.status(StatusCodes.OK).json({
       data: receiptsInfo,
     })
-
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",

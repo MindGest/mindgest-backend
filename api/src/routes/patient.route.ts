@@ -17,7 +17,6 @@ patient.get("/list", controller.listPatients)
 
 patient.get("/types", controller.getPatientTypes)
 
-
 patient.get("/:patientId/receipts", controller.receiptList)
 
 /// Patient Specific Endpoints

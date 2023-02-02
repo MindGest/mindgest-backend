@@ -1045,14 +1045,14 @@ async function filterAssociatedPatients(callerId: number, callerRole: string) {
   return Array.from(patientIdsSet)
 }
 
-export async function receiptList(req: Request<{patientId: string}>, res: Response){
+export async function receiptList(req: Request<{ patientId: string }>, res: Response) {
   /**
    * Returns all the receipts of the patient.
    * if admin, returns all
    * if therapist, returns all recepits from processes in which the caller is associated
    * if therapist, returns all recepits from processes in which the caller is associated and has see permission
    */
-  try{
+  try {
     var decodedToken = res.locals.token
 
     // obtain the caller properties
@@ -1063,22 +1063,22 @@ export async function receiptList(req: Request<{patientId: string}>, res: Respon
     let patientId = Number(req.params.patientId)
 
     // guard cannot see this info
-    if (callerRole == User.GUARD){
+    if (callerRole == User.GUARD) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "You cannot access this information."
+        message: "You cannot access this information.",
       })
     }
 
-    let receiptsInfo = [];
+    let receiptsInfo = []
 
     // get the processes of the patient
     let patient_process = await prisma.patient_process.findMany({
-      where: {patient_person_id: patientId}
+      where: { patient_person_id: patientId },
     })
 
     // for each process
-    for (let process of patient_process){
-      let canSee = false;
+    for (let process of patient_process) {
+      let canSee = false
       // check permission therapist
       if (callerRole == "therapist") {
         let therapist_process = await prisma.therapist_process.findFirst({
@@ -1099,17 +1099,19 @@ export async function receiptList(req: Request<{patientId: string}>, res: Respon
       }
       // if the caller does not have permission, skip this process.
       if (!callerIsAdmin && !canSee && callerRole != User.ACCOUNTANT) {
-        continue;
+        continue
       }
 
       // get the process appointments
-      let appointment_process = await prisma.appointment_process.findMany({where: {process_id: process.process_id}});
+      let appointment_process = await prisma.appointment_process.findMany({
+        where: { process_id: process.process_id },
+      })
 
       // for each appointmet get the receipt info
-      for (let appointment of appointment_process){
-        let receiptInfo = await buildReceipt(Number(appointment.appointment_slot_id));
-        if (receiptInfo){
-          receiptsInfo.push(receiptInfo);
+      for (let appointment of appointment_process) {
+        let receiptInfo = await buildReceipt(Number(appointment.appointment_slot_id))
+        if (receiptInfo) {
+          receiptsInfo.push(receiptInfo)
         }
       }
     }
@@ -1117,7 +1119,7 @@ export async function receiptList(req: Request<{patientId: string}>, res: Respon
     res.status(StatusCodes.OK).json({
       data: receiptsInfo,
     })
-  } catch (error){
+  } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: "Ups... Something went wrong",
     })
