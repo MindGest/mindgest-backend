@@ -1,0 +1,327 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Project "MindGest" {
+  database_type: 'PostgreSQL'
+  Note: 'MindGest Database'
+}
+
+Table person {
+  id BigInt [pk, increment]
+  name String [not null]
+  email String [not null]
+  password String [not null]
+  address String [not null]
+  birth_date DateTime [not null]
+  photo String
+  phone_number BigInt [not null]
+  verified Boolean [not null]
+  active Boolean [not null]
+  approved Boolean [not null]
+  tax_number BigInt
+  accountant accountant
+  admin admin
+  guard guard
+  intern intern
+  notifications notifications [not null]
+  patient patient
+  permissions permissions [not null]
+  therapist therapist
+}
+
+Table therapist {
+  extern Boolean [not null]
+  license String
+  health_system String
+  person_id BigInt [pk]
+  person person [not null]
+  therapist_process therapist_process [not null]
+  therapist_speciality therapist_speciality [not null]
+}
+
+Table guard {
+  person_id BigInt [pk]
+  person person [not null]
+}
+
+Table admin {
+  person_id BigInt [pk]
+  person person [not null]
+}
+
+Table intern {
+  person_id BigInt [pk]
+  person person [not null]
+  intern_process intern_process [not null]
+}
+
+Table accountant {
+  person_id BigInt [pk]
+  person person [not null]
+}
+
+Table patient {
+  health_number BigInt [not null]
+  request String [not null]
+  remarks String
+  patienttype_id BigInt [not null]
+  person_id BigInt [pk]
+  patienttype patienttype [not null]
+  person person [not null]
+  patient_process patient_process [not null]
+  profession profession [not null]
+  school school [not null]
+}
+
+Table school {
+  id BigInt [pk, increment]
+  name String [not null]
+  course String [not null]
+  grade BigInt [unique]
+  patient_person_id BigInt [not null]
+  patient patient [not null]
+}
+
+Table appointment {
+  slot_id BigInt [pk, increment]
+  slot_start_date DateTime [not null]
+  slot_end_date DateTime [not null]
+  archived_date DateTime
+  active Boolean
+  online Boolean
+  room_id BigInt [not null]
+  pricetable_id String [not null]
+  room room [not null]
+  pricetable pricetable [not null]
+  appointment_process appointment_process [not null]
+  receipt receipt [not null]
+}
+
+Table appointment_process {
+  appointment_slot_id BigInt [not null]
+  process_id BigInt [not null]
+  appointment appointment [not null]
+  process process [not null]
+
+  indexes {
+    (appointment_slot_id, process_id) [pk]
+  }
+}
+
+Table intern_process {
+  intern_person_id BigInt [not null]
+  process_id BigInt [not null]
+  intern intern [not null]
+  process process [not null]
+
+  indexes {
+    (intern_person_id, process_id) [pk]
+  }
+}
+
+Table liable {
+  id BigInt [pk, increment]
+  name String [not null]
+  email String [not null]
+  phonenumber BigInt [not null]
+  type String [not null]
+  remarks String
+  process_liable process_liable [not null]
+}
+
+Table notifications {
+  id BigInt [pk, increment]
+  ref String [not null]
+  datetime DateTime [default: `now()`, not null]
+  data String [not null]
+  type String [not null]
+  seen Boolean [not null]
+  settled Boolean [not null]
+  person_id BigInt [not null]
+  person person [not null]
+}
+
+Table patient_process {
+  patient_person_id BigInt [not null]
+  process_id BigInt [not null]
+  patient patient [not null]
+  process process [not null]
+
+  indexes {
+    (patient_person_id, process_id) [pk]
+  }
+}
+
+Table patienttype {
+  id BigInt [pk, increment]
+  type String [not null]
+  patient patient [not null]
+}
+
+Table permissions {
+  editprocess Boolean [not null, default: false]
+  see Boolean [not null, default: false]
+  appoint Boolean [not null, default: false]
+  statitics Boolean [not null, default: false]
+  editpatitent Boolean [not null, default: false]
+  archive Boolean [not null, default: false]
+  isMain Boolean [not null, default: false]
+  id BigInt [pk, increment]
+  person_id BigInt [not null]
+  process_id BigInt [not null]
+  person person [not null]
+  process process [not null]
+}
+
+Table pricetable {
+  id String [pk]
+  type String [not null]
+  price Float [not null]
+  appointment appointment [not null]
+}
+
+Table process {
+  id BigInt [pk, increment]
+  ref String [unique, not null]
+  active Boolean [not null]
+  remarks String
+  speciality_speciality String [not null]
+  appointment_process appointment_process [not null]
+  intern_process intern_process [not null]
+  notes notes [not null]
+  patient_process patient_process [not null]
+  permissions permissions [not null]
+  speciality speciality [not null]
+  process_liable process_liable [not null]
+  therapist_process therapist_process [not null]
+}
+
+Table notes {
+  id BigInt [pk, increment]
+  title String [not null]
+  body String [not null]
+  process_id BigInt [not null]
+  datetime DateTime [not null]
+  process process [not null]
+}
+
+Table process_liable {
+  process_id BigInt [not null]
+  liable_id BigInt [not null]
+  process process [not null]
+  liable liable [not null]
+
+  indexes {
+    (process_id, liable_id) [pk]
+  }
+}
+
+Table profession {
+  id BigInt [pk, increment]
+  name String [unique, not null]
+  patient_person_id BigInt [not null]
+  patient patient [not null]
+}
+
+Table receipt {
+  id BigInt [pk, increment]
+  datetime DateTime [default: `now()`, not null]
+  payed Boolean [default: false]
+  appointment_slot_id BigInt [not null]
+  appointment appointment [not null]
+}
+
+Table room {
+  id BigInt [pk, increment]
+  name String [unique, not null]
+  appointment appointment [not null]
+}
+
+Table speciality {
+  speciality String [pk]
+  code String [not null]
+  description String [not null]
+  process process [not null]
+  therapist_speciality therapist_speciality [not null]
+}
+
+Table therapist_process {
+  therapist_person_id BigInt [not null]
+  process_id BigInt [not null]
+  therapist therapist [not null]
+  process process [not null]
+
+  indexes {
+    (therapist_person_id, process_id) [pk]
+  }
+}
+
+Table therapist_speciality {
+  therapist_person_id BigInt [not null]
+  speciality_speciality String [not null]
+  therapist therapist [not null]
+  speciality speciality [not null]
+
+  indexes {
+    (therapist_person_id, speciality_speciality) [pk]
+  }
+}
+
+Ref: therapist.person_id - person.id [delete: No Action]
+
+Ref: guard.person_id - person.id [delete: No Action]
+
+Ref: admin.person_id - person.id [delete: No Action]
+
+Ref: intern.person_id - person.id [delete: No Action]
+
+Ref: accountant.person_id - person.id [delete: No Action]
+
+Ref: patient.patienttype_id > patienttype.id [delete: No Action]
+
+Ref: patient.person_id - person.id [delete: No Action]
+
+Ref: school.patient_person_id > patient.person_id [delete: No Action]
+
+Ref: appointment.room_id > room.id [delete: No Action]
+
+Ref: appointment.pricetable_id > pricetable.id [delete: No Action]
+
+Ref: appointment_process.appointment_slot_id > appointment.slot_id [delete: No Action]
+
+Ref: appointment_process.process_id > process.id [delete: No Action]
+
+Ref: intern_process.intern_person_id > intern.person_id [delete: No Action]
+
+Ref: intern_process.process_id > process.id [delete: No Action]
+
+Ref: notifications.person_id > person.id [delete: No Action]
+
+Ref: patient_process.patient_person_id > patient.person_id [delete: No Action]
+
+Ref: patient_process.process_id > process.id [delete: No Action]
+
+Ref: permissions.person_id > person.id [delete: No Action]
+
+Ref: permissions.process_id > process.id [delete: No Action]
+
+Ref: process.speciality_speciality > speciality.speciality [delete: No Action]
+
+Ref: notes.process_id > process.id [delete: No Action]
+
+Ref: process_liable.process_id > process.id [delete: No Action]
+
+Ref: process_liable.liable_id > liable.id [delete: No Action]
+
+Ref: profession.patient_person_id > patient.person_id [delete: No Action]
+
+Ref: receipt.appointment_slot_id > appointment.slot_id [delete: No Action]
+
+Ref: therapist_process.therapist_person_id > therapist.person_id [delete: No Action]
+
+Ref: therapist_process.process_id > process.id [delete: No Action]
+
+Ref: therapist_speciality.therapist_person_id > therapist.person_id [delete: No Action]
+
+Ref: therapist_speciality.speciality_speciality > speciality.speciality [delete: No Action]

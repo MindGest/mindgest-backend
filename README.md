@@ -10,15 +10,14 @@ A **nodejs** + **express** implementation of a REST API (backend) for the MindGe
 
 Currently, the Center for Provision of Services to the Community, of the Faculty
 of Psychology and Educational Sciences at the University of Coimbra,
-CPSC-FPCE-UC, makes use of a old-fashioned, complex service management platform
-that does not respond to its users needs.
+CPSC-FPCE-UC, makes use of an old-fashioned, complex service management platform
+that does not respond to its user's needs.
 
 This project, carried out within the scope of the Project Management (2022/2023)
 course, attempts to develop a prototype of a management platform (MindGest) that
 addresses the existing problems. With this new platform, we attempt to automate
 time-consuming and complex tasks that are currently carried out manually, and
-improve on the current platform functionalities, making them simple and more 
-user friendly.
+improve on the current platform functionalities, making them simple and more user-friendly.
 
 ## Development
 
