@@ -845,7 +845,6 @@ export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Re
       infoAppointments.push({
         data: formattedDate,
         estado: receipt?.payed ? "Pago" : "Por Pagar",
-        referencia: receipt != null ? receipt.ref : "",
         valor: type?.price,
       })
     }

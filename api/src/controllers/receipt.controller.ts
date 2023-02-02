@@ -27,13 +27,13 @@ export async function pay(req: Request, res: Response) {
     logger.debug(`PAY [user-id: ${id}] => Updating the receipt status...`)
 
     // Pay / Regress Debt
-    const receiptRef = req.params.receiptId
+    const receiptRef = Number(req.params.receiptId)
     let receipt = await prisma.receipt.findUnique({
-      where: { ref: receiptRef },
+      where: { id: receiptRef },
     })
     await prisma.receipt.update({
       data: { payed: !receipt?.payed },
-      where: { ref: receiptRef },
+      where: { id: receiptRef },
     })
 
     logger.info(`PAY [user-id: ${id}] => Receipt Updated Successfully`)
