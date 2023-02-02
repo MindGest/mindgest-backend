@@ -6,11 +6,12 @@ import schemas from "../utils/schemas"
 
 const speciality = Router()
 
-speciality.use(authMiddleware.authorize())
 
 speciality.get("/list", (req: Request, res: Response) => {
   controller.getAllSpecialities(req, res)
 })
+
+speciality.use(authMiddleware.authorize())
 
 speciality.post(
   "/create",

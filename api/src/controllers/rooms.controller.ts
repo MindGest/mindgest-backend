@@ -41,17 +41,37 @@ export async function listAppointmentRooms(
       var rooms = await prisma.room.findMany()
 
       for (var roomId of rooms) {
-        var appointments = await prisma.$queryRaw<
-          appointment[]
-        >`Select * from appointment where room_id= ${
-          roomId.id
-        } and extract(month from slot_start_date) = ${parseInt(
-          month
-        )} and extract(year from slot_start_date) = ${parseInt(
-          year
-        )} and extract(day from slot_start_date) = ${parseInt(day)}`
+        let appointments
+        if(dateString != null){
+          appointments = await prisma.$queryRaw<
+            appointment[]
+          >`Select * from appointment where room_id= ${
+            roomId.id
+          } and extract(month from slot_start_date) = ${parseInt(
+            month
+          )} and extract(year from slot_start_date) = ${parseInt(
+            year
+          )} and extract(day from slot_start_date) = ${parseInt(day)}`
+        }
+        else{
+          let today = new Date()
+          appointments = await prisma.appointment.findMany({
+            where:{
+              slot_start_date:  {
+                gte: today
+              }
+            },
+            orderBy: {
+              slot_start_date: 'asc'
+            }
+          })
+        }
 
         var roomAppointments = []
+
+        let lastAppointmentHour = "00:00"
+        let lastDay = ""
+        let lastDate = ""
 
         for (var appointment of appointments) {
           var processId = await prisma.appointment_process.findFirst({
@@ -104,14 +124,86 @@ export async function listAppointmentRooms(
             },
           })
 
+          let dateStart = appointment.slot_start_date
+          const formattedDate1 = dateStart?.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric"
+          })
+
+          let dateEnd = appointment.slot_end_date
+          const formattedDate2 = dateEnd?.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric"
+          })
+
+          if(lastDay!=formattedDate1.split("/")[0]){
+            if(lastAppointmentHour != "24:00" && lastDate != ""){
+              let dateEndDay = lastDate.split(", ")[0] + ", " +"24:00"
+              roomAppointments.push({
+                title: "empty",
+                speciality: "empty",
+                id: "empty",
+                startDate: lastDate,
+                endDate: dateEndDay,
+                therapists: [],
+                userId: -1,
+                userName: "empty",
+              })
+            }
+            lastAppointmentHour = "00:00"
+            lastDay=formattedDate1.split("/")[0]
+          }
+
+          lastDate=formattedDate2
+
+          let startHour = formattedDate1.split(", ")[1]
+          if(startHour !=lastAppointmentHour){
+
+            let newDate = formattedDate1.split(", ")[0] + ", " +lastAppointmentHour
+
+            roomAppointments.push({
+              title: "empty",
+              speciality: "empty",
+              id: "empty",
+              startDate: newDate,
+              endDate: formattedDate1,
+              therapists: [],
+              userId: -1,
+              userName: "empty",
+            })
+
+            lastAppointmentHour = formattedDate2.split(", ")[1]
+          } 
+
           roomAppointments.push({
             title: title,
+            speciality: process?.speciality_speciality,
             id: appointment.slot_id,
-            startDate: appointment.slot_start_date,
-            endDate: appointment.slot_end_date,
+            startDate: formattedDate1,
+            endDate: formattedDate2,
             therapists: therapistsInfo,
             userId: patientInfo?.id,
             userName: patientInfo?.name,
+          })
+        }
+
+        if(lastAppointmentHour != "24:00" && lastDate != ""){
+          let dateEndDay = lastDate.split(", ")[0] + ", " +"24:00"
+          roomAppointments.push({
+            title: "empty",
+            speciality: "empty",
+            id: "empty",
+            startDate: lastDate,
+            endDate: dateEndDay,
+            therapists: [],
+            userId: -1,
+            userName: "empty",
           })
         }
 

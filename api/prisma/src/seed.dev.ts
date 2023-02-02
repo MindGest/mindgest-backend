@@ -618,8 +618,8 @@ async function seed() {
       online: false,
       room_id: room1.id,
       pricetable_id: pricetable1.id,
-      slot_start_date: new Date("2023-01-31T22:50:28.538Z"),
-      slot_end_date: new Date("2023-01-31T03:50:28.538Z"),
+      slot_start_date: new Date("2023-02-03T09:50:28.538Z"),
+      slot_end_date: new Date("2023-02-03T10:50:28.538Z"),
       active: false,
     },
   })
@@ -629,8 +629,8 @@ async function seed() {
       online: false,
       room_id: room1.id,
       pricetable_id: pricetable1.id,
-      slot_start_date: new Date("2023-01-22T22:50:28.538Z"),
-      slot_end_date: new Date("2023-01-22T03:50:28.538Z"),
+      slot_start_date: new Date("2023-02-04T09:50:28.538Z"),
+      slot_end_date: new Date("2023-02-04T10:50:28.538Z"),
       active: true,
     },
   })
@@ -640,8 +640,8 @@ async function seed() {
       online: false,
       room_id: room1.id,
       pricetable_id: pricetable1.id,
-      slot_start_date: new Date("2023-01-30T22:50:28.538Z"),
-      slot_end_date: new Date("2023-01-30T03:50:28.538Z"),
+      slot_start_date: new Date("2023-01-30T12:50:28.538Z"),
+      slot_end_date: new Date("2023-01-30T13:50:28.538Z"),
       active: false,
     },
   })
@@ -670,7 +670,7 @@ async function seed() {
   let receipt1 = await prisma.receipt.create({
     data: {
       ref: "istoechato",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       payed: true,
       appointment_slot_id: appointment2.slot_id,
     },
@@ -751,7 +751,7 @@ async function seed() {
     data: {
       title: "testagem",
       body: "teste",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       process_id: process.id,
     },
   })
@@ -762,10 +762,10 @@ async function seed() {
       online: false,
       room_id: room2.id,
       pricetable_id: pricetable2.id,
-      slot_start_date: new Date("2023-01-31T22:50:28.538Z"),
-      slot_end_date: new Date("2023-01-31T03:50:28.538Z"),
+      slot_start_date: new Date("2023-02-03T14:50:28.538Z"),
+      slot_end_date: new Date("2023-02-03T15:50:28.538Z"),
       active: false,
-      archived_date: new Date("2023-01-31T22:50:28.538Z"),
+      archived_date: new Date("2023-02-03T15:50:28.538Z"),
     },
   })
 
@@ -774,10 +774,10 @@ async function seed() {
       online: false,
       room_id: room2.id,
       pricetable_id: pricetable1.id,
-      slot_start_date: new Date("2023-01-22T22:50:28.538Z"),
-      slot_end_date: new Date("2023-01-22T03:50:28.538Z"),
+      slot_start_date: new Date("2023-02-04T16:50:28.538Z"),
+      slot_end_date: new Date("2023-02-04T17:50:28.538Z"),
       active: true,
-      archived_date: new Date("2023-01-22T22:50:28.538Z"),
+      archived_date: new Date("2023-02-04T17:50:28.538Z"),
     },
   })
 
@@ -786,10 +786,10 @@ async function seed() {
       online: false,
       room_id: room2.id,
       pricetable_id: pricetable3.id,
-      slot_start_date: new Date("2023-01-30T22:50:28.538Z"),
-      slot_end_date: new Date("2023-01-30T03:50:28.538Z"),
+      slot_start_date: new Date("2023-01-30T11:50:28.538Z"),
+      slot_end_date: new Date("2023-01-30T12:50:28.538Z"),
       active: false,
-      archived_date: new Date("2023-01-30T22:50:28.538Z"),
+      archived_date: new Date("2023-01-30T12:50:28.538Z"),
     },
   })
 
@@ -817,7 +817,7 @@ async function seed() {
   let receipt2 = await prisma.receipt.create({
     data: {
       ref: "asdasd",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       payed: true,
       appointment_slot_id: appointment5.slot_id,
     },
@@ -826,7 +826,7 @@ async function seed() {
   let receipt3 = await prisma.receipt.create({
     data: {
       ref: "breasdadhbrah",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       payed: true,
       appointment_slot_id: appointment6.slot_id,
     },
@@ -910,7 +910,7 @@ async function seed() {
     data: {
       title: "coiso coiso",
       body: "coisao coisao",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       process_id: process2.id,
     },
   })
@@ -930,10 +930,10 @@ async function seed() {
       online: false,
       room_id: room3.id,
       pricetable_id: pricetable2.id,
-      slot_start_date: new Date("2023-01-31T22:50:28.538Z"),
-      slot_end_date: new Date("2023-01-31T03:50:28.538Z"),
+      slot_start_date: new Date("2023-02-03T15:50:28.538Z"),
+      slot_end_date: new Date("2023-02-03T16:50:28.538Z"),
       active: false,
-      archived_date: new Date("2023-01-31T22:50:28.538Z"),
+      archived_date: new Date("2023-02-03T16:50:28.538Z"),
     },
   })
 
@@ -954,10 +954,10 @@ async function seed() {
       online: false,
       room_id: room3.id,
       pricetable_id: pricetable3.id,
-      slot_start_date: new Date("2023-01-30T15:00:28.538Z"),
-      slot_end_date: new Date("2023-01-30T16:00:28.538Z"),
+      slot_start_date: new Date("2023-01-30T16:00:28.538Z"),
+      slot_end_date: new Date("2023-01-30T17:00:28.538Z"),
       active: false,
-      archived_date: new Date("2023-01-30T16:50:28.538Z"),
+      archived_date: new Date("2023-01-30T17:50:28.538Z"),
     },
   })
 
@@ -985,7 +985,7 @@ async function seed() {
   let receipt4 = await prisma.receipt.create({
     data: {
       ref: "brehbrehsda",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       payed: true,
       appointment_slot_id: appointment8.slot_id,
     },
@@ -994,7 +994,7 @@ async function seed() {
   let receipt5 = await prisma.receipt.create({
     data: {
       ref: "asdadsa",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       payed: true,
       appointment_slot_id: appointment5.slot_id,
     },
@@ -1085,7 +1085,7 @@ async function seed() {
     data: {
       title: "coiso coiso",
       body: "coisao coisao",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       process_id: process3.id,
     },
   })
@@ -1105,10 +1105,10 @@ async function seed() {
       online: false,
       room_id: room3.id,
       pricetable_id: pricetable2.id,
-      slot_start_date: new Date("2023-01-31T22:50:28.538Z"),
-      slot_end_date: new Date("2023-01-31T03:50:28.538Z"),
+      slot_start_date: new Date("2023-02-03T19:50:28.538Z"),
+      slot_end_date: new Date("2023-02-03T20:50:28.538Z"),
       active: false,
-      archived_date: new Date("2023-01-31T22:50:28.538Z"),
+      archived_date: new Date("2023-02-03T20:50:28.538Z"),
     },
   })
 
@@ -1160,7 +1160,7 @@ async function seed() {
   let receipt6 = await prisma.receipt.create({
     data: {
       ref: "fsdfs",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       payed: true,
       appointment_slot_id: appointment11.slot_id,
     },
@@ -1169,7 +1169,7 @@ async function seed() {
   let receipt7 = await prisma.receipt.create({
     data: {
       ref: "asdasdasd",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       payed: true,
       appointment_slot_id: appointment10.slot_id,
     },
@@ -1260,7 +1260,7 @@ async function seed() {
     data: {
       title: "coiso coiso",
       body: "coisao coisao",
-      datetime: new Date("2023-01-22T22:50:28.538Z"),
+      datetime: new Date("2023-02-04T22:50:28.538Z"),
       process_id: process4.id,
     },
   })

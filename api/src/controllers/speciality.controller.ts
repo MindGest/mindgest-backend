@@ -11,12 +11,6 @@ import speciality from "../routes/speciality.route"
  */
 export async function getAllSpecialities(req: Request, res: Response) {
   try {
-    var decodedToken = res.locals.token
-
-    // otbain the caller properties
-    var callerId = decodedToken.id
-    var callerRole = decodedToken.role
-    var callerIsAdmin = decodedToken.admin
 
     var specialities = await prisma.speciality.findMany({
       select: {
