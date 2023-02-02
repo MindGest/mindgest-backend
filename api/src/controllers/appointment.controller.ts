@@ -1,7 +1,9 @@
-import prisma from "../utils/prisma"
-
 import { Request, Response } from "express"
 import { StatusCodes } from "http-status-codes"
+import assert from "assert"
+
+import prisma from "../utils/prisma"
+import logger from "../utils/logger"
 
 import {
   AppointmentArchive,
@@ -10,12 +12,8 @@ import {
   AppointmentInfo,
   AppointmentEdit,
 } from "../utils/types"
-import logger from "../utils/logger"
+
 import { User } from "../utils/schemas"
-import { fetchPersonProperties } from "../services/user.service"
-import assert from "assert"
-import appointment from "../routes/appointment.route"
-import app from "../main"
 import { buildReceipt } from "../services/receipt.service"
 
 export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>, res: Response) {

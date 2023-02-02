@@ -19,34 +19,36 @@ import assert from "assert"
 import appointment from "../routes/appointment.route"
 import { buildReceipt } from "../services/receipt.service"
 
+/**
+ * Migrates a process from a therapist to another.
+ * The current therapist remains as a collaborator of the process.
+ * The new becomes the main therapist.
+ *  If the new is already a collaborator in the process, simply make him main therapist
+ *  else, add the new as a therapist in the process and mak him main therapist.
+ */
 export async function migrate(
-  req: Request<ProcessIDPrams, {}, ProcessMigrationSchemaBody>,
+  req: Request<{ processId: string }, {}, ProcessMigrationSchemaBody>,
   res: Response
 ) {
-  /**
-   * Migrates a process from a therapist to another.
-   * The current therapist remains as a collaborator of the process.
-   * The new becomes the main therapist.
-   *  If the new is already a collaborator in the process, simply make him main therapist
-   *  else, add the new as a therapist in the process and mak him main therapist.
-   */
-  try {
-    const { id, role, isAdmin } = res.locals.token
-    const processId = parseInt(req.params.processId)
+  // Authorize User
+  const { id, role, isAdmin } = res.locals.token
+  const processId = Number(req.params.processId)
 
+  try {
     // Prepare Information
-    let newId = req.body.therapistId
+    const newId = req.body.therapistId
     let old = await prisma.permissions.findFirst({
-      where: { isMain: false, process_id: processId },
+      where: { isMain: true, process_id: processId },
     })
-    let oldId = old?.person_id
+    const oldId = old?.person_id
     logger.info(`MIGRATE [${oldId} -> ${newId}] => Operation Approved! Initiating Migration...`)
 
     // Check if current user has permissions for executing the migration
-    let permissions = await prisma.permissions.findFirst({
+    const permissions = await prisma.permissions.findFirst({
       where: { person_id: id, process_id: processId },
     })
-    if (!isAdmin || !permissions?.editprocess) {
+
+    if (!isAdmin && !permissions?.editprocess) {
       logger.info(`MIGRATE [${oldId} -> ${newId}] => Migration Failed! User lacks authorization`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization to execute this operation",
@@ -59,7 +61,7 @@ export async function migrate(
 
       // Perform Migration
       await prisma.permissions.update({
-        where: { id: old?.id },
+        where: { id: oldId },
         data: { isMain: false }, // remove isMain from the previous main therapist
       })
 
@@ -84,7 +86,6 @@ export async function migrate(
           data: {
             person_id: newId,
             process_id: processId,
-
             editprocess: true,
             see: true,
             appoint: true,
@@ -95,14 +96,12 @@ export async function migrate(
           },
         })
       }
-
       // Migration Successful
       logger.debug(`MIGRATE [${oldId} -> ${newId}] => Process Migrated Successfully!`)
       return res.status(StatusCodes.OK).json({
         message: "Process Migrated Successfully!",
       })
     }
-
     logger.info(
       `MIGRATE [${oldId} -> ${newId}] => Migration Failed. User ${newId} must be a therapist`
     )
@@ -120,11 +119,7 @@ export async function migrate(
 export async function archive(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
     var decoded = res.locals.token
-
     let callerIsAdmin = decoded.admin
-    let callerRole = decoded.role
-    let callerId = decoded.id
-
     var processId = parseInt(req.params.processId)
 
     // check if the process exists.
@@ -174,7 +169,6 @@ export async function info(req: Request<ProcessIDPrams, {}, {}>, res: Response) 
     var decoded = res.locals.token
 
     let callerIsAdmin = decoded.admin
-    let callerRole = decoded.role
     let callerId = decoded.id
 
     var processId = parseInt(req.params.processId)
@@ -254,8 +248,6 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
    * Intern, the ones that he is associated with and has see permission
    */
   try {
-    var queryParams = req.query
-
     var decoded = res.locals.token
 
     let callerIsAdmin = decoded.admin
@@ -287,7 +279,6 @@ export async function list(req: Request<{}, {}, {}, QueryListProcess>, res: Resp
     } else if (active == null && speciality != null) {
       processes = await prisma.process.findMany({ where: { speciality_speciality: speciality } })
     } else {
-      // todos
       processes = await prisma.process.findMany()
     }
 
@@ -603,124 +594,10 @@ export async function create(req: Request<{}, {}, ProcessCreateBody>, res: Respo
   }
 }
 
-// export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, res: Response) {
-//   try {
-//     var decoded = res.locals.token
-//     var processId = parseInt(req.params.processId)
-
-//     var permissions = await prisma.permissions.findFirst({
-//       where: {
-//         process_id: processId,
-//         person_id: decoded.id,
-//       },
-//     })
-
-//     if (decoded.admin == false || permissions!.see == false) {
-//       return res.status(StatusCodes.UNAUTHORIZED).json({
-//         message: "User doesn't have authorization",
-//       })
-//     }
-
-//     let permissionMainTherapist = await prisma.permissions.findFirst({
-//       where: {
-//         process_id: processId,
-//         isMain: true,
-//       },
-//     })
-
-//     await prisma.permissions.delete({
-//       where: {
-//         id: permissionMainTherapist?.id,
-//       },
-//     })
-
-//     await prisma.therapist_process.deleteMany({
-//       where: {
-//         therapist_person_id: permissionMainTherapist?.person_id,
-//         process_id: permissionMainTherapist?.id,
-//       },
-//     })
-
-//     await prisma.therapist_process.create({
-//       data: {
-//         process_id: processId,
-//         therapist_person_id: req.body.therapistId,
-//       },
-//     })
-
-//     await prisma.permissions.create({
-//       data: {
-//         editpatitent: true,
-//         see: true,
-//         appoint: true,
-//         statitics: true,
-//         editprocess: true,
-//         isMain: true,
-//         process_id: processId,
-//         person_id: req.body.therapistId,
-//       },
-//     })
-
-//     await prisma.process.update({
-//       where: {
-//         id: processId,
-//       },
-//       data: {
-//         speciality_speciality: req.body.speciality,
-//       },
-//     })
-
-//     for (let colaboratorId of req.body.colaborators) {
-//       var type = await prisma.intern.findUnique({
-//         where: {
-//           person_id: colaboratorId,
-//         },
-//       })
-
-//       if (type != null) {
-//         //é interno
-//         await prisma.intern_process.create({
-//           data: {
-//             process_id: processId,
-//             intern_person_id: colaboratorId,
-//           },
-//         })
-//       } else {
-//         //é terapeuta
-//         await prisma.therapist_process.create({
-//           data: {
-//             process_id: processId,
-//             therapist_person_id: colaboratorId,
-//           },
-//         })
-//       }
-
-//       await prisma.permissions.create({
-//         data: {
-//           process_id: processId,
-//           person_id: colaboratorId,
-//         },
-//       })
-//     }
-
-//     return res.status(StatusCodes.OK).json({
-//       message: "Edit done!",
-//     })
-//   } catch (error) {
-//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-//       message: "Ups... Something went wrong",
-//     })
-//   }
-// }
-
 export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, res: Response) {
   try {
     var decoded = res.locals.token
-
     let callerIsAdmin = decoded.admin
-    let callerRole = decoded.role
-    let callerId = decoded.id
-
     var processId = parseInt(req.params.processId)
 
     // check if the process exists.
@@ -1639,8 +1516,6 @@ export async function receiptList(req: Request<{ processId: string }>, res: Resp
     })
   }
 }
-
-// TODO: Auth
 
 export default {
   archive,

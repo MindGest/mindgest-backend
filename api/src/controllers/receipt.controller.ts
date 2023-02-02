@@ -200,8 +200,8 @@ export async function list(req: Request, res: Response) {
       }
       receiptsInfo.push(await buildReceipt(Number(receipt.appointment_slot_id)))
     }
-
     res.status(StatusCodes.OK).json({
+      message: "Receipt List Retrieved Successfully!",
       data: receiptsInfo,
     })
   } catch (error) {
