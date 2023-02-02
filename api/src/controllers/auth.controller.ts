@@ -77,7 +77,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
     }
 
     // Create entry in the table, associated with the user's role
-    let payload = null
+    let payload = {}
     switch (req.body.role) {
       case User.ACCOUNTANT:
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (accountant)...`)
