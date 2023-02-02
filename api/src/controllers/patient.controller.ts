@@ -15,6 +15,8 @@ import {
 import logger from "../utils/logger"
 import uploadPicture from "../utils/upload"
 import { getProfilePicture, saveProfilePicture } from "../services/profile.service"
+import { User } from "../utils/schemas"
+import { buildReceipt } from "../services/receipt.service"
 
 const CHILD_PATIENT = "child"
 const TEEN_PATIENT = "teen"
@@ -1043,6 +1045,85 @@ async function filterAssociatedPatients(callerId: number, callerRole: string) {
   return Array.from(patientIdsSet)
 }
 
+export async function receiptList(req: Request<{patientId: string}>, res: Response){
+  /**
+   * Returns all the receipts of the patient.
+   * if admin, returns all
+   * if therapist, returns all recepits from processes in which the caller is associated
+   * if therapist, returns all recepits from processes in which the caller is associated and has see permission
+   */
+  try{
+    var decodedToken = res.locals.token
+
+    // obtain the caller properties
+    var callerId = decodedToken.id
+    var callerRole = decodedToken.role
+    var callerIsAdmin = decodedToken.admin
+
+    let patientId = Number(req.params.patientId)
+
+    // guard cannot see this info
+    if (callerRole == User.GUARD){
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "You cannot access this information."
+      })
+    }
+
+    let receiptsInfo = [];
+
+    // get the processes of the patient
+    let patient_process = await prisma.patient_process.findMany({
+      where: {patient_person_id: patientId}
+    })
+
+    // for each process
+    for (let process of patient_process){
+      let canSee = false;
+      // check permission therapist
+      if (callerRole == "therapist") {
+        let therapist_process = await prisma.therapist_process.findFirst({
+          where: { therapist_person_id: callerId, process_id: process.process_id },
+        })
+        if (therapist_process != null) {
+          canSee = true
+        }
+      }
+      // check permission intern
+      else if (callerRole == "intern") {
+        let permission = await prisma.permissions.findFirst({
+          where: { person_id: callerId, process_id: process.process_id },
+        })
+        if (permission != null && permission.see) {
+          canSee = true
+        }
+      }
+      // if the caller does not have permission, skip this process.
+      if (!callerIsAdmin && !canSee && callerRole != User.ACCOUNTANT) {
+        continue;
+      }
+
+      // get the process appointments
+      let appointment_process = await prisma.appointment_process.findMany({where: {process_id: process.process_id}});
+
+      // for each appointmet get the receipt info
+      for (let appointment of appointment_process){
+        let receiptInfo = await buildReceipt(Number(appointment.appointment_slot_id));
+        if (receiptInfo){
+          receiptsInfo.push(receiptInfo);
+        }
+      }
+    }
+
+    res.status(StatusCodes.OK).json({
+      data: receiptsInfo,
+    })
+  } catch (error){
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 export default {
   listPatients,
   getPatientInfo,
@@ -1057,4 +1138,5 @@ export default {
   getPatientTypes,
   uploadProfilePicture,
   downloadProfilePicture,
+  receiptList,
 }

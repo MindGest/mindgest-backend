@@ -13,7 +13,7 @@ receipt.use(authMiddleware.authorize())
 
 // Endpoints
 
-receipt.get("/list")
+receipt.get("/list", controller.list)
 receipt.get("/:receiptId/info", controller.info)
 receipt.put("/:receiptId/pay", controller.pay)
 

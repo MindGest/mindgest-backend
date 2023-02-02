@@ -1573,7 +1573,7 @@ export async function receiptList(req: Request<{ processId: string }>, res: Resp
 
   try {
     // Check Permissions (Admin access is always granted)
-    if (!admin || role !== User.ACCOUNTANT) {
+    if (!admin && role !== User.ACCOUNTANT) {
       let access = false
       if (role == User.THERAPIST) {
         // Grant access if therapist belongs to the process
@@ -1602,7 +1602,7 @@ export async function receiptList(req: Request<{ processId: string }>, res: Resp
           where: { id: id },
         })
         assert(permissions !== null)
-        if (process !== null && process !== undefined) {
+        if (process !== null && process !== undefined && permissions.see) {
           access = true
         }
       }
