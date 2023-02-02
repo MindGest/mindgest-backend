@@ -28,6 +28,7 @@ import middleware from "../middleware/api.middleware"
 import cookieParser from "cookie-parser"
 
 // Util
+import bodyParser from "body-parser"
 ;(BigInt.prototype as any).toJSON = function () {
   return Number(this.toString())
 }
@@ -42,6 +43,7 @@ const api = Router()
 // Middleware
 api.use(helmet())
 api.use(express.json())
+api.use(express.urlencoded({ extended: true }))
 api.use(
   cors({
     origin: FRONTEND_URL,

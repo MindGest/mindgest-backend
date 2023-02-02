@@ -30,6 +30,10 @@ them simple and more user-friendly.
 
 ## Development
 
+If you are a developer, you might be interested on a more in-depth look of the
+project. Check this [README](./api/README.md) to learn more about how can you
+use the tools made available through npm scripts.
+
 ### Project Structure
 
 * `api`: The source code of the API
@@ -45,6 +49,7 @@ The documentation for the MIndGest Backend (REST API) can be consulted by
 running the server and accessing the `/api/docs` endpoint. 
 
 ### Dashboard & Issues
+
 If you find something not working as expected or you have any suggestions feel
 free to submit an [issue](https://github.com/MindGest/mindgest-backend/issues).
 Please use the [templates](./.github/ISSUE_TEMPLATE/) provided! 
@@ -55,16 +60,13 @@ This deployment tutorial will assume you are running linux or any debian based d
 Nonetheless, it's possible to deploy on other platforms. 
 
 Before choosing the method for deploying the application you must first clone this project.
+
 ```sh
 git clone https://github.com/MindGest/mindgest-backend.git
 ```
 
 Afterwards, choose your preformed method for running the application and follow
 the steps.  
-
-If you are a developer, you might be interested on a more in-depth look of the
-project.  Check this [README](./api/README.md) to learn more about how can you
-use the tools available, scripts, and run software tests.
 
 ### Native
 To deploy this project you may want to run the software natively. For
