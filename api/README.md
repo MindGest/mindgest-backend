@@ -1,9 +1,9 @@
 # MindGest REST API
 
-
 ---
 
 ## Install
+
 ```sh
 $ git clone https://github.com/Mindgest/mindgest-backend
 $ cd api
