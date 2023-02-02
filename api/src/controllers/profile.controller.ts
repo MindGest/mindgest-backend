@@ -25,6 +25,8 @@ import {
   User,
 } from "../utils/schemas"
 import uploadPicture from "../utils/upload"
+import { attachCookies, createAccessToken, createRefreshToken } from "../services/auth.service"
+import { Exception } from "handlebars"
 
 export async function uploadProfilePicture(req: Request, res: Response) {
   try {
@@ -194,4 +196,61 @@ export async function editProfileInfo(req: Request<{}, {}, EditProfileBody>, res
   }
 }
 
-export default { uploadProfilePicture, downloadProfilePicture, fetchProfileInfo, editProfileInfo }
+export async function switchView(req: Request, res: Response) {
+  // Authorize User
+  const { id, role, admin } = res.locals.token
+  try {
+    if (!admin || role !== User.THERAPIST) {
+      logger.info(`SWITCH [${id}] => Switch View is not possible for this user!`)
+      return res.status(StatusCodes.NOT_ACCEPTABLE).json({
+        message: "This operation is only defined for Admin Therapists",
+      })
+    }
+    logger.info(`SWITCH [${id}] => Switch View Request Granted!`)
+
+    // Access Token Information
+    const accessTokenPayload = {
+      id: Number(id),
+      admin: admin,
+      role: role === User.THERAPIST ? User.ADMIN : User.THERAPIST,
+    }
+
+    // Refresh Token Information
+    const refreshTokenPayload = {
+      person: Number(id),
+      session: {
+        ip: req.ip,
+        userAgent: req.headers["user-agent"],
+        creationDate: req.headers.date,
+      },
+    }
+
+    // Generate/Sign New Tokens
+    let accessToken = createAccessToken(accessTokenPayload)
+    let refreshToken = createRefreshToken(refreshTokenPayload)
+
+    // Attach tokens as cookies
+    logger.debug(`SWITCH [${id}] => Attaching cookies...`)
+    attachCookies(res, accessToken, refreshToken)
+
+    logger.info(`SWITCH [${id}] => View Switched.`)
+    return res.status(StatusCodes.OK).json({
+      message: "Switch View Successful!",
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    })
+  } catch (error) {
+    logger.error(`SWITCH => Server Error: ${error}`)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export default {
+  uploadProfilePicture,
+  downloadProfilePicture,
+  fetchProfileInfo,
+  editProfileInfo,
+  switchView,
+}
