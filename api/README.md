@@ -1,83 +1,123 @@
-# MindGest REST API
+# MindGest - REST API
 
----
+This document provides a reference to the tooling developed for this API and a
+brief description of the required parametrization. 
 
-## Install
+## Environment
 
-```sh
-$ git clone https://github.com/Mindgest/mindgest-backend
-$ cd api
-$ npm install
-$ npm run prisma:generate
+Both the REST API and the database require some parameter configuration that
+allows for the adaptation of the application to different circumstances. This
+configuration, for security purposes, was done using environment files that
+contain variables that are loaded in the program at runtime. The following 
+sections highlight the environment variables' names, types, and descriptions.
+
+### API
+
+* **Email Server**
+  - `SMTP_EMAIL` (string)
+ 
+    This environment variable contains the email address of the account used to
+    send emails to `the registered users. 
+    
+    *Example:*
+    > noreply@gmail.com
+
+  - `SMTP_PASS` (string)
+
+    This environment variable contains the password or token for authorizing the
+    application to send emails from the address defined by **SMTP_EMAIL**
+    
+    *Example:*
+    > dzpqlsunçauhcald 
+
+  - `SMTP_HOST` (string)
+
+    This environment variable contains the name of the host machine (mail server) in charge of sending the email to the user's inbox.
+
+    *Example:*
+    > stmp.gmail.com
+  
+  - `SMTP_PORT` (integer)
+
+    This environment variable contains the host machine (mail server) SMTP port. 
+    
+    *Example:*
+    > 465
+
+* **Frontend Web App URL**
+  - `FRONTEND_URL` (URL)
+
+    The URL of the frontend web application. This field
+    is required to allow for Cross Origin Resource Policy
+
+
+* **File Uploads Folder**
+  - `FILE_UPLOAD_DIR`(string)
+
+* **Cookie Signing**
+  - `COOKIE_SECRET`(string)
+
+* **Authentication**
+  - `JWT_ACCESS_SECRET` (string)
+  - `JWT_REFRESH_SECRET`(string)
+  - `JWT_UTIL_SECRET`  (string)
+
+### PostgresSQL Database
+
+`DATABASE_URL` (URL)
+
+```
+postgresql://${USER}:${PASSWORD}@${HOST}:${PORT}/${DB}?schema=public
 ```
 
-## Configuration
+## NPM Scripts
 
-Copy the example environment file `.env.example` to a new file name `.env`, edit the parameters and
-you should be good to go!
+### General
 
-Make sure that the database is running on the url specified in the `.env` file! To be certain that
-the schema is up to date run:
+#### Install and Uninstall
+  "uninstall": "rimraf build node_modules uploads logs",
 
-```sh
-$ npm run prisma:push
-```
+#### Build and Clean
+  "build": "rimraf ./build && tsc --build && copyfiles -a assets/**/* ./build",
+  "clean": "rimraf build uploads logs",
 
-Furthermore, if you want to seed the database with dummy data that we provided for testing, just run
-the following command:
+#### Run
+  "start": "dotenv -v NODE_ENV=production -e prisma/.env -- node build/src/main.js",
+  "dev": "dotenv -v NODE_ENV=development -e prisma/.env -- tsc-watch --onSuccess \"ts-node src/main.ts\"",
 
-```sh
-$ npm run prisma:seed
-```
+### Prisma 
 
-## Inspecting the database
+#### Generate Client
+  "prisma:generate": "npx prisma generate",
 
-To inspect the data that is currently loaded into the database you may use the following tool.
+#### Push Schema
+  "prisma:push": "npx prisma db push",
 
-```sh
-$ npm run prisma:studio
-```
+#### Seed
+  "prisma:seed": "dotenv -v NODE_ENV=production npx prisma db seed",
+  "prisma:seed-dev": "dotenv -v NODE_ENV=development npx prisma db seed",
+  "prisma:seed-test": "dotenv -v NODE_ENV=test npx prisma db seed",
 
-## Testing the project
+#### Studio
+  "prisma:studio": "npx prisma studio",
 
-To run the integration/unit tests run the following command
+### Testing
+  "test": "npm run test:db-up && npm run test:run --rootDir test ; npm run test:db-down",
 
-```sh
-$ npm test
-```
+#### Environment
+  "test:env": "cp -n prisma/.env.test.example prisma/.env.test",
 
-## Running the project
+#### Database
+  "test:db-up": "docker compose -f ../util/docker-compose.yml --profile dev up -d --wait --remove-orphans",
+  "test:db-down": "docker compose -f ../util/docker-compose.yml --profile dev down --volumes",
+  "test:db-setup": "dotenv -e prisma/.env.test -- npm run prisma:push && npm run prisma:seed-test",
 
-Please set the **NODE_ENV** variable in your `.env` file to _development_ (it should be the default)
-and run the following command.
+### 
+  "test:studio": "dotenv -e prisma/.env.test prisma studio",
+  "test:jest": "dotenv -v NODE_ENV=test -e prisma/.env.test -- jest",
+  "test:run": "npm run test:db-setup && npm run test:jest",
 
-```sh
-$ npm run dev
-```
-
-## Running/Building in Production
-
-Please set the **NODE_ENV** variable in your `.env` file to _production_ and run the following
-commands.
-
-```sh
-$ npm run build
-$ npm start
-```
-
-## Cleaning
-
-To clean up all the files generated both during the build process and a run of the application you
-can run the following commands:
-
-```sh
-$ npm run clean
-```
-
-## Uninstalling
-
-To completely remove all the generated files, including the installed packages please run:
-
-```sh
-$ npm run uninstall
-```
+## Util
+  "format:check": "prettier --check ."
+  "env": "npm run cp -n .env.example .env && cp -n prisma/.env.example prisma/.env",
+  "format": "prettier --write . && npx prisma format",
