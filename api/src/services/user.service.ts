@@ -233,8 +233,6 @@ export async function updateInfoPatient(id: number, body: any) {
   }
 }
 
-
-
 export default {
   updateInfoTherapist,
   updateInfoGuard,
