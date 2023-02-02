@@ -156,13 +156,12 @@ export async function info(req: Request<MarkNotificationQueryParams>, res: Respo
       })
     }
 
-    if (notification.person_id !== id) {
+    if (notification.person_id != id) {
       logger.info(`NOTIFICATION [user-id: ${id}] => Notification does not belong to this user!`)
       return res.status(StatusCodes.FORBIDDEN).json({
         message: `Notification with id '${req.params.id}' does not belong to user '${id}'`,
       })
     }
-
     logger.info(
       `NOTIFICATION [user-id: ${id}] => Successfully retrieved notification ${req.params.id}!`
     )
