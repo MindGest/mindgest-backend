@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express"
 
-import ProfileEditRouter from "./profile.edit.route"
+import ProfileEditRouter from "./profile.route"
 import AdminEditRouter from "./admin.route"
 import NotificationRouter from "./notification.route"
 
