@@ -73,7 +73,6 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
       birthDate: person.birth_date,
       phoneNumber: person.phone_number,
       taxNumber: person.tax_number,
-      verified: person.verified,
     }
 
     // Create entry in the table, associated with the user's role
