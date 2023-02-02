@@ -42,7 +42,7 @@ export async function listAppointmentRooms(
 
       for (var roomId of rooms) {
         let appointments
-        if(dateString != null){
+        if (dateString != null) {
           appointments = await prisma.$queryRaw<
             appointment[]
           >`Select * from appointment where room_id= ${
@@ -52,18 +52,17 @@ export async function listAppointmentRooms(
           )} and extract(year from slot_start_date) = ${parseInt(
             year
           )} and extract(day from slot_start_date) = ${parseInt(day)}`
-        }
-        else{
+        } else {
           let today = new Date()
           appointments = await prisma.appointment.findMany({
-            where:{
-              slot_start_date:  {
-                gte: today
-              }
+            where: {
+              slot_start_date: {
+                gte: today,
+              },
             },
             orderBy: {
-              slot_start_date: 'asc'
-            }
+              slot_start_date: "asc",
+            },
           })
         }
 
@@ -130,7 +129,7 @@ export async function listAppointmentRooms(
             month: "2-digit",
             year: "numeric",
             hour: "numeric",
-            minute: "numeric"
+            minute: "numeric",
           })
 
           let dateEnd = appointment.slot_end_date
@@ -139,12 +138,12 @@ export async function listAppointmentRooms(
             month: "2-digit",
             year: "numeric",
             hour: "numeric",
-            minute: "numeric"
+            minute: "numeric",
           })
 
-          if(lastDay!=formattedDate1.split("/")[0]){
-            if(lastAppointmentHour != "24:00" && lastDate != ""){
-              let dateEndDay = lastDate.split(", ")[0] + ", " +"24:00"
+          if (lastDay != formattedDate1.split("/")[0]) {
+            if (lastAppointmentHour != "24:00" && lastDate != "") {
+              let dateEndDay = lastDate.split(", ")[0] + ", " + "24:00"
               roomAppointments.push({
                 title: "empty",
                 speciality: "empty",
@@ -157,15 +156,14 @@ export async function listAppointmentRooms(
               })
             }
             lastAppointmentHour = "00:00"
-            lastDay=formattedDate1.split("/")[0]
+            lastDay = formattedDate1.split("/")[0]
           }
 
-          lastDate=formattedDate2
+          lastDate = formattedDate2
 
           let startHour = formattedDate1.split(", ")[1]
-          if(startHour !=lastAppointmentHour){
-
-            let newDate = formattedDate1.split(", ")[0] + ", " +lastAppointmentHour
+          if (startHour != lastAppointmentHour) {
+            let newDate = formattedDate1.split(", ")[0] + ", " + lastAppointmentHour
 
             roomAppointments.push({
               title: "empty",
@@ -179,7 +177,7 @@ export async function listAppointmentRooms(
             })
 
             lastAppointmentHour = formattedDate2.split(", ")[1]
-          } 
+          }
 
           roomAppointments.push({
             title: title,
@@ -193,8 +191,8 @@ export async function listAppointmentRooms(
           })
         }
 
-        if(lastAppointmentHour != "24:00" && lastDate != ""){
-          let dateEndDay = lastDate.split(", ")[0] + ", " +"24:00"
+        if (lastAppointmentHour != "24:00" && lastDate != "") {
+          let dateEndDay = lastDate.split(", ")[0] + ", " + "24:00"
           roomAppointments.push({
             title: "empty",
             speciality: "empty",

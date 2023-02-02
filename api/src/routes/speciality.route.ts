@@ -6,7 +6,6 @@ import schemas from "../utils/schemas"
 
 const speciality = Router()
 
-
 speciality.get("/list", (req: Request, res: Response) => {
   controller.getAllSpecialities(req, res)
 })

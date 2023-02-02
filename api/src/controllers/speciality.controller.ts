@@ -11,7 +11,6 @@ import speciality from "../routes/speciality.route"
  */
 export async function getAllSpecialities(req: Request, res: Response) {
   try {
-
     var specialities = await prisma.speciality.findMany({
       select: {
         speciality: true,
