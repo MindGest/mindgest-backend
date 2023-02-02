@@ -236,6 +236,27 @@ async function seed() {
     },
   })
 
+  // intern for register approval
+  let personForApproval = await prisma.person.create({
+    data: {
+      active: true,
+      verified: true,
+      approved: false,
+      name: "Orácio",
+      email: "oracio@student.dei.uc.pt",
+      password: await argon2.hash("12345"),
+      address: "Rua da Perdição",
+      birth_date: new Date("2000-11-21T23:50:28.538Z"),
+      phone_number: 912345678,
+      tax_number: 231321123,
+    },
+  })
+  let internForApproval = await prisma.intern.create({
+    data: {
+      person_id: personForApproval.id,
+    },
+  })
+
   // admins
   let person5 = await prisma.person.create({
     data: {
@@ -1829,49 +1850,182 @@ async function seed() {
   })
 
   // notifications
-  let uuid = randomUUID()
-  let notification1Admin1 = await prisma.notifications.create({
-    data: {
-      ref: uuid,
-      type: "migrate",
-      data: JSON.stringify({
-        processId: Number(processChild1.id),
-        therapistId: Number(therapist3.person_id),
-      }),
-      seen: false,
-      settled: false,
-      person_id: admin1.person_id,
-    },
-  })
+    // migrate process
+    let uuid = randomUUID()
+    let notification1Admin1 = await prisma.notifications.create({
+      data: {
+        ref: uuid,
+        type: "migrate",
+        data: JSON.stringify({
+          processId: Number(processChild1.id),
+          therapistId: Number(therapist3.person_id),
+        }),
+        seen: false,
+        settled: false,
+        person_id: admin1.person_id,
+      },
+    })
 
-  let notification1Admin2 = await prisma.notifications.create({
-    data: {
-      ref: uuid,
-      type: "migrate",
-      data: JSON.stringify({
-        processId: Number(processChild1.id),
-        therapistId: Number(therapist3.person_id),
-      }),
-      seen: false,
-      settled: false,
-      person_id: admin2.person_id,
-    },
-  })
+    let notification1Admin2 = await prisma.notifications.create({
+      data: {
+        ref: uuid,
+        type: "migrate",
+        data: JSON.stringify({
+          processId: Number(processChild1.id),
+          therapistId: Number(therapist3.person_id),
+        }),
+        seen: false,
+        settled: false,
+        person_id: admin2.person_id,
+      },
+    })
 
-  // para o terapeuta que é admin
-  let notification1Admin3 = await prisma.notifications.create({
-    data: {
-      ref: uuid,
-      type: "migrate",
-      data: JSON.stringify({
-        processId: Number(processChild1.id),
-        therapistId: Number(therapist3.person_id),
-      }),
-      seen: false,
-      settled: false,
-      person_id: therapist3.person_id,
-    },
-  })
+    // para o terapeuta que é admin
+    let notification1Admin3 = await prisma.notifications.create({
+      data: {
+        ref: uuid,
+        type: "migrate",
+        data: JSON.stringify({
+          processId: Number(processChild1.id),
+          therapistId: Number(therapist3.person_id),
+        }),
+        seen: false,
+        settled: false,
+        person_id: therapist3.person_id,
+      },
+    })
+
+    // regist approval
+    let uuid2 = randomUUID()
+    let notification2Admin1 = await prisma.notifications.create({
+      data: {
+        ref: uuid2,
+        type: "register",
+        data: JSON.stringify({
+          data:{
+            address: personForApproval.address,
+            admin: false,
+            birthDate: personForApproval.birth_date,
+            email: personForApproval.email,
+            id: Number(personForApproval.id),
+            name: personForApproval.name,
+            phoneNumber: Number(personForApproval.phone_number),
+            role: "intern",
+            taxNumber: Number(personForApproval.tax_number),
+          }
+        }),
+        seen: false,
+        settled: false,
+        person_id: admin1.person_id,
+      },
+    })
+  
+    let notification2Admin2 = await prisma.notifications.create({
+      data: {
+        ref: uuid2,
+        type: "register",
+        data: JSON.stringify({
+          data:{
+            address: personForApproval.address,
+            admin: false,
+            birthDate: personForApproval.birth_date,
+            email: personForApproval.email,
+            id: Number(personForApproval.id),
+            name: personForApproval.name,
+            phoneNumber: Number(personForApproval.phone_number),
+            role: "intern",
+            taxNumber: Number(personForApproval.tax_number),
+          }
+        }),
+        seen: false,
+        settled: false,
+        person_id: admin2.person_id,
+      },
+    })
+  
+    // para o terapeuta que é admin
+    let notification2Admin3 = await prisma.notifications.create({
+      data: {
+        ref: uuid2,
+        type: "register",
+        data: JSON.stringify({
+          data:{
+            address: personForApproval.address,
+            admin: false,
+            birthDate: personForApproval.birth_date,
+            email: personForApproval.email,
+            id: Number(personForApproval.id),
+            name: personForApproval.name,
+            phoneNumber: Number(personForApproval.phone_number),
+            role: "intern",
+            taxNumber: Number(personForApproval.tax_number),
+          }
+        }),
+        seen: false,
+        settled: false,
+        person_id: therapist3.person_id,
+      },
+    })
+
+    // process creation
+    let uuid3 = randomUUID()
+    let notification3Admin1 = await prisma.notifications.create({
+      data: {
+        ref: uuid3,
+        type: "process",
+        data: JSON.stringify({
+          data: {
+            speciality: specialityAdult.speciality,
+            patientIds: [Number(patientAdult1.person_id)],
+            liableIds: [Number(liableMother.id)],
+            therapistId: Number(therapist2.person_id),
+            remarks: "Observações gerais do processo.",
+          }
+        }),
+        seen: false,
+        settled: false,
+        person_id: admin1.person_id,
+      },
+    })
+  
+    let notification3Admin2 = await prisma.notifications.create({
+      data: {
+        ref: uuid3,
+        type: "process",
+        data: JSON.stringify({
+          data: {
+            speciality: specialityAdult.speciality,
+            patientIds: [Number(patientAdult1.person_id)],
+            liableIds: [Number(liableMother.id)],
+            therapistId: Number(therapist2.person_id),
+            remarks: "Observações gerais do processo.",
+          }
+        }),
+        seen: false,
+        settled: false,
+        person_id: admin2.person_id,
+      },
+    })
+  
+    // para o terapeuta que é admin
+    let notification3Admin3 = await prisma.notifications.create({
+      data: {
+        ref: uuid3,
+        type: "process",
+        data: JSON.stringify({
+          data: {
+            speciality: specialityAdult.speciality,
+            patientIds: [Number(patientAdult1.person_id)],
+            liableIds: [Number(liableMother.id)],
+            therapistId: Number(therapist2.person_id),
+            remarks: "Observações gerais do processo.",
+          }
+        }),
+        seen: false,
+        settled: false,
+        person_id: therapist3.person_id,
+      },
+    })
 }
 
 export default { seed }
