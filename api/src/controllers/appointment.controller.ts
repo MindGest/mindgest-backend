@@ -10,6 +10,13 @@ import {
   AppointmentInfo,
   AppointmentEdit,
 } from "../utils/types"
+import logger from "../utils/logger"
+import { User } from "../utils/schemas"
+import { fetchPersonProperties } from "../services/user.service"
+import assert from "assert"
+import appointment from "../routes/appointment.route"
+import app from "../main"
+import { buildReceipt } from "../services/receipt.service"
 
 export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>, res: Response) {
   /**
@@ -1279,6 +1286,180 @@ async function listAppointmentsOfNextDays(req: Request, res: Response) {
   }
 }
 
+export async function createReceipt(req: Request<{ appointmentId: string }>, res: Response) {
+  // Authorizing User
+  const { id, role, admin } = res.locals.token
+  const appointmentId = req.params.appointmentId
+
+  try {
+    // Fetch Appointment
+    const appointment = await prisma.appointment_process.findFirst({
+      where: { appointment: { slot_id: Number(appointmentId) } },
+    })
+
+    // Check If It Exists
+    if (appointment === null || appointment === undefined) {
+      logger.info(`RECEIPT [user-id: ${id}] => Appointment does not exist.`)
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Appointment with id '${appointmentId} does not exist...`,
+      })
+    }
+
+    // Check Permissions (Admin access is always granted)
+    if (!admin) {
+      let access = false
+      if (role == User.THERAPIST) {
+        // Grant access if therapist belongs to the process
+        const process = await prisma.therapist_process.findUnique({
+          where: {
+            therapist_person_id_process_id: {
+              therapist_person_id: id,
+              process_id: appointment.process_id,
+            },
+          },
+        })
+        if (process !== null && process !== undefined) {
+          access = true
+        }
+      } else if (role === User.INTERN) {
+        // Grant access if intern belongs to the current process and has `archive` permissions.
+        const process = await prisma.intern_process.findUnique({
+          where: {
+            intern_person_id_process_id: {
+              intern_person_id: id,
+              process_id: appointment.process_id,
+            },
+          },
+        })
+        const permissions = await prisma.permissions.findUnique({
+          where: { id: id },
+        })
+        assert(permissions !== null)
+        if (process !== null && process !== undefined) {
+          access = true
+        }
+      }
+
+      if (!access) {
+        logger.info(
+          `RECEIPT [user-id: ${id}] => Authorization to create receipt revoked (insufficient permissions)`
+        )
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: "Receipt Creation Failed (insufficient permissions)",
+        })
+      }
+    }
+    logger.info(`RECEIPT [user-id: ${id}] => Authorization to create receipt granted...`)
+
+    // Create Receipt
+    logger.debug(`RECEIPT [user-id: ${id}] => Generating Receipt...`)
+    await prisma.receipt.create({
+      data: { appointment_slot_id: Number(appointmentId) },
+    })
+
+    logger.debug(`RECEIPT [user-id: ${id}] => Receipt Created Successfully...`)
+    res.status(StatusCodes.OK).json({
+      message: "Receipt Created Successfully",
+    })
+  } catch (error) {
+    logger.error(`RECEIPT => Server Error: ${error}`)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+export async function getReceipt(req: Request<{ appointmentId: string }>, res: Response) {
+  // Authorizing User
+  const { id, role, admin } = res.locals.token
+  const appointmentId = req.params.appointmentId
+
+  try {
+    // Fetch Appointment
+    const appointment_process = await prisma.appointment_process.findFirst({
+      where: { appointment: { slot_id: Number(appointmentId) } },
+    })
+
+    // Check If It Exists
+    if (appointment_process === null || appointment_process === undefined) {
+      logger.info(`RECEIPT [user-id: ${id}] => Appointment does not exist.`)
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Appointment with id '${appointmentId} does not exist...`,
+      })
+    }
+
+    // Check Permissions (Admin and Accountant access is always granted)
+    if (!admin || role !== User.ACCOUNTANT) {
+      let access = false
+      if (role == User.THERAPIST) {
+        // Grant access if therapist belongs to the process
+        const process = await prisma.therapist_process.findUnique({
+          where: {
+            therapist_person_id_process_id: {
+              therapist_person_id: id,
+              process_id: appointment_process.process_id,
+            },
+          },
+        })
+        if (process !== null && process !== undefined) {
+          access = true
+        }
+      } else if (role === User.INTERN) {
+        // Grant access if intern belongs to the current process and has `archive` permissions.
+        const process = await prisma.intern_process.findUnique({
+          where: {
+            intern_person_id_process_id: {
+              intern_person_id: id,
+              process_id: appointment_process.process_id,
+            },
+          },
+        })
+        const permissions = await prisma.permissions.findUnique({
+          where: { id: id },
+        })
+        assert(permissions !== null)
+        if (process !== null && process !== undefined) {
+          access = true
+        }
+      }
+
+      // Grant Access
+      if (!access) {
+        logger.info(
+          `RECEIPT [user-id: ${id}] => Authorization to fetch receipt revoked (insufficient permissions)`
+        )
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: "Receipt Creation Failed (insufficient permissions)",
+        })
+      }
+    }
+    logger.info(`RECEIPT [user-id: ${id}] => Authorization to fetch receipt granted...`)
+
+    // Fetch Receipt
+    logger.debug(`RECEIPT [user-id: ${id}] => Retrieving Receipt...`)
+
+    // Build Receipt
+    const payload = buildReceipt(Number(appointmentId))
+    if (payload === null) {
+      logger.info(`RECEIPT [user-id: ${id}] => Receipt does not exist.`)
+      return res.status(StatusCodes.NOT_FOUND).json({
+        message: `Receipt does not exist (not generated yet)`,
+      })
+    }
+
+    logger.debug(`RECEIPT [user-id: ${id}] => Receipt Retrieved Successfully...`)
+    res.status(StatusCodes.OK).json({
+      message: "Receipt Retrieved Successfully",
+      data: payload,
+    })
+  } catch (error) {
+    logger.error(`RECEIPT => Server Error: ${error}`)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
 export default {
   getAllAppointments,
   createAppointment,
@@ -1290,4 +1471,6 @@ export default {
   listAppointmentsOfTheDay,
   onGoingAppointments,
   listAppointmentsOfNextDays,
+  getReceipt,
+  createReceipt,
 }

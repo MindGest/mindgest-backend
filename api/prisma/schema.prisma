@@ -219,7 +219,6 @@ model profession {
 
 model receipt {
   id                  BigInt      @id @default(autoincrement())
-  ref                 String      @unique @default(cuid())
   datetime            DateTime    @default(now())
   payed               Boolean?    @default(false)
   appointment_slot_id BigInt

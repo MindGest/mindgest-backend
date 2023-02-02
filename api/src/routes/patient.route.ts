@@ -17,6 +17,9 @@ patient.get("/list", controller.listPatients)
 
 patient.get("/types", controller.getPatientTypes)
 
+// TODO: Problem for future pedro
+//patient.get("/:patientId/receipts", controller.receiptList)
+
 /// Patient Specific Endpoints
 patient.post("/:patientId/info", controller.getPatientInfo)
 

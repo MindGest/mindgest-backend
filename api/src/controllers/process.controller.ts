@@ -14,6 +14,10 @@ import {
   UpdateNoteBody,
 } from "../utils/types"
 import logger from "../utils/logger"
+import { User } from "../utils/schemas"
+import assert from "assert"
+import appointment from "../routes/appointment.route"
+import { buildReceipt } from "../services/receipt.service"
 
 export async function migrate(
   req: Request<ProcessIDPrams, {}, ProcessMigrationSchemaBody>,
@@ -1549,6 +1553,96 @@ async function privateGetNextAppointment(processId: number) {
   return appointmentToReturn
 }
 
+export async function receiptList(req: Request<{ processId: string }>, res: Response) {
+  // Authorizing User
+  const { id, role, admin } = res.locals.token
+  const processId = Number(req.params.processId)
+
+  // Fetch Process
+  const process = await prisma.process.findUnique({
+    where: { id: processId },
+  })
+
+  // Check If It Exists
+  if (process === null || process === undefined) {
+    logger.info(`RECEIPT [user-id: ${id}] => The process does not exist.`)
+    return res.status(StatusCodes.NOT_FOUND).json({
+      message: `Process with id '${processId} does not exist...`,
+    })
+  }
+
+  try {
+    // Check Permissions (Admin access is always granted)
+    if (!admin || role !== User.ACCOUNTANT) {
+      let access = false
+      if (role == User.THERAPIST) {
+        // Grant access if therapist belongs to the process
+        const process = await prisma.therapist_process.findUnique({
+          where: {
+            therapist_person_id_process_id: {
+              therapist_person_id: id,
+              process_id: processId,
+            },
+          },
+        })
+        if (process !== null && process !== undefined) {
+          access = true
+        }
+      } else if (role === User.INTERN) {
+        // Grant access if intern belongs to the current process and has `archive` permissions.
+        const process = await prisma.intern_process.findUnique({
+          where: {
+            intern_person_id_process_id: {
+              intern_person_id: id,
+              process_id: processId,
+            },
+          },
+        })
+        const permissions = await prisma.permissions.findUnique({
+          where: { id: id },
+        })
+        assert(permissions !== null)
+        if (process !== null && process !== undefined) {
+          access = true
+        }
+      }
+
+      // Grant Access
+      if (!access) {
+        logger.info(
+          `RECEIPT [user-id: ${id}] => Authorization to fetch receipts revoked (insufficient permissions)`
+        )
+        return res.status(StatusCodes.FORBIDDEN).json({
+          message: "Receipt Listing Failed (insufficient permissions)",
+        })
+      }
+    }
+    logger.info(`RECEIPT [user-id: ${id}] => Authorization to fetch receipts granted...`)
+    const appointments = await prisma.appointment_process.findMany({
+      where: { process_id: processId },
+    })
+
+    // Return receipts
+    let receipts = []
+    for (let appointment of appointments) {
+      receipts.push(await buildReceipt(Number(appointment.appointment_slot_id)))
+    }
+
+    logger.debug(`RECEIPT [user-id: ${id}] => Receipts Retrieved Successfully...`)
+    res.status(StatusCodes.OK).json({
+      message: "Receipts Retrieved Successfully",
+      data: receipts.filter((r) => r !== null),
+    })
+  } catch (error) {
+    logger.error(`RECEIPT => Server Error: ${error}`)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: "Ups... Something went wrong",
+    })
+  }
+}
+
+// TODO: Auth
+
 export default {
   archive,
   info,
@@ -1567,4 +1661,5 @@ export default {
   migrate,
   note,
   updateNote,
+  receiptList,
 }

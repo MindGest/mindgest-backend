@@ -32,6 +32,7 @@ process.get("/:processId/info", controller.info)
 
 process.post("/:processId/archive", controller.archive)
 process.post("/:processId/activate", controller.activate)
+process.get("/:processId/receipts", controller.receiptList)
 
 process.post(
   "/:processId/edit",

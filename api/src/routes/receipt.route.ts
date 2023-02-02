@@ -1,7 +1,6 @@
-import { Router, Request, Response } from "express"
+import { Router } from "express"
+
 import controller from "../controllers/receipt.controller"
-import middleware from "../middleware/api.middleware"
-import schemas from "../utils/schemas"
 
 import authMiddleware from "../middleware/auth.middleware"
 
@@ -13,18 +12,9 @@ const receipt = Router()
 receipt.use(authMiddleware.authorize())
 
 // Endpoints
-receipt.get("/list", controller.list)
 
-receipt.get("/:processId/list", controller.listProcess)
-
+receipt.get("/list")
 receipt.get("/:receiptId/info", controller.info)
-
-// receipt.get("/:appointmentId", controller.fetch)
-receipt.post("/:appointmentId/create", controller.create)
-
-receipt.get("/list/:patientId", controller.list)
-
-receipt.get("/:receiptRef/info", controller.info)
-receipt.put("/:receiptRef/pay", controller.pay)
+receipt.put("/:receiptId/pay", controller.pay)
 
 export default receipt

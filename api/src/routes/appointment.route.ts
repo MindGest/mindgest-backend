@@ -47,6 +47,11 @@ appointment.get("/next", controller.listAppointmentsOfNextDays)
 
 appointment.get("/ongoing", controller.onGoingAppointments)
 
+appointment
+  .route("/:appointmentId/receipt")
+  .get(controller.getReceipt)
+  .post(controller.createReceipt)
+
 appointment.put(
   "/archive",
   middleware.requestValidator(schemas.AppointmentArchiveSchema),
