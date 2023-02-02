@@ -113,8 +113,6 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
     }
 
     var allAppointmentsInfo: any = []
-    // get all the appointmentIds of every process
-    var appointmentIds: Array<number> = []
     for (let i = 0; i < processes.length; i++) {
       // get the appointments of the processes[i]
       var appointment_process = await prisma.appointment_process.findMany({
@@ -184,10 +182,9 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       }
 
       for (let e = 0; e < appointment_process.length; e++) {
-        appointmentIds.push(Number(appointment_process[e].appointment_slot_id))
         // obtain the appointment info
         var appointmentInfo = await prisma.appointment.findFirst({
-          where: { slot_id: appointmentIds[e] },
+          where: { slot_id: appointment_process[e].appointment_slot_id },
           select: {
             slot_id: true,
             online: true,
