@@ -31,13 +31,13 @@ export async function migrate(
   res: Response
 ) {
   // Authorize User
-  const { id, role, isAdmin } = res.locals.token
+  const { id, role, admin } = res.locals.token
   const processId = Number(req.params.processId)
 
   try {
     // Prepare Information
     const newId = req.body.therapistId
-    let old = await prisma.permissions.findFirst({
+    const old = await prisma.permissions.findFirst({
       where: { isMain: true, process_id: processId },
     })
     const oldId = old?.person_id
@@ -48,7 +48,7 @@ export async function migrate(
       where: { person_id: id, process_id: processId },
     })
 
-    if (!isAdmin && !permissions?.editprocess) {
+    if (!admin && !permissions?.editprocess) {
       logger.info(`MIGRATE [${oldId} -> ${newId}] => Migration Failed! User lacks authorization`)
       return res.status(StatusCodes.UNAUTHORIZED).json({
         message: "User doesn't have authorization to execute this operation",
@@ -60,8 +60,8 @@ export async function migrate(
       logger.debug(`MIGRATE [${oldId} -> ${newId}] => Migrating process...`)
 
       // Perform Migration
-      await prisma.permissions.update({
-        where: { id: oldId },
+      await prisma.permissions.updateMany({
+        where: { person_id: oldId, process_id: processId },
         data: { isMain: false }, // remove isMain from the previous main therapist
       })
 
