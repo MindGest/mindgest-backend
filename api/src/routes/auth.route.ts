@@ -1,7 +1,5 @@
 import { Router } from "express"
 
-import cookieParser from "cookie-parser"
-
 import schemas from "../utils/schemas"
 import controller from "../controllers/auth.controller"
 import middleware from "../middleware/api.middleware"

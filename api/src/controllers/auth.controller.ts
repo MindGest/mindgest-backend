@@ -28,6 +28,7 @@ import {
 } from "../utils/types"
 
 import { User } from "../utils/schemas"
+import { randomUUID } from "crypto"
 
 export async function register(req: Request<{}, {}, RegistrationBody>, res: Response) {
   try {
@@ -63,7 +64,19 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
       },
     })
 
+    // Build Response Payload
+    let body = {
+      name: person.name,
+      email: person.email,
+      address: person.address,
+      birthDate: person.birth_date,
+      phoneNumber: person.phone_number,
+      taxNumber: person.tax_number,
+      verified: person.verified,
+    }
+
     // Create entry in the table, associated with the user's role
+    let payload = null
     switch (req.body.role) {
       case User.ACCOUNTANT:
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (accountant)...`)
@@ -92,11 +105,11 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
             person: { connect: { id: person.id } },
           },
         })
+        payload = { ...body, admin: true }
         break
       case User.THERAPIST: {
         // Insert therapist in the therapist table
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (therapist)...`)
-
         const speciality = await prisma.speciality.findUnique({
           where: {
             speciality: req.body.speciality,
@@ -111,7 +124,7 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
         }
 
         // Create Therapist
-        await prisma.therapist.create({
+        const therapist = await prisma.therapist.create({
           data: {
             license: req.body.license,
             health_system: req.body.healthSystem,
@@ -128,6 +141,14 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
           },
         })
 
+        let tmp = {
+          ...body,
+          license: therapist.license,
+          healthSystem: therapist.health_system,
+          extern: therapist.extern,
+          speciality: speciality.speciality,
+        }
+
         // Add therapist as an admin too
         logger.debug(`REGISTER [${req.body.email}] => Creating a table entry (admin)...`)
         if ((await prisma.admin.count()) < 4) {
@@ -136,10 +157,30 @@ export async function register(req: Request<{}, {}, RegistrationBody>, res: Resp
               person: { connect: { id: person.id } },
             },
           })
+          payload = { ...tmp, admin: true }
         }
         break
       }
     }
+
+    // Send Notification To Admins
+    let uuid = randomUUID()
+    for (let admin of await prisma.admin.findMany()) {
+      logger.debug(
+        `REGISTER [${req.body.email}] => Generating notification for admin user ${admin.person_id}`
+      )
+      await prisma.notifications.create({
+        data: {
+          person: { connect: { id: admin.person_id } },
+          data: JSON.stringify(payload),
+          type: "register",
+          settled: false,
+          seen: false,
+          ref: uuid,
+        },
+      })
+    }
+
     logger.info(`REGISTER [${req.body.email}] => Account Created!`)
     res.status(StatusCodes.CREATED).json({
       message: "The user account was created successfully",
