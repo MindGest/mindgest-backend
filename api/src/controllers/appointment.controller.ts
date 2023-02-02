@@ -176,9 +176,9 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       var patients: any = []
       for (let e = 0; e < patient_process.length; e++) {
         let patient = await prisma.person.findFirst({
-          where: {id: patient_process[e].patient_person_id}
+          where: { id: patient_process[e].patient_person_id },
         })
-        patients.push(patient?.name);
+        patients.push(patient?.name)
       }
 
       for (let e = 0; e < appointment_process.length; e++) {
