@@ -598,6 +598,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         //process: processes[i]
         speciality: process.speciality_speciality,
         processRef: process.ref,
+        processId: process.id,
       },
     })
   } catch (error) {
