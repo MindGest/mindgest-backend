@@ -589,6 +589,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         appointmentStartTime: appointment.slot_start_date,
         appointmentEndTime: appointment.slot_end_date,
         appointmentRoom: appointment.room.name,
+        appointmentId: appointment.slot_id,
         //appointment: appointmentInfo,
         mainTherapist: mainTherapist?.name,
         collaborators: collaborators,
