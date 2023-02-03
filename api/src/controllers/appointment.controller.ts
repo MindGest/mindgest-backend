@@ -63,10 +63,10 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       }
     } else if (callerRole == "therapist") {
       isTherapist = true
-      therapistId = req.body.filterId
+      therapistId = callerId
     } else if (callerRole == "intern") {
       isIntern = true
-      internId = req.body.filterId
+      internId = callerId
     }
 
     // all appointments
@@ -487,6 +487,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
       select: {
         slot_start_date: true,
         slot_end_date: true,
+        archived_date: true,
         slot_id: true,
         room: { select: { name: true } },
       },
@@ -589,6 +590,8 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         appointmentStartTime: appointment.slot_start_date,
         appointmentEndTime: appointment.slot_end_date,
         appointmentRoom: appointment.room.name,
+        appointmentArchived: appointment.archived_date == null ? false : true,
+        appointmentId: appointment.slot_id,
         //appointment: appointmentInfo,
         mainTherapist: mainTherapist?.name,
         collaborators: collaborators,
@@ -598,6 +601,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         //process: processes[i]
         speciality: process.speciality_speciality,
         processRef: process.ref,
+        processId: process.id,
       },
     })
   } catch (error) {
