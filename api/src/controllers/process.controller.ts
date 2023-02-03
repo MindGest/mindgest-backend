@@ -667,7 +667,13 @@ export async function edit(req: Request<ProcessIDPrams, {}, ProcessEditBody>, re
 
 export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Response) {
   try {
-    var decoded = res.locals.token
+    var decodedToken = res.locals.token
+
+    // otbain the caller properties
+    var callerId = decodedToken.id
+    var callerRole = decodedToken.role
+    var callerIsAdmin = decodedToken.admin
+
     var processId = parseInt(req.params.processId)
 
     // check if the process exists.
@@ -679,55 +685,140 @@ export async function appointments(req: Request<ProcessIDPrams, {}, {}>, res: Re
       })
     }
 
-    var appointments = await prisma.appointment_process.findMany({
-      where: {
-        process_id: processId,
-      },
+    var allAppointmentsInfo: any = []
+    // get the appointments of the process
+    var appointment_process = await prisma.appointment_process.findMany({
+      where: { process_id: process.id },
     })
+    // get the interns of the process
+    var intern_process = await prisma.intern_process.findMany({
+      where: { process_id: process.id },
+    })
+    var interns: any = []
+    var intern
+    for (let e = 0; e < intern_process.length; e++) {
+      intern = await prisma.intern.findFirst({
+        where: { person_id: intern_process[e].intern_person_id },
+        include: {
+          person: {
+            select: {
+              name: true,
+              // email: true,
+              // address: true,
+              // birth_date: true,
+              // phone_number: true
+            },
+          },
+        },
+      })
+      interns.push(intern?.person.name)
+    }
 
-    var infoAppointments = []
+    // get the therapists of the process
+    var therapist_process = await prisma.therapist_process.findMany({
+      where: { process_id: process.id },
+    })
+    var therapists: any = []
+    var therapist
+    for (let e = 0; e < therapist_process.length; e++) {
+      therapist = await prisma.therapist.findFirst({
+        where: { person_id: therapist_process[e].therapist_person_id },
+        select: {
+          //extern: true,
+          //cedula: true,
+          //healthsystem: true,
+          person: {
+            select: {
+              name: true,
+              //email: true,
+              //address: true,
+              //birth_date: true,
+              //phone_number: true
+            },
+          },
+        },
+      })
+      therapists.push(therapist?.person.name)
+    }
 
-    for (var appointmentProcess of appointments) {
-      var apointment = await prisma.appointment.findUnique({
-        where: {
-          slot_id: appointmentProcess.appointment_slot_id,
+    // get the patients of the process
+    var patient_process = await prisma.patient_process.findMany({
+      where: { process_id: process.id },
+    })
+    var patients: any = []
+    for (let e = 0; e < patient_process.length; e++) {
+      let patient = await prisma.person.findFirst({
+        where: { id: patient_process[e].patient_person_id },
+      })
+      patients.push(patient?.name)
+    }
+
+    for (let e = 0; e < appointment_process.length; e++) {
+      // obtain the appointment info
+      var appointmentInfo = await prisma.appointment.findFirst({
+        where: { slot_id: appointment_process[e].appointment_slot_id },
+        select: {
+          slot_id: true,
+          online: true,
+          slot_start_date: true,
+          slot_end_date: true,
+          room: {
+            select: { name: true },
+          },
+          pricetable: {
+            select: {
+              type: true,
+              price: true,
+            },
+          },
         },
       })
 
-      var room = await prisma.room.findUnique({
-        where: {
-          id: apointment?.room_id,
-        },
+      // get care takers
+      let process_liable = await prisma.process_liable.findMany({
+        where: { process_id: process.id },
       })
+      let careTakers = []
+      for (let i = 0; i < process_liable.length; i++) {
+        let careTaker = await prisma.liable.findFirst({
+          where: { id: process_liable[i].liable_id },
+        })
+        careTakers.push(careTaker?.name)
+      }
 
-      var type = await prisma.pricetable.findUnique({
-        where: {
-          id: apointment?.pricetable_id,
-        },
-      })
-
-      let date = apointment?.slot_start_date
-      const formattedDate = date?.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-
+      // if it is paid
+      // get the receipt (if null or not paid, it is not paid )
       let receipt = await prisma.receipt.findFirst({
-        where: {
-          appointment_slot_id: apointment?.slot_id,
-        },
+        where: { appointment_slot_id: appointment_process[e].appointment_slot_id },
       })
+      let paid = false
+      if (receipt != null && receipt.payed) {
+        paid = true
+      }
 
-      infoAppointments.push({
-        data: formattedDate,
-        estado: receipt?.payed ? "Pago" : "Por Pagar",
-        valor: type?.price,
+      if (!appointmentInfo) {
+        continue
+      }
+      // build data for the current appointment
+      allAppointmentsInfo.push({
+        appointmentId: appointmentInfo.slot_id,
+        appointmentStartTime: appointmentInfo.slot_start_date,
+        appointmentEndTime: appointmentInfo.slot_end_date,
+        appointmentRoom: appointmentInfo.room.name,
+        //appointment: appointmentInfo,
+        therapists: therapists,
+        //interns: interns,
+        patients: patients,
+        careTakers: careTakers,
+        paid: paid,
+        processId: process.id,
+        speciality: process.speciality_speciality,
       })
     }
 
-    return res.status(StatusCodes.OK).json({
-      message: infoAppointments,
+    res.status(StatusCodes.OK).json({
+      message: "It is working.",
+      data: allAppointmentsInfo,
     })
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
