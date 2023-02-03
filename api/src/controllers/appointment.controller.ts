@@ -487,6 +487,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
       select: {
         slot_start_date: true,
         slot_end_date: true,
+        archived_date: true,
         slot_id: true,
         room: { select: { name: true } },
       },
@@ -589,6 +590,7 @@ export async function infoAppointment(req: Request<{}, {}, AppointmentInfo>, res
         appointmentStartTime: appointment.slot_start_date,
         appointmentEndTime: appointment.slot_end_date,
         appointmentRoom: appointment.room.name,
+        appointmentArchived: appointment.archived_date == null ? false : true,
         appointmentId: appointment.slot_id,
         //appointment: appointmentInfo,
         mainTherapist: mainTherapist?.name,
