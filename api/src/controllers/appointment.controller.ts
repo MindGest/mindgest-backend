@@ -63,10 +63,10 @@ export async function getAllAppointments(req: Request<{}, {}, AppointmentsList>,
       }
     } else if (callerRole == "therapist") {
       isTherapist = true
-      therapistId = callerId;
+      therapistId = callerId
     } else if (callerRole == "intern") {
       isIntern = true
-      internId = callerId;
+      internId = callerId
     }
 
     // all appointments
