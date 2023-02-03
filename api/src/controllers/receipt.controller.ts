@@ -14,7 +14,7 @@ export async function pay(req: Request, res: Response) {
   const { id, role, admin } = res.locals.token
   logger.info(`PAY [user-id: ${id}] => Authorization to pay/regress receipt payment granted...`)
 
-  if (!admin || role !== User.ACCOUNTANT) {
+  if (!admin && role !== User.ACCOUNTANT) {
     logger.info(
       `RECEIPT [user-id: ${id}] => Authorization to pay receipt revoked (insufficient permissions)`
     )
