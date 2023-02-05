@@ -56,10 +56,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     env_file:
-<<<<<<< HEAD
-=======
       - ../api/.env
->>>>>>> dev
       - .env
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
